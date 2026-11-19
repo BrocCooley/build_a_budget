@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3efe6">
+<title>Build a Budget</title>
+<meta name="description" content="A two-minute budgeting game about food insecurity: one cashier's paycheck, thirty days, and what's left for food.">
+<style>
+:root{
+  --bg:#f3efe6; --card:#fffdf8; --paper:#fffef9; --ink:#17201c; --muted:#5f665f; --faint:#8b918a; --line:#e3ddd0;
+  --accent:#1d6b52; --accent-ink:#ffffff; --accent-soft:#dcebe3; --accent-deep:#124a38;
+  --red:#c0331f; --red-soft:#f6ddd7;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Charter,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+button{font:inherit;color:inherit}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+
+/* ---------- Meter ---------- */
+.meter{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:12px 16px 10px;border-bottom:1px solid var(--line);transition:transform .4s var(--ease)}
+.meter.idle{transform:translateY(-100%);position:absolute;left:0;right:0;pointer-events:none}
+.meter-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.meter-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
+.day{font:700 11px/1 var(--mono);letter-spacing:.06em;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.meter-main{display:flex;align-items:baseline;gap:10px;margin-top:3px;min-height:38px}
+.meter-amt{font:700 32px/1.1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;transition:color .3s}
+.meter-amt.neg{color:var(--red)}
+.meter-amt.bump{animation:bump .45s var(--ease)}
+@keyframes bump{30%{transform:scale(1.06)}}
+.ebt{font:700 12px/1 var(--mono);color:var(--accent-deep);background:var(--accent-soft);border-radius:6px;padding:5px 7px;align-self:center;animation:pop .5s var(--ease)}
+@keyframes pop{from{opacity:0;transform:scale(.6)}}
+.meter-delta{margin-left:auto;font:700 14px/1 var(--mono);font-variant-numeric:tabular-nums;opacity:0;transform:translateY(4px);transition:opacity .25s,transform .25s}
+.meter-delta.show{opacity:1;transform:none}
+.meter-delta.down{color:var(--red)}
+.meter-delta.up{color:var(--accent)}
+.meter-bar{height:5px;background:var(--line);border-radius:3px;margin-top:8px;overflow:hidden}
+.meter-fill{height:100%;width:0;background:var(--accent);border-radius:3px;transition:width .8s var(--ease),background .3s}
+.meter-fill.low{background:var(--red)}
+
+/* ---------- Layout ---------- */
+main{flex:1;padding:20px 16px 36px}
+main.enter{animation:enter .45s var(--ease)}
+@keyframes enter{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+main.shake{animation:shake .5s ease}
+@keyframes shake{15%,55%{transform:translateX(-7px)}35%,75%{transform:translateX(7px)}}
+.dots{display:flex;gap:5px;margin:0 0 18px}
+.dots i{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.dots i.done{background:var(--ink)}
+.dots i.now{background:var(--accent)}
+.kicker{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1,h2{font-family:var(--serif);font-weight:700;letter-spacing:-.015em;margin:0}
+h1{font-size:44px;line-height:1.02;margin-bottom:16px}
+h2{font-size:30px;line-height:1.08;margin-bottom:10px}
+p{margin:0 0 14px}
+.lead{font-size:17px}
+.muted{color:var(--muted)}
+.cite{display:block;font-size:11.5px;color:var(--faint);margin-top:3px;font-weight:400}
+.small{font-size:14px}
+.red{color:var(--red)}
+.accent{color:var(--accent)}
+.mono{font-family:var(--mono)}
+
+/* ---------- Choice cards ---------- */
+.opts{margin-top:18px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 16px 15px;margin:0 0 12px;cursor:pointer;min-height:72px;position:relative;transition:border-color .15s,transform .15s var(--ease),box-shadow .2s,opacity .25s;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.opt:hover{border-color:var(--ink);box-shadow:0 6px 18px -10px rgba(0,0,0,.25)}
+.opt:active{transform:scale(.98)}
+.opt.picked{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.015)}
+.opts.locked .opt:not(.picked){opacity:.35}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:700;font-size:17px}
+.opt-price{font:700 16px/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.opt-sub{font-size:14px;color:var(--muted);margin-top:5px;padding-right:4px}
+.tag{display:inline-block;font:700 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:5px;background:var(--bg);color:var(--muted);margin-top:8px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:17px 16px;border-radius:16px;border:0;background:var(--ink);color:#fff;font-weight:700;font-size:17px;cursor:pointer;margin:0 0 10px;transition:transform .12s,background .2s}
+.btn:hover{background:#000}
+.btn:active{transform:scale(.98)}
+.btn.go{background:var(--accent)}
+.btn.go:hover{background:var(--accent-deep)}
+.btn.secondary{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.secondary:hover{background:var(--card)}
+.btn.link{background:none;color:var(--muted);padding:12px;font-size:15px;font-weight:600}
+.btn .arr{transition:transform .2s}
+.btn:hover .arr{transform:translateX(3px)}
+.actions{margin-top:24px}
+
+.note{background:var(--accent-soft);border-radius:14px;padding:13px 15px;font-size:15px;margin:0 0 14px}
+.note.bad{background:var(--red-soft)}
+.note.plain{background:var(--card);border:1px solid var(--line)}
+
+/* ---------- Intro ---------- */
+.hero{padding-top:12px}
+.hero h1 span{display:block;animation:rise .7s var(--ease) both}
+.hero h1 span:nth-child(2){animation-delay:.15s}
+.hero h1 span:nth-child(3){animation-delay:.3s;color:var(--accent)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.who{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 22px}
+.who span{font:600 13px/1 var(--sans);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 11px}
+
+/* ---------- Phone notification ---------- */
+.notif{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:20px;padding:13px 14px;box-shadow:0 14px 34px -16px rgba(0,0,0,.35);margin:4px 0 20px;animation:drop .65s cubic-bezier(.2,1.3,.35,1) both}
+@keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.96)}}
+.notif-icon{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font:800 12px/1 var(--mono);color:#fff;background:var(--ink);letter-spacing:.02em}
+.notif-icon.red{background:var(--red)}
+.notif-icon.green{background:var(--accent)}
+.notif-body{flex:1;min-width:0}
+.notif-head{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-weight:600}
+.notif-title{font-weight:700;font-size:15.5px;margin-top:2px}
+.notif-text{font-size:14.5px;color:var(--ink)}
+
+/* ---------- Autopay list ---------- */
+.auto{list-style:none;padding:0;margin:16px 0}
+.auto li{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px dashed var(--line);animation:rise .5s var(--ease) both}
+.auto li:nth-child(2){animation-delay:.12s}.auto li:nth-child(3){animation-delay:.24s}.auto li:nth-child(4){animation-delay:.36s}
+.auto .chk{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.auto .tot{border-bottom:0;font-weight:700}
+.auto .amt{margin-left:auto;font-family:var(--mono);font-weight:700}
+
+/* ---------- Food calendar ---------- */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:16px 0 10px}
+.cal div{aspect-ratio:1;border-radius:9px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font:600 12px/1 var(--mono);color:var(--faint);transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease)}
+.cal div.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cal div.off{background:var(--red-soft);border-color:transparent;color:var(--red);text-decoration:line-through}
+.cal div.last{transform:scale(1.12);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--red)}
+.cal-key{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.cal-key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.verdict{font-family:var(--serif);font-size:30px;line-height:1.1;font-weight:700;margin:4px 0 12px;opacity:0;transition:opacity .4s}
+.verdict.show{opacity:1}
+.math{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:12px}
+.math b{font-family:var(--mono);text-align:right}
+.math .cite{grid-column:1/-1;margin-top:-4px}
+
+/* ---------- Results ---------- */
+.big{font:800 64px/0.95 var(--sans);letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin:6px 0 8px}
+.headline{font-family:var(--serif);font-size:34px;line-height:1.05;font-weight:700;margin:0 0 10px}
+.nosnap{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:15px}
+.nosnap b{font-family:var(--mono);font-size:17px}
+
+.receipt{position:relative;background:var(--paper);font:13.5px/1.55 var(--mono);padding:20px 18px 24px;margin:22px 0 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.3);animation:print 1.1s var(--ease) both}
+@keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-12px)}to{clip-path:inset(0 0 -20px 0);transform:none}}
+.receipt::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:radial-gradient(circle at 7px 10px,transparent 6.5px,var(--paper) 7px) 0 0/14px 10px repeat-x}
+.receipt h3{font:700 13px/1.3 var(--mono);text-align:center;letter-spacing:.14em;margin:0}
+.receipt .sub{text-align:center;color:var(--muted);font-size:12px;margin:2px 0 12px}
+.receipt .rl{display:flex;gap:6px;align-items:baseline}
+.receipt .rl .d{flex:1;border-bottom:1px dotted #bdb6a6;transform:translateY(-4px)}
+.receipt .rl.tot{font-weight:700}
+.receipt hr{border:0;border-top:1px dashed #bdb6a6;margin:8px 0}
+.receipt .due{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:18px;margin-top:10px}
+.receipt .stamp{display:inline-block;transform:rotate(-8deg);border:2.5px solid var(--red);color:var(--red);font:800 15px/1 var(--mono);letter-spacing:.08em;padding:6px 8px;border-radius:6px;opacity:0;animation:stamp .35s 1.2s cubic-bezier(.3,1.6,.5,1) forwards}
+.receipt .stamp.ok{border-color:var(--accent);color:var(--accent)}
+@keyframes stamp{from{opacity:0;transform:rotate(-8deg) scale(1.8)}to{opacity:.9;transform:rotate(-8deg) scale(1)}}
+
+/* ---------- Final ---------- */
+.stat{padding:20px 0;border-bottom:1px solid var(--line)}
+.stat:last-of-type{border-bottom:0}
+.stat .big{font-size:76px}
+.stat p{font-size:17px}
+
+.credit{text-align:center;font:600 12px/1.4 var(--mono);letter-spacing:.06em;color:var(--faint);margin:28px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+.sources{padding-left:18px;margin:0 0 16px}
+.sources li{margin:0 0 12px;font-size:14px;word-break:break-word}
+.sources a{color:var(--accent)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 16px}
+
+@media (max-width:360px){ h1{font-size:38px} h2{font-size:26px} .big{font-size:54px} }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.001s!important;animation-delay:0s!important;transition:none!important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="meter idle" id="meter" aria-live="polite">
+    <div class="meter-row">
+      <span class="meter-label">Money left this month</span>
+      <span class="day" id="day">DAY 1 / 30</span>
+    </div>
+    <div class="meter-main">
+      <span class="meter-amt" id="meterAmt">$0</span>
+      <span class="ebt" id="ebt" hidden></span>
+      <span class="meter-delta" id="meterDelta"></span>
+    </div>
+    <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+  </header>
+  <main id="screen"></main>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIG — every number used in the game lives here.
+   Each value has its source. Items marked ESTIMATE are approximations.
+   ===================================================================== */
+const CONFIG = {
+  hoursPerYear: 2080,            // 40 hrs/week × 52 weeks (full time)
+  payrollTaxRate: 0.0765,        // Social Security 6.2% + Medicare 1.45% (FICA). Take-home = gross × (1 − 0.0765) = gross × 0.9235
+
+  cities: {
+    fargo: {
+      name: "Fargo, ND",
+      wage: 16.07,               // BLS OEWS May 2025, median hourly wage, Cashiers (41-2011), Fargo ND-MN metro
+      wageLabel: "Median cashier pay",
+      wageCite: "BLS, 2025",
+      rent: {
+        oneBR: 917,              // HUD FY2026 Fair Market Rent, 1BR, Fargo ND-MN MSA
+        twoBR: 1112              // HUD FY2026 Fair Market Rent, 2BR, Fargo ND-MN MSA
+      },
+      rentCite: "HUD, 2026",
+      childCare: {
+        center: 873,             // Child Care Aware of America / First Five Years Fund — center care, 4-year-old, ND (monthly)
+        home: 847                // Child Care Aware of America / First Five Years Fund — family/home-based care, 4-year-old, ND (monthly)
+      },
+      childCareCite: { center: "Child Care Aware", home: "Child Care Aware" },
+      busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
+      stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
+      stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009."
+    },
+    minneapolis: {
+      name: "Minneapolis, MN",
+      wage: 16.37,               // City of Minneapolis minimum wage, effective Jan 1, 2026
+      wageLabel: "Minneapolis minimum wage",
+      wageCite: "City of Minneapolis, 2026",
+      rent: {
+        oneBR: 1405,             // HUD FY2026 Fair Market Rent, 1BR, Minneapolis-St. Paul-Bloomington MSA
+        twoBR: 1709              // HUD FY2026 Fair Market Rent, 2BR, Minneapolis-St. Paul-Bloomington MSA
+      },
+      rentCite: "HUD, 2026",
+      childCare: {
+        center: 1500,            // Economic Policy Institute, via Minnesota Reformer (2025) — center care, 4-year-old
+        home: 950                // ESTIMATE — home-based care, 4-year-old, Minneapolis
+      },
+      childCareCite: { center: "EPI, 2025", home: "estimate" },
+      busPass: 76,               // ESTIMATE — Metro Transit monthly pass
+      stateMinWage: null,
+      stateMinWageNote: null
+    }
+  },
+
+  transport: {
+    carMonthly: 350              // ESTIMATE — insurance + gas + payment on an older car
+  },
+
+  basicsMonthly: 100,            // ESTIMATE — phone, toiletries, kid's clothes
+
+  surprise: {
+    amount: 400,                 // Matches the Federal Reserve SHED "$400 emergency" benchmark
+    cardMonthlyPayment: 40,      // ESTIMATE — monthly payment the player makes on the card
+    cardAPR: 0.22                // ESTIMATE — typical credit card interest rate
+  },
+
+  food: {
+    usdaMonthly: 500,            // USDA Thrifty Food Plan, parent + 4-year-old (~$500/mo). Adult female 20–50 = $248.50/mo (Jan 2026). VERIFY against current USDA Cost of Food report
+    adultFemale20to50: 248.50,   // USDA Thrifty Food Plan, Jan 2026
+    convenienceMarkup: 0.25,     // ESTIMATE — no car, so you shop at the nearby convenience store: food costs +25%
+    cite: "USDA, 2026"
+  },
+
+  snap: {                        // Federal SNAP benefit formula, FY2027 (Oct 1, 2026 – Sep 30, 2027), 48 states + DC
+    max2Person: 562,             // USDA FNS FY2027 COLA memo — maximum allotment, 2-person household
+    earnedIncomeDeduction: 0.20, // Federal rule: 20% of earned income is not counted
+    standardDeduction: 217,      // USDA FNS FY2027 COLA memo — standard deduction, households of 1–3
+    excessShelterCap: 769,       // USDA FNS FY2027 COLA memo — max excess shelter deduction (no elderly/disabled member)
+    benefitReduction: 0.30,      // Benefit = max allotment − 30% of net income
+    grossLimit2Person: 3608,     // 200% of poverty, 2-person household (ND DHS SNAP Manual, Appendix B, eff. 10/1/2026). ND and MN both use 200% under broad-based categorical eligibility — VERIFY MN
+    // Child care is fully deductible (dependent care deduction).
+    // Shelter cost = HUD Fair Market Rent, which already includes tenant-paid utilities, so no separate utility allowance is added.
+    cite: "USDA, 2026"
+  },
+
+  daysInMonth: 30,
+
+  stats: {
+    foodInsecure2024: 13.7,      // USDA ERS, Household Food Security in the United States in 2024 — final edition of the report
+    cover400WithCash: 63,        // Federal Reserve SHED 2025 — % of adults who would cover a $400 expense with cash or equivalent
+    under50kCant100: "4 in 10"   // Federal Reserve SHED 2025 — adults earning under $50k who couldn't cover $100 from savings
+  }
+};
+
+/* =====================================================================
+   CALCULATIONS — pure functions (also used by test-paths.js)
+   ===================================================================== */
+// <calc>
+function takeHomeFor(wage) {
+  const gross = wage * CONFIG.hoursPerYear / 12;
+  return { gross, net: gross * (1 - CONFIG.payrollTaxRate) };
+}
+
+function cardPayoff() {
+  const s = CONFIG.surprise;
+  let bal = s.amount, months = 0, total = 0;
+  const r = s.cardAPR / 12;
+  while (bal > 0.005 && months < 600) {
+    bal += bal * r;
+    const p = Math.min(s.cardMonthlyPayment, bal);
+    bal -= p; total += p; months++;
+  }
+  return { months, total };
+}
+
+function surpriseCost(choice) {
+  if (choice === "pay") return CONFIG.surprise.amount;
+  if (choice === "card") return CONFIG.surprise.cardMonthlyPayment;
+  return 0;
+}
+
+// Monthly SNAP benefit (federal formula). Returns 0 if over the gross income limit.
+function snapBenefit(gross, rent, childCare) {
+  const s = CONFIG.snap;
+  if (gross > s.grossLimit2Person) return 0;
+  const adjusted = Math.max(0, gross * (1 - s.earnedIncomeDeduction) - s.standardDeduction - childCare);
+  const excessShelter = Math.min(s.excessShelterCap, Math.max(0, rent - adjusted / 2));
+  const netIncome = Math.max(0, adjusted - excessShelter);
+  return Math.max(0, Math.floor(s.max2Person - Math.ceil(s.benefitReduction * netIncome)));
+}
+
+function pathAtWage(city, c, wage) {
+  const { gross, net } = takeHomeFor(wage);
+  const housing = city.rent[c.housing];
+  const care = city.childCare[c.care];
+  const transport = c.transport === "car" ? CONFIG.transport.carMonthly : city.busPass;
+  const basics = CONFIG.basicsMonthly;
+  const surprise = surpriseCost(c.surprise);
+  const leftover = net - housing - care - transport - basics - surprise;   // cash left after bills
+  const snap = snapBenefit(gross, housing, care);                         // can only be spent on food
+  const foodMoney = snap + Math.max(0, leftover);
+  const need = CONFIG.food.usdaMonthly * (c.transport === "bus" ? 1 + CONFIG.food.convenienceMarkup : 1);
+  const foodGap = Math.max(0, need - foodMoney);                          // short on groceries
+  const billsBehind = Math.max(0, -leftover);                             // short on rent/bills (SNAP can't pay these)
+  const shortfall = foodGap + billsBehind;
+  const gap = shortfall > 0 ? shortfall : need - foodMoney;               // > 0 short, <= 0 = money to spare
+  const gapNoSnap = need - leftover;                                      // same path, no SNAP
+  const daysFed = Math.min(CONFIG.daysInMonth, Math.floor(foodMoney / need * CONFIG.daysInMonth)); // days the food budget covers
+  return { wage, gross, net, housing, care, transport, basics, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed };
+}
+
+function computePath(cityKey, c, wageOverride) {
+  const city = CONFIG.cities[cityKey];
+  const wage = wageOverride != null ? wageOverride : city.wage;
+  const r = pathAtWage(city, c, wage);
+  r.conscious = (c.housing === "oneBR") + (c.care === "home") + (c.transport === "bus") + (c.surprise === "pay");
+  // Lowest wage (to the cent) that closes the gap. Scanned, because SNAP shrinks as pay rises
+  // and drops to $0 at the income limit, so the relationship isn't a straight line.
+  r.wageToClose = null;
+  if (r.gap > 0) {
+    for (let cents = Math.round(wage * 100) + 1; cents <= 10000; cents++) {
+      if (pathAtWage(city, c, cents / 100).gap <= 0) { r.wageToClose = cents / 100; break; }
+    }
+  }
+  return r;
+}
+// </calc>
+
+/* =====================================================================
+   UI
+   ===================================================================== */
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => (n < -0.5 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+const fmtWage = (n) => "$" + n.toFixed(2);
+const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const buzz = (p) => { try { if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(p); } catch (e) {} };
+const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
+
+const S = { screen: "intro", city: null, wageOverride: null, c: {} };
+const FLOW = ["housing", "care", "transport", "basics", "snap", "surprise", "food"];
+const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, food: 30, results: 30 };
+
+function city() { return CONFIG.cities[S.city]; }
+function path() { return computePath(S.city, S.c, S.wageOverride); }
+
+/* ---------- Meter ---------- */
+let meterShown = 0, meterRaf = null, deltaTimer = null;
+function meterMax() { return S.city ? takeHomeFor(S.wageOverride ?? city().wage).net : 1; }
+function cashBalance() {
+  if (!S.city) return null;
+  const c = S.c, ct = city();
+  let bal = meterMax();
+  if (c.housing) bal -= ct.rent[c.housing];
+  if (c.care) bal -= ct.childCare[c.care];
+  if (c.transport) bal -= c.transport === "car" ? CONFIG.transport.carMonthly : ct.busPass;
+  if (c.basics) bal -= CONFIG.basicsMonthly;
+  if (c.surprise) bal -= surpriseCost(c.surprise);
+  return bal;
+}
+function updateMeter() {
+  const m = $("meter"), amt = $("meterAmt"), fill = $("meterFill"), d = $("meterDelta"), ebt = $("ebt");
+  const target = cashBalance();
+  const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results");
+  m.classList.toggle("idle", !inGame);
+  if (!inGame) return;
+  $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
+  if (S.c.snap) { const s = path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
+  else ebt.hidden = true;
+
+  const from = meterShown, diff = target - from;
+  if (Math.abs(diff) < 0.5) return;
+  d.textContent = (diff < 0 ? "−" : "+") + fmt(Math.abs(diff));
+  d.className = "meter-delta show " + (diff < 0 ? "down" : "up");
+  clearTimeout(deltaTimer); deltaTimer = setTimeout(() => d.classList.remove("show"), 1700);
+  const pct = target / meterMax() * 100;
+  fill.style.width = Math.max(0, Math.min(100, pct)) + "%";
+  fill.classList.toggle("low", pct < 15);
+  amt.classList.remove("bump"); void amt.offsetWidth; amt.classList.add("bump");
+  cancelAnimationFrame(meterRaf);
+  const dur = reduceMotion ? 0 : 800, t0 = performance.now();
+  const tick = (t) => {
+    const k = dur ? Math.min(1, (t - t0) / dur) : 1;
+    const v = k < 1 ? from + diff * (1 - Math.pow(1 - k, 3)) : target;
+    meterShown = v;
+    amt.textContent = fmt(v);
+    amt.classList.toggle("neg", v < -0.5);
+    if (k < 1) meterRaf = requestAnimationFrame(tick);
+  };
+  meterRaf = requestAnimationFrame(tick);
+}
+
+/* ---------- Building blocks ---------- */
+const dots = () => {
+  const i = FLOW.indexOf(S.screen);
+  return `<div class="dots" aria-label="Step ${i + 1} of ${FLOW.length}">${FLOW.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join("")}</div>`;
+};
+const opt = (act, val, title, price, sub, tag) =>
+  `<button class="opt" data-act="${act}" data-val="${val}"><div class="opt-top"><span>${title}</span><span class="opt-price">${price}</span></div>${sub ? `<div class="opt-sub">${sub}</div>` : ""}${tag ? `<span class="tag">${tag}</span>` : ""}</button>`;
+const notif = (icon, iconClass, app, title, text) =>
+  `<div class="notif" role="status"><div class="notif-icon ${iconClass}">${icon}</div><div class="notif-body"><div class="notif-head"><span>${app}</span><span>now</span></div><div class="notif-title">${title}</div><div class="notif-text">${text}</div></div></div>`;
+const next = (to, label, cls = "") => `<button class="btn ${cls}" data-act="next" data-val="${to}">${label} <span class="arr">→</span></button>`;
+
+/* ---------- Screens ---------- */
+const screens = {
+  intro() {
+    const cityBtn = (key) => {
+      const c = CONFIG.cities[key];
+      return opt("city", key, c.name, fmtWage(c.wage) + "/hr",
+        `${c.wageLabel} → <b>${fmt(takeHomeFor(c.wage).net)}</b>/mo after payroll tax<span class="cite">(${c.wageCite})</span>`);
+    };
+    return `<div class="hero">
+      <p class="kicker">Build a Budget · a 2-minute game</p>
+      <h1><span>One paycheck.</span><span>Thirty days.</span><span>Make it work.</span></h1>
+      <div class="who"><span>Single parent</span><span>Kid, age 4</span><span>Cashier, 40 hrs/week</span></div>
+      <p class="lead">Make the smart choice at every step. Then see if the food lasts.</p>
+      <div class="opts"><p class="kicker" style="margin-top:20px">Choose your city</p>${cityBtn("fargo")}${cityBtn("minneapolis")}</div>
+    </div>`;
+  },
+
+  housing() {
+    const r = city().rent;
+    const banner = S.wageOverride
+      ? `<div class="note">Replay: this time you earn <b>${fmtWage(S.wageOverride)}/hr</b> instead of ${fmtWage(city().wage)}. Same choices. Let's see.</div>` : "";
+    return `${dots()}${banner}<p class="kicker">Day 1 · Rent is due</p>
+      <h2>Where do you live?</h2>
+      <p class="muted">Typical rent in ${city().name}.<span class="cite">(${city().rentCite})</span></p>
+      <div class="opts">
+      ${opt("housing", "oneBR", "1-bedroom", fmt(r.oneBR), "You and your kid share a room.", "Cheaper")}
+      ${opt("housing", "twoBR", "2-bedroom", fmt(r.twoBR), "Your kid gets their own room.")}
+      </div>`;
+  },
+
+  care() {
+    const cc = city().childCare, ci = city().childCareCite;
+    return `${dots()}<p class="kicker">Day 1 · You start your shift at 7</p>
+      <h2>Who watches your kid?</h2>
+      <p class="muted">Full-time care for a 4-year-old, every month.</p>
+      <div class="opts">
+      ${opt("care", "center", "Licensed center", fmt(cc.center), `Set hours, trained staff.<span class="cite">(${ci.center})</span>`)}
+      ${opt("care", "home", "Home-based daycare", fmt(cc.home), `A smaller group in a neighbor's home.<span class="cite">(${ci.home})</span>`, "Cheaper")}
+      </div>`;
+  },
+
+  transport() {
+    return `${dots()}<p class="kicker">Day 2 · Getting to work</p>
+      <h2>Car or bus?</h2>
+      <div class="opts">
+      ${opt("transport", "car", "Keep your old car", fmt(CONFIG.transport.carMonthly), `Payment, insurance, gas.<span class="cite">(estimate)</span>`)}
+      ${opt("transport", "bus", "Take the bus", fmt(city().busPass), `Catch: without a car, you shop at the corner store nearby. Food costs about 25% more.<span class="cite">(estimate)</span>`, "Cheaper")}
+      </div>`;
+  },
+
+  basics() {
+    return `${dots()}<p class="kicker">Day 6 · Autopay</p>
+      <h2>These happen no matter what.</h2>
+      <ul class="auto">
+        <li><span class="chk">✓</span>Phone bill</li>
+        <li><span class="chk">✓</span>Toiletries and household supplies</li>
+        <li><span class="chk">✓</span>Kid's clothes (they keep growing)</li>
+        <li class="tot">Basics<span class="amt">${fmt(CONFIG.basicsMonthly)}</span></li>
+      </ul>
+      <p class="cite">(estimate)</p>
+      <div class="actions">${next("snap", "Continue")}</div>`;
+  },
+
+  snap() {
+    const r = path();
+    const body = r.snap > 0
+      ? `${notif("EBT", "green", "SNAP · EBT card", "Your benefits are ready", `${fmt(r.snap)} was added to your EBT card.`)}
+         <h2>You qualified for SNAP.</h2>
+         <p class="lead">${fmt(r.snap)} a month in food assistance.<span class="cite">(${CONFIG.snap.cite})</span></p>
+         <div class="note plain small">SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.</div>`
+      : `${notif("EBT", "", "SNAP · Application", "Application denied", "Your income is over the limit.")}
+         <h2>No SNAP this time.</h2>
+         <p class="lead">At ${fmtWage(r.wage)}/hr, you earn too much to qualify.<span class="cite">(${CONFIG.snap.cite})</span></p>`;
+    return `${dots()}<p class="kicker">Day 10 · You applied for food assistance</p>${body}
+      <div class="actions">${next("surprise", "Continue")}</div>`;
+  },
+
+  surprise() {
+    const car = S.c.transport === "car";
+    const p = cardPayoff();
+    const n = car
+      ? notif("AUTO", "red", "Auto shop", "Your estimate is ready", `Brakes and a worn belt: <b>${fmt(CONFIG.surprise.amount)}</b>.`)
+      : notif("DDS", "red", "Dental office", "Treatment plan", `Your kid needs a filling: <b>${fmt(CONFIG.surprise.amount)}</b>.`);
+    if (S.c.surprise) {
+      const lines = {
+        pay: `Paid. The ${fmt(CONFIG.surprise.amount)} came out of what was left for food.`,
+        card: `The bill is paid. The debt isn't: ${fmt(CONFIG.surprise.cardMonthlyPayment)} this month, and every month for about ${p.months} months.`,
+        skip: car
+          ? "You skip the repair. The car still runs, for now. If it dies, so does your way to work."
+          : "You skip the dentist. The pain doesn't go away, and it gets more expensive the longer it waits."
+      };
+      return `${dots()}<p class="kicker">Day 17 · Something comes up</p>
+        <h2>${car ? "The car." : "Your kid's tooth."}</h2>
+        <div class="note ${S.c.surprise === "pay" ? "" : "bad"}">${lines[S.c.surprise]}</div>
+        <div class="actions">${next("food", "Go grocery shopping", "go")}</div>`;
+    }
+    return `${dots()}<p class="kicker">Day 17 · Something comes up</p>
+      ${n}
+      <h2>${car ? "The car needs work." : "Your kid's tooth hurts."}</h2>
+      <p class="muted">Only ${CONFIG.stats.cover400WithCash}% of U.S. adults could cover this with cash.<span class="cite">(Federal Reserve, 2025)</span></p>
+      <div class="opts">
+      ${opt("surprise", "pay", "Pay it now", fmt(CONFIG.surprise.amount), "No debt. It comes out of what's left for food.", "No debt")}
+      ${opt("surprise", "card", "Put it on a credit card", fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
+        `At ${Math.round(CONFIG.surprise.cardAPR * 100)}% interest, ${fmt(CONFIG.surprise.amount)} becomes about ${fmt(p.total)} over ${p.months} months.<span class="cite">(estimate)</span>`)}
+      ${opt("surprise", "skip", "Skip it", "$0", car ? "Keep driving and hope." : "Wait and hope it gets better.")}
+      </div>`;
+  },
+
+  food() {
+    const r = path();
+    const bus = S.c.transport === "bus";
+    const D = CONFIG.daysInMonth;
+    const cells = Array.from({ length: D }, (_, i) => `<div>${i + 1}</div>`).join("");
+    setTimeout(() => animateCalendar(r), 350);
+    return `${dots()}<p class="kicker">Day 1–30 · Groceries</p>
+      <h2>Will the food last?</h2>
+      <div class="math">
+        <span>Cash left after bills</span><b class="${r.leftover < 0 ? "red" : ""}">${fmt(r.leftover)}</b>
+        ${r.leftover < 0 ? `<span class="small red" style="grid-column:1/-1;margin-top:-4px">That's rent and bills you can't pay. Nothing left for food.</span>` : ""}
+        <span>SNAP (food only)</span><b>+${fmt(r.snap)}</b>
+        <span><b style="font-family:var(--sans);text-align:left">Food budget</b></span><b>${fmt(r.foodMoney)}</b>
+        <span>Cheapest healthy diet${bus ? ", corner-store prices" : ""}</span><b>${fmt(r.need)}</b>
+        <span class="cite">(${CONFIG.food.cite}${bus ? "; +25% estimate" : ""})</span>
+      </div>
+      <div class="cal" id="cal">${cells}</div>
+      <div class="cal-key"><span><i style="background:var(--accent)"></i>Food covered</span><span><i style="background:var(--red-soft)"></i>Not covered</span></div>
+      <div class="verdict" id="verdict"></div>
+      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${next("results", "See the month's receipt", "go")}</div>`;
+  },
+
+  results() {
+    const r = path();
+    const c = city();
+    const short = r.gap > 0;
+    const p = cardPayoff();
+    let head;
+    if (r.foodGap > 0) {
+      head = `<p class="headline">The food ran out on <span class="red">day ${r.daysFed + 1}</span>.</p>
+        <div class="big red">${fmt(r.foodGap)}</div>
+        <p class="lead">short of USDA's cheapest healthy diet, <b>even with SNAP</b>.${r.billsBehind > 0 ? ` And <b class="red">${fmt(r.billsBehind)}</b> behind on rent and bills.` : ""}</p>`;
+    } else if (r.billsBehind > 0) {
+      head = `<p class="headline">SNAP kept food on the table. It can't pay rent.</p>
+        <div class="big red">${fmt(r.billsBehind)}</div>
+        <p class="lead">behind on rent and bills this month.</p>`;
+    } else if (r.gap > -1) {
+      head = `<p class="headline">You made it. With <span class="accent">nothing</span> left.</p>
+        <p class="lead">Not a dollar for anything else this month.</p>`;
+    } else {
+      head = `<p class="headline">You made it, with</p>
+        <div class="big accent">${fmt(-r.gap)}</div>
+        <p class="lead">left for everything else this month.</p>`;
+    }
+    const noSnap = `<div class="nosnap"><span>Without SNAP</span><b class="${r.gapNoSnap > 0 ? "red" : "accent"}">${r.gapNoSnap > 0 ? fmt(r.gapNoSnap) + " short" : fmt(-r.gapNoSnap) + " to spare"}</b></div>`;
+    const stillOwed = {
+      card: `And the card bill didn't go away. You owe ${fmt(CONFIG.surprise.cardMonthlyPayment)} a month for ${p.months - 1} more months, ${fmt(p.total)} in all. Next month starts ${fmt(CONFIG.surprise.cardMonthlyPayment)} behind.`,
+      skip: `And the ${S.c.transport === "car" ? "repair" : "dental bill"} didn't go away. It's still waiting, and it usually costs more later.`
+    }[S.c.surprise];
+    const owedNote = stillOwed ? `<div class="note bad">${stillOwed}</div>` : "";
+    const raiseLine = S.wageOverride
+      ? `<div class="note">At ${fmtWage(S.wageOverride)}/hr: ${fmtWage(S.wageOverride - c.wage)} more per hour than the real wage of ${fmtWage(c.wage)}.</div>` : "";
+    const ctx = c.stateMinWageNote && !S.wageOverride
+      ? `<p class="small muted">For context: ${c.stateMinWageNote}<span class="cite">(U.S. DOL)</span></p>` : "";
+    const surpriseLabel = { pay: "SURPRISE BILL", card: "CARD PAYMENT", skip: "SURPRISE (UNPAID)" }[S.c.surprise];
+    const rl = (l, v, cls = "") => `<div class="rl ${cls}"><span>${l}</span><span class="d"></span><span>${v}</span></div>`;
+    const stamp = short ? `<span class="stamp">SHORT</span>` : `<span class="stamp ok">LEFT OVER</span>`;
+    const other = S.city === "fargo" ? "Minneapolis" : "Fargo";
+    return `
+      <p class="kicker">You made ${r.conscious} of 4 budget-conscious choices</p>
+      ${head}
+      ${noSnap}
+      ${owedNote}
+      ${raiseLine}
+      <div class="receipt">
+        <h3>ONE MONTH</h3>
+        <div class="sub">${c.name.toUpperCase()} · ${fmtWage(r.wage)}/HR · 40 HRS/WK</div>
+        ${rl("TAKE-HOME PAY", fmt(r.net))}
+        <hr>
+        ${rl("RENT", "−" + fmt(r.housing))}
+        ${rl("CHILD CARE", "−" + fmt(r.care))}
+        ${rl(S.c.transport === "car" ? "CAR" : "BUS PASS", "−" + fmt(r.transport))}
+        ${rl("BASICS", "−" + fmt(r.basics))}
+        ${rl(surpriseLabel, "−" + fmt(r.surprise))}
+        <hr>
+        ${rl("CASH LEFT", fmt(r.leftover), "tot")}
+        ${rl("SNAP / EBT", "+" + fmt(r.snap))}
+        ${rl("FOOD NEEDED", "−" + fmt(r.need))}
+        <hr>
+        <div class="due">${stamp}<span class="${short ? "red" : "accent"}">${fmt(Math.abs(r.gap))}</span></div>
+      </div>
+      ${ctx}
+      <div class="actions">
+        ${next("final", "What this means", "go")}
+        ${short && r.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${r.wageToClose}">Replay earning ${fmtWage(r.wageToClose)}/hr</button>` : ""}
+        <button class="btn secondary" data-act="otherCity">Try ${other}</button>
+        <button class="btn link" data-act="replay">Replay from the start</button>
+      </div>`;
+  },
+
+  final() {
+    const st = CONFIG.stats;
+    setTimeout(countUp, 200);
+    return `
+      <p class="kicker">The bigger picture</p>
+      <div class="stat">
+        <div class="big" data-count="${st.foodInsecure2024}" data-dec="1">0%</div>
+        <p>of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.</p>
+        <span class="cite">(USDA ERS, 2025)</span>
+      </div>
+      <div class="stat">
+        <div class="big" data-count="${st.cover400WithCash}" data-dec="0">0%</div>
+        <p>of U.S. adults could cover a surprise $400 expense with cash.</p>
+        <span class="cite">(Federal Reserve, 2025)</span>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" data-act="next" data-val="sources">Sources</button>
+        <button class="btn link" data-act="replay">Play again</button>
+      </div>
+      <p class="credit">Build a Budget · Created by Ryan Cooley</p>`;
+  },
+
+  sources() {
+    return `
+      <h2>Sources</h2>
+      <ol class="sources">
+        <li>U.S. Bureau of Labor Statistics. <i>Occupational Employment and Wage Statistics, May 2025: Cashiers (41-2011), Fargo, ND-MN.</i> <a href="https://www.bls.gov/oes/" target="_blank" rel="noopener">bls.gov/oes</a></li>
+        <li>City of Minneapolis. <i>Minimum Wage, rate effective January 1, 2026.</i> <a href="https://www.minneapolismn.gov/" target="_blank" rel="noopener">minneapolismn.gov</a></li>
+        <li>U.S. Department of Housing and Urban Development. <i>FY2026 Fair Market Rents</i> (Fargo, ND-MN MSA; Minneapolis-St. Paul-Bloomington, MN-WI MSA). <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank" rel="noopener">huduser.gov</a></li>
+        <li>Child Care Aware of America / First Five Years Fund. <i>Child care costs, North Dakota.</i> <a href="https://www.ffyf.org/" target="_blank" rel="noopener">ffyf.org</a></li>
+        <li>Economic Policy Institute, via <i>Minnesota Reformer</i> (2025). <i>Cost of child care in Minnesota.</i> <a href="https://minnesotareformer.com/" target="_blank" rel="noopener">minnesotareformer.com</a></li>
+        <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>USDA Food Plans: Cost of Food Report (Thrifty Food Plan), January 2026.</i> <a href="https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports" target="_blank" rel="noopener">fns.usda.gov</a></li>
+        <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>SNAP Fiscal Year 2027 Cost-of-Living Adjustments.</i> <a href="https://www.fns.usda.gov/snap/allotment/cola" target="_blank" rel="noopener">fns.usda.gov</a></li>
+        <li>North Dakota Department of Health and Human Services. <i>SNAP Policy Manual, Appendix B: Table of Standards</i> (effective Oct. 1, 2026). <a href="https://www.nd.gov/dhs/policymanuals/SNAP/" target="_blank" rel="noopener">nd.gov</a></li>
+        <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
+        <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
+        <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
+      </ol>
+      <div class="panel small">
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), basics (${fmt(CONFIG.basicsMonthly)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${CONFIG.food.convenienceMarkup * 100}%), and credit card terms (${Math.round(CONFIG.surprise.cardAPR * 100)}% APR, ${fmt(CONFIG.surprise.cardMonthlyPayment)}/mo).</p>
+        <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
+        <p><b>Food calendar:</b> days covered = food budget ÷ monthly food cost × 30.</p>
+        <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
+      </div>
+      <div class="actions"><button class="btn secondary" data-act="next" data-val="final">Back</button></div>`;
+  }
+};
+
+/* ---------- Effects ---------- */
+async function animateCalendar(r) {
+  const cal = $("cal"); if (!cal) return;
+  const cells = [...cal.children];
+  const step = reduceMotion ? 0 : 45;
+  for (let i = 0; i < cells.length; i++) {
+    if (!document.body.contains(cal)) return;
+    cells[i].classList.add(i < r.daysFed ? "on" : "off");
+    if (i === r.daysFed && r.daysFed < cells.length) { cells[i].classList.add("last"); buzz(60); }
+    if (step) await wait(i < r.daysFed ? step : step * 0.6);
+  }
+  const v = $("verdict");
+  if (!v) return;
+  if (r.foodGap > 0) v.innerHTML = `Food runs out on <span class="red">day ${r.daysFed + 1}</span>.`;
+  else if (r.billsBehind > 0) v.innerHTML = `The food lasts. <span class="red">Rent doesn't get paid.</span>`;
+  else v.innerHTML = `The food lasts the month.`;
+  v.classList.add("show");
+  $("foodNext").style.opacity = 1;
+}
+
+function countUp() {
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const to = parseFloat(el.dataset.count), dec = +el.dataset.dec, dur = reduceMotion ? 0 : 1300, t0 = performance.now();
+    const tick = (t) => {
+      const k = dur ? Math.min(1, (t - t0) / dur) : 1;
+      el.textContent = (to * (1 - Math.pow(1 - k, 3))).toFixed(dec) + "%";
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ---------- Navigation ---------- */
+function go(name) {
+  S.screen = name;
+  if (name === "basics") S.c.basics = true;
+  if (name === "snap") S.c.snap = true;
+  const m = $("screen");
+  m.innerHTML = screens[name]();
+  m.className = "";
+  void m.offsetWidth;
+  m.className = "enter";
+  window.scrollTo(0, 0);
+  updateMeter();
+  if (name === "surprise" && !S.c.surprise) setTimeout(() => { m.className = "shake"; buzz([80, 60, 80]); }, 450);
+}
+
+function restart(cityKey, wageOverride) {
+  S.city = cityKey; S.wageOverride = wageOverride ?? null; S.c = {};
+  meterShown = 0;
+  go(cityKey ? "housing" : "intro");
+}
+
+let locked = false;
+const AFTER = { housing: "care", care: "transport", transport: "basics", surprise: "surprise" };
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-act]");
+  if (!b || locked) return;
+  const { act, val } = b.dataset;
+  if (act === "city" || AFTER[act]) {
+    // Choice: highlight, pause a beat, then move on
+    locked = true;
+    b.classList.add("picked");
+    b.parentElement.classList.add("locked");
+    buzz(15);
+    await wait(320);
+    locked = false;
+    if (act === "city") return restart(val);
+    S.c[act] = val;
+    return go(AFTER[act]);
+  }
+  switch (act) {
+    case "next": go(val); break;
+    case "raise": restart(S.city, parseFloat(val)); break;
+    case "otherCity": restart(S.city === "fargo" ? "minneapolis" : "fargo"); break;
+    case "replay": S.city = null; S.wageOverride = null; S.c = {}; meterShown = 0; go("intro"); break;
+  }
+});
+
+go("intro");
+</script>
+</body>
+</html>
