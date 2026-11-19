@@ -11,6 +11,7 @@
   --bg:#f3efe6; --card:#fffdf8; --paper:#fffef9; --ink:#17201c; --muted:#5f665f; --faint:#8b918a; --line:#e3ddd0;
   --accent:#1d6b52; --accent-ink:#ffffff; --accent-soft:#dcebe3; --accent-deep:#124a38;
   --red:#c0331f; --red-soft:#f6ddd7;
+  --s1:#17201c; --s2:#3d4641; --s3:#646c67; --s4:#8d938e; --s5:#b6bab4;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Charter,Georgia,serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -20,10 +21,11 @@
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 button{font:inherit;color:inherit}
-.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative}
 
 /* ---------- Meter ---------- */
-.meter{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:12px 16px 10px;border-bottom:1px solid var(--line);transition:transform .4s var(--ease)}
+.meter{position:sticky;top:0;z-index:10;background:rgba(243,239,230,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:12px 16px 10px;border-bottom:1px solid var(--line);transition:transform .4s var(--ease)}
 .meter.idle{transform:translateY(-100%);position:absolute;left:0;right:0;pointer-events:none}
 .meter-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .meter-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
@@ -64,20 +66,30 @@ p{margin:0 0 14px}
 .small{font-size:14px}
 .red{color:var(--red)}
 .accent{color:var(--accent)}
-.mono{font-family:var(--mono)}
+.section{margin:26px 0 8px;font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 
 /* ---------- Choice cards ---------- */
 .opts{margin-top:18px}
-.opt{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 16px 15px;margin:0 0 12px;cursor:pointer;min-height:72px;position:relative;transition:border-color .15s,transform .15s var(--ease),box-shadow .2s,opacity .25s;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:15px 16px 14px;margin:0 0 12px;cursor:pointer;min-height:72px;position:relative;transition:border-color .15s,transform .15s var(--ease),box-shadow .2s,opacity .25s,background .2s;box-shadow:0 1px 0 rgba(0,0,0,.03)}
 .opt:hover{border-color:var(--ink);box-shadow:0 6px 18px -10px rgba(0,0,0,.25)}
 .opt:active{transform:scale(.98)}
 .opt.picked{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.015)}
 .opts.locked .opt:not(.picked){opacity:.35}
+.opt.nope{border-color:var(--red);background:var(--red-soft);cursor:default;animation:shake .45s ease}
+.opt.nope:hover{box-shadow:none}
 .opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.opt-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:700;font-size:17px}
+.opt-top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:17px}
+.opt-top .t{flex:1}
+.opt-ico{width:38px;height:38px;border-radius:11px;background:var(--bg);display:grid;place-items:center;flex:none;color:var(--ink)}
+.opt.nope .opt-ico{background:#fff;color:var(--red)}
 .opt-price{font:700 16px/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-.opt-sub{font-size:14px;color:var(--muted);margin-top:5px;padding-right:4px}
-.tag{display:inline-block;font:700 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:5px;background:var(--bg);color:var(--muted);margin-top:8px}
+.opt-sub{font-size:14px;color:var(--muted);margin-top:6px}
+.opt.nope .opt-sub{color:var(--red);font-weight:600}
+.share{display:flex;align-items:center;gap:8px;margin-top:9px;font:600 11.5px/1 var(--mono);color:var(--muted)}
+.share .bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.share .bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.tag{display:inline-block;font:700 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent-deep);margin-top:9px}
+.tag.no{background:var(--red);color:#fff}
 
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:17px 16px;border-radius:16px;border:0;background:var(--ink);color:#fff;font-weight:700;font-size:17px;cursor:pointer;margin:0 0 10px;transition:transform .12s,background .2s}
 .btn:hover{background:#000}
@@ -101,13 +113,14 @@ p{margin:0 0 14px}
 .hero h1 span:nth-child(2){animation-delay:.15s}
 .hero h1 span:nth-child(3){animation-delay:.3s;color:var(--accent)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.who{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 22px}
-.who span{font:600 13px/1 var(--sans);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 11px}
+.who{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 22px}
+.who span{display:inline-flex;align-items:center;gap:6px;font:600 13px/1 var(--sans);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 11px 7px 8px}
+.who svg.i{width:17px;height:17px}
 
 /* ---------- Phone notification ---------- */
 .notif{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:20px;padding:13px 14px;box-shadow:0 14px 34px -16px rgba(0,0,0,.35);margin:4px 0 20px;animation:drop .65s cubic-bezier(.2,1.3,.35,1) both}
 @keyframes drop{from{opacity:0;transform:translateY(-40px) scale(.96)}}
-.notif-icon{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font:800 12px/1 var(--mono);color:#fff;background:var(--ink);letter-spacing:.02em}
+.notif-icon{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;color:#fff;background:var(--ink)}
 .notif-icon.red{background:var(--red)}
 .notif-icon.green{background:var(--accent)}
 .notif-body{flex:1;min-width:0}
@@ -115,16 +128,62 @@ p{margin:0 0 14px}
 .notif-title{font-weight:700;font-size:15.5px;margin-top:2px}
 .notif-text{font-size:14.5px;color:var(--ink)}
 
-/* ---------- Autopay list ---------- */
+/* ---------- Autopay ---------- */
 .auto{list-style:none;padding:0;margin:16px 0}
-.auto li{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px dashed var(--line);animation:rise .5s var(--ease) both}
+.auto li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);animation:rise .5s var(--ease) both}
 .auto li:nth-child(2){animation-delay:.12s}.auto li:nth-child(3){animation-delay:.24s}.auto li:nth-child(4){animation-delay:.36s}
-.auto .chk{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+.auto .ico{width:38px;height:38px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;flex:none}
 .auto .tot{border-bottom:0;font-weight:700}
 .auto .amt{margin-left:auto;font-family:var(--mono);font-weight:700}
 
-/* ---------- Food calendar ---------- */
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:16px 0 10px}
+/* ---------- EBT card ---------- */
+.ebtcard{position:relative;aspect-ratio:1.6;max-width:300px;border-radius:18px;padding:18px 20px;color:#fff;background:linear-gradient(135deg,#25805f 0%,#1d6b52 45%,#124a38 100%);box-shadow:0 18px 36px -18px rgba(18,74,56,.7);margin:6px 0 20px;overflow:hidden;animation:cardin .8s cubic-bezier(.2,1.2,.35,1) both}
+@keyframes cardin{from{opacity:0;transform:rotate(-6deg) translateY(30px) scale(.9)}}
+.ebtcard::before{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.08)}
+.ebtcard .chip{width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#e9d9a6,#c7b06b);margin:14px 0 10px}
+.ebtcard .lbl{font:700 12px/1 var(--mono);letter-spacing:.14em;opacity:.85}
+.ebtcard .bal{font:800 34px/1 var(--mono);letter-spacing:-.02em}
+.ebtcard .foot{position:absolute;left:20px;bottom:16px;font:600 11px/1 var(--mono);letter-spacing:.1em;opacity:.8}
+
+/* ---------- Dot / meal grids ---------- */
+.g100{display:grid;grid-template-columns:repeat(20,1fr);gap:4px;margin:12px 0 8px;max-width:340px}
+.g100 i{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--s5);transition:background .3s,border-color .3s}
+.g100 i.on{background:var(--accent);border-color:var(--accent)}
+.g100 i.red{background:var(--red);border-color:var(--red)}
+.figure{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin:0 0 14px}
+.figure .cap{font-size:14px;color:var(--ink);margin:0}
+
+.meals{display:grid;grid-template-columns:repeat(30,1fr);grid-template-rows:repeat(6,auto);grid-auto-flow:column;gap:2px;margin:10px 0 6px}
+.meals i{aspect-ratio:1;border-radius:2px;background:var(--accent);transition:background .2s}
+.meals i.x{background:var(--red)}
+.meals-key{display:flex;justify-content:space-between;font:600 11px/1.3 var(--mono);color:var(--muted)}
+
+/* ---------- Bars ---------- */
+.hbar{margin:10px 0}
+.hbar .row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:5px}
+.hbar .row b{font-family:var(--mono)}
+.hbar .track{height:14px;background:var(--bg);border-radius:7px;overflow:hidden}
+.hbar .track i{display:block;height:100%;width:0;border-radius:7px;background:var(--ink);transition:width 1s var(--ease)}
+.hbar .track i.acc{background:var(--accent)}
+.hbar .track i.red{background:var(--red)}
+
+.stack{position:relative;display:flex;height:34px;border-radius:9px;overflow:hidden;background:var(--bg);margin:12px 0 4px}
+.stack i{height:100%;transition:width 1s var(--ease)}
+.stack i.over{background:repeating-linear-gradient(-45deg,var(--red) 0 6px,#d9614f 6px 12px)}
+.stack-mark{position:relative;height:16px;font:600 10.5px/1 var(--mono);color:var(--muted)}
+.stack-mark span{position:absolute;top:2px;transform:translateX(-100%);white-space:nowrap;padding-right:4px;border-right:2px solid var(--ink);height:14px;display:flex;align-items:center}
+.legend{list-style:none;padding:0;margin:8px 0 0;font-size:14px}
+.legend li{display:flex;align-items:center;gap:9px;padding:5px 0}
+.legend .sw{width:12px;height:12px;border-radius:3px;flex:none}
+.legend .v{margin-left:auto;font-family:var(--mono);font-weight:700}
+.legend .p{width:44px;text-align:right;font:600 12px/1 var(--mono);color:var(--muted)}
+
+/* ---------- Food ---------- */
+.plate{display:flex;align-items:center;gap:16px;margin:6px 0 14px}
+.plate svg{width:76px;height:76px;flex:none}
+.plate .amt{font:800 44px/1 var(--mono);letter-spacing:-.03em}
+.plate .per{font:600 12px/1.3 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:14px 0 10px}
 .cal div{aspect-ratio:1;border-radius:9px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font:600 12px/1 var(--mono);color:var(--faint);transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease)}
 .cal div.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .cal div.off{background:var(--red-soft);border-color:transparent;color:var(--red);text-decoration:line-through}
@@ -133,17 +192,16 @@ p{margin:0 0 14px}
 .cal-key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .verdict{font-family:var(--serif);font-size:30px;line-height:1.1;font-weight:700;margin:4px 0 12px;opacity:0;transition:opacity .4s}
 .verdict.show{opacity:1}
-.math{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:12px}
-.math b{font-family:var(--mono);text-align:right}
-.math .cite{grid-column:1/-1;margin-top:-4px}
 
 /* ---------- Results ---------- */
-.big{font:800 64px/0.95 var(--sans);letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin:6px 0 8px}
-.headline{font-family:var(--serif);font-size:34px;line-height:1.05;font-weight:700;margin:0 0 10px}
-.nosnap{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:15px}
-.nosnap b{font-family:var(--mono);font-size:17px}
-
-.receipt{position:relative;background:var(--paper);font:13.5px/1.55 var(--mono);padding:20px 18px 24px;margin:22px 0 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.3);animation:print 1.1s var(--ease) both}
+.big{font:800 64px/0.95 var(--sans);letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin:6px 0 6px}
+.headline{font-family:var(--serif);font-size:32px;line-height:1.07;font-weight:700;margin:0 0 14px}
+details.rec{margin:8px 0 0}
+details.rec summary{cursor:pointer;font-weight:700;padding:14px 0;list-style:none;display:flex;align-items:center;gap:8px}
+details.rec summary::-webkit-details-marker{display:none}
+details.rec summary::after{content:"+";margin-left:auto;font:700 20px/1 var(--mono)}
+details.rec[open] summary::after{content:"−"}
+.receipt{position:relative;background:var(--paper);font:13.5px/1.55 var(--mono);padding:20px 18px 24px;margin:4px 0 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.3);animation:print 1s var(--ease) both}
 @keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-12px)}to{clip-path:inset(0 0 -20px 0);transform:none}}
 .receipt::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:radial-gradient(circle at 7px 10px,transparent 6.5px,var(--paper) 7px) 0 0/14px 10px repeat-x}
 .receipt h3{font:700 13px/1.3 var(--mono);text-align:center;letter-spacing:.14em;margin:0}
@@ -153,21 +211,52 @@ p{margin:0 0 14px}
 .receipt .rl.tot{font-weight:700}
 .receipt hr{border:0;border-top:1px dashed #bdb6a6;margin:8px 0}
 .receipt .due{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:18px;margin-top:10px}
-.receipt .stamp{display:inline-block;transform:rotate(-8deg);border:2.5px solid var(--red);color:var(--red);font:800 15px/1 var(--mono);letter-spacing:.08em;padding:6px 8px;border-radius:6px;opacity:0;animation:stamp .35s 1.2s cubic-bezier(.3,1.6,.5,1) forwards}
-.receipt .stamp.ok{border-color:var(--accent);color:var(--accent)}
+.stamp{display:inline-block;transform:rotate(-8deg);border:2.5px solid var(--red);color:var(--red);font:800 15px/1 var(--mono);letter-spacing:.08em;padding:6px 8px;border-radius:6px;animation:stamp .35s .9s cubic-bezier(.3,1.6,.5,1) both}
+.stamp.ok{border-color:var(--accent);color:var(--accent)}
 @keyframes stamp{from{opacity:0;transform:rotate(-8deg) scale(1.8)}to{opacity:.9;transform:rotate(-8deg) scale(1)}}
 
 /* ---------- Final ---------- */
-.stat{padding:20px 0;border-bottom:1px solid var(--line)}
-.stat:last-of-type{border-bottom:0}
 .stat .big{font-size:76px}
 .stat p{font-size:17px}
-
+.closing{font-family:var(--serif);font-size:24px;line-height:1.2;font-weight:700;margin:22px 0 4px}
 .credit{text-align:center;font:600 12px/1.4 var(--mono);letter-spacing:.06em;color:var(--faint);margin:28px 0 0;padding-top:16px;border-top:1px solid var(--line)}
 .sources{padding-left:18px;margin:0 0 16px}
 .sources li{margin:0 0 12px;font-size:14px;word-break:break-word}
 .sources a{color:var(--accent)}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 16px}
+
+/* ---------- Edit panel (only with ?edit) ---------- */
+#editor{position:fixed;left:0;top:0;bottom:0;width:380px;background:#fff;border-right:1px solid var(--line);z-index:60;display:flex;flex-direction:column;font:14px/1.4 var(--sans);transition:transform .3s var(--ease);box-shadow:8px 0 30px -20px rgba(0,0,0,.3)}
+body.editing{padding-left:380px}
+.ed-top{padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.ed-top h4{margin:0 0 4px;font:700 16px/1.2 var(--sans)}
+.ed-top p{margin:0 0 10px;color:var(--muted);font-size:12.5px}
+.ed-btns{display:flex;gap:8px;margin-bottom:10px}
+.ed-btns button,.ed-tabs button{flex:1;padding:9px 10px;border-radius:9px;border:1.5px solid var(--ink);background:#fff;font-weight:700;font-size:13px;cursor:pointer}
+.ed-btns button.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+#editor select,#editor input,#editor textarea{width:100%;font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+#editor textarea{resize:vertical;min-height:40px}
+#editor input:focus,#editor textarea:focus,#editor select:focus{outline:none;border-color:var(--accent)}
+.ed-tabs{display:flex;gap:6px;margin-top:8px}
+.ed-tabs button{border-color:var(--line)}
+.ed-tabs button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.ed-list{flex:1;overflow:auto;padding:6px 16px 30px}
+.ed-group{font:700 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+.ed-f{display:block;margin:0 0 10px}
+.ed-l{display:flex;align-items:center;gap:6px;font:600 12px/1.3 var(--mono);color:var(--muted);margin-bottom:4px;word-break:break-all}
+.ed-l .chg{display:none;width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.ed-f.changed .ed-l .chg{display:inline-block}
+.ed-f.changed .ed-l{color:var(--accent-deep)}
+.ed-l .rs{margin-left:auto;display:none;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:600 11px/1 var(--sans)}
+.ed-f.changed .ed-l .rs{display:inline}
+.ed-count{font-size:12px;color:var(--muted)}
+#edToggle{display:none;position:fixed;left:12px;bottom:12px;z-index:70;padding:12px 16px;border-radius:999px;border:0;background:var(--ink);color:#fff;font-weight:700;box-shadow:0 8px 20px -8px rgba(0,0,0,.5);cursor:pointer}
+@media (max-width:900px){
+  body.editing{padding-left:0}
+  #editor{width:min(92vw,380px);transform:translateX(-102%)}
+  #editor.open{transform:none}
+  #edToggle{display:block}
+}
 
 @media (max-width:360px){ h1{font-size:38px} h2{font-size:26px} .big{font-size:54px} }
 @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.001s!important;animation-delay:0s!important;transition:none!important} }
@@ -177,7 +266,7 @@ p{margin:0 0 14px}
 <div class="app">
   <header class="meter idle" id="meter" aria-live="polite">
     <div class="meter-row">
-      <span class="meter-label">Money left this month</span>
+      <span class="meter-label" id="meterLabel">Money left this month</span>
       <span class="day" id="day">DAY 1 / 30</span>
     </div>
     <div class="meter-main">
@@ -194,6 +283,7 @@ p{margin:0 0 14px}
 /* =====================================================================
    CONFIG — every number used in the game lives here.
    Each value has its source. Items marked ESTIMATE are approximations.
+   (Easiest way to change things: open the game with ?edit at the end of the URL.)
    ===================================================================== */
 const CONFIG = {
   hoursPerYear: 2080,            // 40 hrs/week × 52 weeks (full time)
@@ -214,7 +304,8 @@ const CONFIG = {
         center: 873,             // Child Care Aware of America / First Five Years Fund — center care, 4-year-old, ND (monthly)
         home: 847                // Child Care Aware of America / First Five Years Fund — family/home-based care, 4-year-old, ND (monthly)
       },
-      childCareCite: { center: "Child Care Aware", home: "Child Care Aware" },
+      childCareCiteCenter: "Child Care Aware",
+      childCareCiteHome: "Child Care Aware",
       busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
       stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
       stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009."
@@ -233,10 +324,11 @@ const CONFIG = {
         center: 1500,            // Economic Policy Institute, via Minnesota Reformer (2025) — center care, 4-year-old
         home: 950                // ESTIMATE — home-based care, 4-year-old, Minneapolis
       },
-      childCareCite: { center: "EPI, 2025", home: "estimate" },
+      childCareCiteCenter: "EPI, 2025",
+      childCareCiteHome: "estimate",
       busPass: 76,               // ESTIMATE — Metro Transit monthly pass
       stateMinWage: null,
-      stateMinWageNote: null
+      stateMinWageNote: ""
     }
   },
 
@@ -256,6 +348,8 @@ const CONFIG = {
     usdaMonthly: 500,            // USDA Thrifty Food Plan, parent + 4-year-old (~$500/mo). Adult female 20–50 = $248.50/mo (Jan 2026). VERIFY against current USDA Cost of Food report
     adultFemale20to50: 248.50,   // USDA Thrifty Food Plan, Jan 2026
     convenienceMarkup: 0.25,     // ESTIMATE — no car, so you shop at the nearby convenience store: food costs +25%
+    people: 2,                   // Parent + 4-year-old
+    mealsPerDay: 3,
     cite: "USDA, 2026"
   },
 
@@ -279,6 +373,188 @@ const CONFIG = {
     under50kCant100: "4 in 10"   // Federal Reserve SHED 2025 — adults earning under $50k who couldn't cover $100 from savings
   }
 };
+
+/* =====================================================================
+   TEXT — every word players see. {curly} words are filled in by the game.
+   **double stars** = bold.
+   ===================================================================== */
+const TEXT = {
+  "meter.label": "Money left this month",
+
+  "intro.kicker": "Build a Budget · a 2-minute game",
+  "intro.title1": "One paycheck.",
+  "intro.title2": "Thirty days.",
+  "intro.title3": "Make it work.",
+  "intro.tag1": "Single parent",
+  "intro.tag2": "Kid, age 4",
+  "intro.tag3": "Cashier, 40 hrs/week",
+  "intro.lead": "Make the smart choice at every step. Then see if the food lasts.",
+  "intro.pick": "Choose your city",
+  "intro.cityLine": "{label} → **{pay}**/mo after payroll tax",
+  "replay.banner": "Replay: this time you earn **{wage}/hr** instead of {oldWage}. Same choices. Let's see.",
+
+  "share": "{pct} of your paycheck",
+  "tag.cheaper": "Cheaper",
+  "tag.noDebt": "No debt",
+
+  "housing.kicker": "Day 1 · Rent is due",
+  "housing.title": "Where do you live?",
+  "housing.sub": "Typical rent in {city}.",
+  "housing.oneBR": "1-bedroom",
+  "housing.oneBR.sub": "You and your kid share a room.",
+  "housing.twoBR": "2-bedroom",
+  "housing.twoBR.sub": "Your kid gets their own room.",
+
+  "care.kicker": "Day 1 · Your shift starts at 7",
+  "care.title": "Who watches your kid?",
+  "care.sub": "Full-time care for a 4-year-old, every month.",
+  "care.center": "Licensed center",
+  "care.center.sub": "Set hours, trained staff.",
+  "care.home": "Home-based daycare",
+  "care.home.sub": "A smaller group in a neighbor's home.",
+
+  "transport.kicker": "Day 2 · Getting to work",
+  "transport.title": "Car or bus?",
+  "transport.car": "Keep your old car",
+  "transport.car.sub": "Payment, insurance, gas.",
+  "transport.bus": "Take the bus",
+  "transport.bus.sub": "Catch: without a car, you shop at the corner store. Food costs about 25% more.",
+
+  "basics.kicker": "Day 6 · Autopay",
+  "basics.title": "These happen no matter what.",
+  "basics.phone": "Phone bill",
+  "basics.supplies": "Toiletries and household supplies",
+  "basics.clothes": "Kid's clothes (they keep growing)",
+  "basics.total": "Basics",
+
+  "snap.kicker": "Day 10 · You applied for food assistance",
+  "snap.title": "You qualified for SNAP.",
+  "snap.lead": "**{amount}** a month in food assistance, loaded onto an EBT card.",
+  "snap.note": "SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.",
+  "snap.deniedTitle": "No SNAP this time.",
+  "snap.deniedLead": "At {wage}/hr, you earn too much to qualify.",
+
+  "surprise.kicker": "Day 17 · Something comes up",
+  "surprise.carApp": "Auto shop",
+  "surprise.carNotifTitle": "Your estimate is ready",
+  "surprise.carNotif": "Brakes and a worn belt: **{amount}**.",
+  "surprise.carTitle": "The car needs work.",
+  "surprise.dentalApp": "Dental office",
+  "surprise.dentalNotifTitle": "Treatment plan",
+  "surprise.dentalNotif": "Your kid needs a filling: **{amount}**.",
+  "surprise.dentalTitle": "Your kid's tooth hurts.",
+  "surprise.stat": "Only **{pct} in 100** U.S. adults could cover this with cash.",
+  "surprise.pay": "Pay it now",
+  "surprise.pay.sub": "No debt. It comes out of what's left for food.",
+  "surprise.card": "Put it on a credit card",
+  "surprise.card.sub": "At {apr} interest, {amount} becomes about {total} over {months} months.",
+  "surprise.skip": "Skip it",
+  "surprise.skip.subCar": "Keep driving and hope.",
+  "surprise.skip.subDental": "Wait and hope it gets better.",
+  "surprise.after.pay": "Paid. The {amount} came out of what was left for food.",
+  "surprise.after.card": "The bill is paid. The debt isn't: {payment} this month, and every month for about {months} months.",
+  "surprise.after.skipCar": "You skip the repair. The car still runs, for now. If it dies, so does your way to work.",
+  "surprise.after.skipDental": "You skip the dentist. The pain doesn't go away, and it gets more expensive the longer it waits.",
+  "surprise.next": "Keep going",
+
+  "cut.kicker": "Day 20 · The math stops working",
+  "cut.title": "Something has to give.",
+  "cut.lead": "You're **{gap} short** this month. What do you cut?",
+  "cut.rent": "Rent",
+  "cut.rent.no": "Late fees, then an eviction notice. Losing your home costs far more than {gap}.",
+  "cut.care": "Child care",
+  "cut.care.no": "No daycare means no shift. You'd lose {pay} in pay to save {cost}.",
+  "cut.transport": "Getting to work",
+  "cut.transport.no": "No ride means no shift. You'd lose {pay} in pay to save {cost}.",
+  "cut.phone": "Phone",
+  "cut.phone.no": "Your manager texts the schedule. Miss a shift, risk the job.",
+  "cut.food": "Food",
+  "cut.food.sub": "Smaller meals. Skip some. Hope it's enough.",
+  "cut.notOption": "Not really an option",
+  "cut.yes": "Food is the one bill nobody comes to collect. So food is what gives.",
+  "cut.next": "See how far the food goes",
+
+  "food.kicker": "Day 1–30 · Groceries",
+  "food.title": "Will the food last?",
+  "food.perMeal": "per person, per meal",
+  "food.perMealNote": "That's USDA's cheapest healthy diet: the government's own bare-minimum food budget.",
+  "food.perMealBus": "Corner-store prices.",
+  "food.budget": "Your food budget",
+  "food.budgetDetail": "{cash} cash + {snap} SNAP",
+  "food.need": "Cheapest healthy diet",
+  "food.behind": "You're already **{amount}** behind on rent and bills. SNAP can't pay those.",
+  "food.keyOn": "Food covered",
+  "food.keyOff": "Not covered",
+  "food.verdictShort": "Food runs out on {day}.",
+  "food.verdictBills": "The food lasts. {rent}",
+  "food.verdictBillsRent": "Rent doesn't get paid.",
+  "food.verdictOk": "The food lasts the month.",
+  "food.next": "See your month",
+
+  "results.choices": "You made {n} of 4 budget-conscious choices",
+  "results.leadShort": "You did everything you could. The food ran out on {day}.",
+  "results.mealsSkipped": "meals skipped this month",
+  "results.mealsKey": "Each square is one meal for one of you",
+  "results.mealsNote": "That's **{gap} short** of USDA's cheapest healthy diet, even with SNAP.",
+  "results.billsToo": "And **{amount}** behind on rent and bills.",
+  "results.leadBills": "SNAP kept food on the table. It can't pay rent.",
+  "results.billsBehind": "behind on rent and bills",
+  "results.leadZero": "You made it. With nothing left.",
+  "results.leadOk": "You made it, with **{amount}** left for everything else this month.",
+  "results.mealsAll": "All {total} meals covered.",
+  "results.snapTitle": "What SNAP did",
+  "results.withSnap": "With SNAP",
+  "results.withoutSnap": "Without SNAP",
+  "results.short": "short",
+  "results.spare": "to spare",
+  "results.whereTitle": "Where the paycheck went",
+  "results.paycheckEnds": "paycheck ends",
+  "results.over": "Over by",
+  "results.owedCard": "And the card bill didn't go away. You owe {payment} a month for {months} more months, {total} in all. Next month starts {payment} behind.",
+  "results.owedSkipCar": "And the repair didn't go away. It's still waiting, and it usually costs more later.",
+  "results.owedSkipDental": "And the dental bill didn't go away. It's still waiting, and it usually costs more later.",
+  "results.raise": "At {wage}/hr: {diff} more per hour than the real wage of {oldWage}.",
+  "results.context": "For context: {note}",
+  "results.receipt": "See the full receipt",
+  "results.next": "What this means",
+  "results.raiseBtn": "Replay earning {wage}/hr",
+  "results.otherCity": "Try {city}",
+  "results.replay": "Replay from the start",
+
+  "label.rent": "Rent",
+  "label.care": "Child care",
+  "label.car": "Car",
+  "label.bus": "Bus pass",
+  "label.basics": "Basics",
+  "label.surprisePay": "Surprise bill",
+  "label.surpriseCard": "Card payment",
+  "label.surpriseSkip": "Surprise (unpaid)",
+  "label.food": "Left for food",
+
+  "final.kicker": "The bigger picture",
+  "final.stat": "of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.",
+  "final.grid": "About **{n} in every 100** households.",
+  "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and one surprise bill.",
+  "final.sources": "Sources",
+  "final.again": "Play again",
+  "final.credit": "Build a Budget · Created by Ryan Cooley"
+};
+
+/* Saved edits from the edit panel. The edit panel's Download button rewrites this block. */
+const EDITS = /*EDITS-START*/{"config":{},"text":{}}/*EDITS-END*/;
+
+const DEFAULTS = { config: JSON.parse(JSON.stringify(CONFIG)), text: Object.assign({}, TEXT) };
+function getPath(obj, path) { return path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj); }
+function setPath(obj, path, val) {
+  const ks = path.split("."), last = ks.pop();
+  const o = ks.reduce((a, k) => a[k], obj);
+  if (o && last in o) o[last] = val;
+}
+function applyEdits(e) {
+  for (const p in (e.config || {})) setPath(CONFIG, p, e.config[p]);
+  for (const k in (e.text || {})) if (k in TEXT) TEXT[k] = e.text[k];
+}
+applyEdits(EDITS);
 
 /* =====================================================================
    CALCULATIONS — pure functions (also used by test-paths.js)
@@ -333,8 +609,12 @@ function pathAtWage(city, c, wage) {
   const shortfall = foodGap + billsBehind;
   const gap = shortfall > 0 ? shortfall : need - foodMoney;               // > 0 short, <= 0 = money to spare
   const gapNoSnap = need - leftover;                                      // same path, no SNAP
-  const daysFed = Math.min(CONFIG.daysInMonth, Math.floor(foodMoney / need * CONFIG.daysInMonth)); // days the food budget covers
-  return { wage, gross, net, housing, care, transport, basics, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed };
+  const days = CONFIG.daysInMonth;
+  const daysFed = Math.min(days, Math.floor(foodMoney / need * days));    // days the food budget covers
+  const totalMeals = days * CONFIG.food.people * CONFIG.food.mealsPerDay;
+  const perMeal = need / totalMeals;                                      // $ per person per meal
+  const mealsSkipped = Math.min(totalMeals, Math.round(foodGap / perMeal));
+  return { wage, gross, net, housing, care, transport, basics, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed, totalMeals, perMeal, mealsSkipped };
 }
 
 function computePath(cityKey, c, wageOverride) {
@@ -359,14 +639,43 @@ function computePath(cityKey, c, wageOverride) {
    ===================================================================== */
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => (n < -0.5 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
-const fmtWage = (n) => "$" + n.toFixed(2);
+const fmtWage = (n) => "$" + Number(n).toFixed(2);
+const pct = (a, b) => Math.round(a / b * 100) + "%";
 const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const buzz = (p) => { try { if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(p); } catch (e) {} };
 const wait = (ms) => new Promise((r) => setTimeout(r, reduceMotion ? 0 : ms));
+function t(key, vars) {
+  let s = TEXT[key];
+  if (s == null) return key;
+  s = String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && k in vars ? vars[k] : m));
+  return s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+}
+
+/* Line icons */
+const IC = {
+  home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  homeBig: '<path d="M2 11l10-7 10 7"/><path d="M4 10v10h16V10"/><path d="M8 13h3v3H8zM13 13h3v3h-3z"/>',
+  kid: '<circle cx="12" cy="6" r="3"/><path d="M7 21v-5a5 5 0 0 1 10 0v5"/>',
+  parent: '<circle cx="12" cy="5" r="2.6"/><path d="M8 21v-9a4 4 0 0 1 8 0v9"/>',
+  car: '<path d="M4 16v-4l2-5h12l2 5v4z"/><circle cx="8" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/><path d="M4 12h16"/>',
+  bus: '<rect x="5" y="3" width="14" height="15" rx="2"/><path d="M5 11h14M8 21v-3M16 21v-3"/><circle cx="8.5" cy="14.5" r=".8"/><circle cx="15.5" cy="14.5" r=".8"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  bag: '<path d="M6 8h12l-1 13H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  shirt: '<path d="M8 3L3 6l2 4 3-1v12h8V9l3 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+  cart: '<path d="M3 4h2l2.5 11h10L20 8H6.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+  wrench: '<path d="M14.5 6.5a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8z" transform="translate(-2 -2)"/><path d="M4 20l6-6"/>',
+  tooth: '<path d="M7 3c-2.5 0-4 2-4 5 0 4 2 5 2.5 9 .3 2.5 1 4 2 4s1.5-2 2-4.5c.3-1.2.9-1.5 2.5-1.5s2.2.3 2.5 1.5c.5 2.5 1 4.5 2 4.5s1.7-1.5 2-4c.5-4 2.5-5 2.5-9 0-3-1.5-5-4-5-2 0-3 1-5 1S9 3 7 3z"/>',
+  card: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/>',
+  skip: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+  plate: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/>',
+  dollar: '<path d="M12 2v20M17 6.5c-1-1.5-2.8-2-5-2-3 0-4.5 1.5-4.5 3.5 0 4.5 10 2.5 10 7.5 0 2-1.8 3.5-5 3.5-2.4 0-4.2-.8-5-2.5"/>',
+  check: '<path d="M5 12l5 5L20 7"/>'
+};
+const icon = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 
 const S = { screen: "intro", city: null, wageOverride: null, c: {} };
-const FLOW = ["housing", "care", "transport", "basics", "snap", "surprise", "food"];
-const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, food: 30, results: 30 };
+const FLOW = ["housing", "care", "transport", "basics", "snap", "surprise", "cut", "food"];
+const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, cut: 20, food: 30, results: 30 };
 
 function city() { return CONFIG.cities[S.city]; }
 function path() { return computePath(S.city, S.c, S.wageOverride); }
@@ -387,6 +696,7 @@ function cashBalance() {
 }
 function updateMeter() {
   const m = $("meter"), amt = $("meterAmt"), fill = $("meterFill"), d = $("meterDelta"), ebt = $("ebt");
+  $("meterLabel").textContent = TEXT["meter.label"];
   const target = cashBalance();
   const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results");
   m.classList.toggle("idle", !inGame);
@@ -394,20 +704,19 @@ function updateMeter() {
   $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
   if (S.c.snap) { const s = path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
   else ebt.hidden = true;
-
+  const pctLeft = target / meterMax() * 100;
+  fill.style.width = Math.max(0, Math.min(100, pctLeft)) + "%";
+  fill.classList.toggle("low", pctLeft < 15);
   const from = meterShown, diff = target - from;
-  if (Math.abs(diff) < 0.5) return;
+  if (Math.abs(diff) < 0.5) { amt.textContent = fmt(target); return; }
   d.textContent = (diff < 0 ? "−" : "+") + fmt(Math.abs(diff));
   d.className = "meter-delta show " + (diff < 0 ? "down" : "up");
   clearTimeout(deltaTimer); deltaTimer = setTimeout(() => d.classList.remove("show"), 1700);
-  const pct = target / meterMax() * 100;
-  fill.style.width = Math.max(0, Math.min(100, pct)) + "%";
-  fill.classList.toggle("low", pct < 15);
   amt.classList.remove("bump"); void amt.offsetWidth; amt.classList.add("bump");
   cancelAnimationFrame(meterRaf);
   const dur = reduceMotion ? 0 : 800, t0 = performance.now();
-  const tick = (t) => {
-    const k = dur ? Math.min(1, (t - t0) / dur) : 1;
+  const tick = (now) => {
+    const k = dur ? Math.min(1, (now - t0) / dur) : 1;
     const v = k < 1 ? from + diff * (1 - Math.pow(1 - k, 3)) : target;
     meterShown = v;
     amt.textContent = fmt(v);
@@ -422,70 +731,84 @@ const dots = () => {
   const i = FLOW.indexOf(S.screen);
   return `<div class="dots" aria-label="Step ${i + 1} of ${FLOW.length}">${FLOW.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join("")}</div>`;
 };
-const opt = (act, val, title, price, sub, tag) =>
-  `<button class="opt" data-act="${act}" data-val="${val}"><div class="opt-top"><span>${title}</span><span class="opt-price">${price}</span></div>${sub ? `<div class="opt-sub">${sub}</div>` : ""}${tag ? `<span class="tag">${tag}</span>` : ""}</button>`;
-const notif = (icon, iconClass, app, title, text) =>
-  `<div class="notif" role="status"><div class="notif-icon ${iconClass}">${icon}</div><div class="notif-body"><div class="notif-head"><span>${app}</span><span>now</span></div><div class="notif-title">${title}</div><div class="notif-text">${text}</div></div></div>`;
+// Choice card: icon, title, price, sub-line, paycheck-share bar, tag
+function opt({ act, val, ico, title, price, sub, cost, tag, tagCls }) {
+  const share = cost != null && S.city
+    ? `<div class="share"><span class="bar"><i style="width:${Math.min(100, cost / meterMax() * 100)}%"></i></span><span>${t("share", { pct: pct(cost, meterMax()) })}</span></div>` : "";
+  return `<button class="opt" data-act="${act}" data-val="${val}">
+    <div class="opt-top">${ico ? `<span class="opt-ico">${icon(ico)}</span>` : ""}<span class="t">${title}</span><span class="opt-price">${price}</span></div>
+    ${sub ? `<div class="opt-sub">${sub}</div>` : ""}${share}${tag ? `<span class="tag ${tagCls || ""}">${tag}</span>` : ""}</button>`;
+}
+const notif = (ico, cls, app, title, text) =>
+  `<div class="notif" role="status"><div class="notif-icon ${cls}">${icon(ico)}</div><div class="notif-body"><div class="notif-head"><span>${app}</span><span>now</span></div><div class="notif-title">${title}</div><div class="notif-text">${text}</div></div></div>`;
 const next = (to, label, cls = "") => `<button class="btn ${cls}" data-act="next" data-val="${to}">${label} <span class="arr">→</span></button>`;
+const cite = (s) => s ? `<span class="cite">(${s})</span>` : "";
+const grid100 = (n, cls = "on") => `<div class="g100">${Array.from({ length: 100 }, (_, i) => `<i class="${i < n ? cls : ""}"></i>`).join("")}</div>`;
+const hbar = (label, value, frac, cls) =>
+  `<div class="hbar"><div class="row"><span>${label}</span><b class="${cls === "red" ? "red" : ""}">${value}</b></div><div class="track"><i class="${cls || ""}" data-w="${Math.max(0, Math.min(100, frac * 100))}"></i></div></div>`;
+function growBars() {
+  requestAnimationFrame(() => setTimeout(() => {
+    document.querySelectorAll("[data-w]").forEach((el) => { el.style.width = el.dataset.w + "%"; });
+  }, 80));
+}
 
 /* ---------- Screens ---------- */
 const screens = {
   intro() {
     const cityBtn = (key) => {
       const c = CONFIG.cities[key];
-      return opt("city", key, c.name, fmtWage(c.wage) + "/hr",
-        `${c.wageLabel} → <b>${fmt(takeHomeFor(c.wage).net)}</b>/mo after payroll tax<span class="cite">(${c.wageCite})</span>`);
+      return opt({ act: "city", val: key, ico: "homeBig", title: c.name, price: fmtWage(c.wage) + "/hr",
+        sub: t("intro.cityLine", { label: c.wageLabel, pay: fmt(takeHomeFor(c.wage).net) }) + cite(c.wageCite) });
     };
     return `<div class="hero">
-      <p class="kicker">Build a Budget · a 2-minute game</p>
-      <h1><span>One paycheck.</span><span>Thirty days.</span><span>Make it work.</span></h1>
-      <div class="who"><span>Single parent</span><span>Kid, age 4</span><span>Cashier, 40 hrs/week</span></div>
-      <p class="lead">Make the smart choice at every step. Then see if the food lasts.</p>
-      <div class="opts"><p class="kicker" style="margin-top:20px">Choose your city</p>${cityBtn("fargo")}${cityBtn("minneapolis")}</div>
+      <p class="kicker">${t("intro.kicker")}</p>
+      <h1><span>${t("intro.title1")}</span><span>${t("intro.title2")}</span><span>${t("intro.title3")}</span></h1>
+      <div class="who"><span>${icon("parent")}${t("intro.tag1")}</span><span>${icon("kid")}${t("intro.tag2")}</span><span>${icon("cart")}${t("intro.tag3")}</span></div>
+      <p class="lead">${t("intro.lead")}</p>
+      <div class="opts"><p class="kicker" style="margin-top:20px">${t("intro.pick")}</p>${cityBtn("fargo")}${cityBtn("minneapolis")}</div>
     </div>`;
   },
 
   housing() {
     const r = city().rent;
-    const banner = S.wageOverride
-      ? `<div class="note">Replay: this time you earn <b>${fmtWage(S.wageOverride)}/hr</b> instead of ${fmtWage(city().wage)}. Same choices. Let's see.</div>` : "";
-    return `${dots()}${banner}<p class="kicker">Day 1 · Rent is due</p>
-      <h2>Where do you live?</h2>
-      <p class="muted">Typical rent in ${city().name}.<span class="cite">(${city().rentCite})</span></p>
+    const banner = S.wageOverride ? `<div class="note">${t("replay.banner", { wage: fmtWage(S.wageOverride), oldWage: fmtWage(city().wage) })}</div>` : "";
+    return `${dots()}${banner}<p class="kicker">${t("housing.kicker")}</p>
+      <h2>${t("housing.title")}</h2>
+      <p class="muted">${t("housing.sub", { city: city().name })}${cite(city().rentCite)}</p>
       <div class="opts">
-      ${opt("housing", "oneBR", "1-bedroom", fmt(r.oneBR), "You and your kid share a room.", "Cheaper")}
-      ${opt("housing", "twoBR", "2-bedroom", fmt(r.twoBR), "Your kid gets their own room.")}
+      ${opt({ act: "housing", val: "oneBR", ico: "home", title: t("housing.oneBR"), price: fmt(r.oneBR), sub: t("housing.oneBR.sub"), cost: r.oneBR, tag: t("tag.cheaper") })}
+      ${opt({ act: "housing", val: "twoBR", ico: "homeBig", title: t("housing.twoBR"), price: fmt(r.twoBR), sub: t("housing.twoBR.sub"), cost: r.twoBR })}
       </div>`;
   },
 
   care() {
-    const cc = city().childCare, ci = city().childCareCite;
-    return `${dots()}<p class="kicker">Day 1 · You start your shift at 7</p>
-      <h2>Who watches your kid?</h2>
-      <p class="muted">Full-time care for a 4-year-old, every month.</p>
+    const cc = city().childCare, ct = city();
+    return `${dots()}<p class="kicker">${t("care.kicker")}</p>
+      <h2>${t("care.title")}</h2>
+      <p class="muted">${t("care.sub")}</p>
       <div class="opts">
-      ${opt("care", "center", "Licensed center", fmt(cc.center), `Set hours, trained staff.<span class="cite">(${ci.center})</span>`)}
-      ${opt("care", "home", "Home-based daycare", fmt(cc.home), `A smaller group in a neighbor's home.<span class="cite">(${ci.home})</span>`, "Cheaper")}
+      ${opt({ act: "care", val: "center", ico: "kid", title: t("care.center"), price: fmt(cc.center), sub: t("care.center.sub") + cite(ct.childCareCiteCenter), cost: cc.center })}
+      ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome), cost: cc.home, tag: t("tag.cheaper") })}
       </div>`;
   },
 
   transport() {
-    return `${dots()}<p class="kicker">Day 2 · Getting to work</p>
-      <h2>Car or bus?</h2>
+    return `${dots()}<p class="kicker">${t("transport.kicker")}</p>
+      <h2>${t("transport.title")}</h2>
       <div class="opts">
-      ${opt("transport", "car", "Keep your old car", fmt(CONFIG.transport.carMonthly), `Payment, insurance, gas.<span class="cite">(estimate)</span>`)}
-      ${opt("transport", "bus", "Take the bus", fmt(city().busPass), `Catch: without a car, you shop at the corner store nearby. Food costs about 25% more.<span class="cite">(estimate)</span>`, "Cheaper")}
+      ${opt({ act: "transport", val: "car", ico: "car", title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate"), cost: CONFIG.transport.carMonthly })}
+      ${opt({ act: "transport", val: "bus", ico: "bus", title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate"), cost: city().busPass, tag: t("tag.cheaper") })}
       </div>`;
   },
 
   basics() {
-    return `${dots()}<p class="kicker">Day 6 · Autopay</p>
-      <h2>These happen no matter what.</h2>
+    return `${dots()}<p class="kicker">${t("basics.kicker")}</p>
+      <h2>${t("basics.title")}</h2>
       <ul class="auto">
-        <li><span class="chk">✓</span>Phone bill</li>
-        <li><span class="chk">✓</span>Toiletries and household supplies</li>
-        <li><span class="chk">✓</span>Kid's clothes (they keep growing)</li>
-        <li class="tot">Basics<span class="amt">${fmt(CONFIG.basicsMonthly)}</span></li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}</li>
+        <li><span class="ico">${icon("bag")}</span>${t("basics.supplies")}</li>
+        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}</li>
+        <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(CONFIG.basicsMonthly)}</span></li>
       </ul>
       <p class="cite">(estimate)</p>
       <div class="actions">${next("snap", "Continue")}</div>`;
@@ -494,45 +817,66 @@ const screens = {
   snap() {
     const r = path();
     const body = r.snap > 0
-      ? `${notif("EBT", "green", "SNAP · EBT card", "Your benefits are ready", `${fmt(r.snap)} was added to your EBT card.`)}
-         <h2>You qualified for SNAP.</h2>
-         <p class="lead">${fmt(r.snap)} a month in food assistance.<span class="cite">(${CONFIG.snap.cite})</span></p>
-         <div class="note plain small">SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.</div>`
-      : `${notif("EBT", "", "SNAP · Application", "Application denied", "Your income is over the limit.")}
-         <h2>No SNAP this time.</h2>
-         <p class="lead">At ${fmtWage(r.wage)}/hr, you earn too much to qualify.<span class="cite">(${CONFIG.snap.cite})</span></p>`;
-    return `${dots()}<p class="kicker">Day 10 · You applied for food assistance</p>${body}
+      ? `<h2>${t("snap.title")}</h2>
+         <div class="ebtcard"><div class="lbl">EBT · SNAP</div><div class="chip"></div><div class="bal">${fmt(r.snap)}.00</div><div class="foot">FOOD ONLY · MONTHLY</div></div>
+         <p class="lead">${t("snap.lead", { amount: fmt(r.snap) })}${cite(CONFIG.snap.cite)}</p>
+         <div class="note plain small">${t("snap.note")}</div>`
+      : `<h2>${t("snap.deniedTitle")}</h2>
+         <p class="lead">${t("snap.deniedLead", { wage: fmtWage(r.wage) })}${cite(CONFIG.snap.cite)}</p>`;
+    return `${dots()}<p class="kicker">${t("snap.kicker")}</p>${body}
       <div class="actions">${next("surprise", "Continue")}</div>`;
   },
 
   surprise() {
     const car = S.c.transport === "car";
-    const p = cardPayoff();
-    const n = car
-      ? notif("AUTO", "red", "Auto shop", "Your estimate is ready", `Brakes and a worn belt: <b>${fmt(CONFIG.surprise.amount)}</b>.`)
-      : notif("DDS", "red", "Dental office", "Treatment plan", `Your kid needs a filling: <b>${fmt(CONFIG.surprise.amount)}</b>.`);
+    const p = cardPayoff(), A = CONFIG.surprise.amount;
+    const title = car ? t("surprise.carTitle") : t("surprise.dentalTitle");
     if (S.c.surprise) {
-      const lines = {
-        pay: `Paid. The ${fmt(CONFIG.surprise.amount)} came out of what was left for food.`,
-        card: `The bill is paid. The debt isn't: ${fmt(CONFIG.surprise.cardMonthlyPayment)} this month, and every month for about ${p.months} months.`,
-        skip: car
-          ? "You skip the repair. The car still runs, for now. If it dies, so does your way to work."
-          : "You skip the dentist. The pain doesn't go away, and it gets more expensive the longer it waits."
-      };
-      return `${dots()}<p class="kicker">Day 17 · Something comes up</p>
-        <h2>${car ? "The car." : "Your kid's tooth."}</h2>
-        <div class="note ${S.c.surprise === "pay" ? "" : "bad"}">${lines[S.c.surprise]}</div>
-        <div class="actions">${next("food", "Go grocery shopping", "go")}</div>`;
+      const line = {
+        pay: t("surprise.after.pay", { amount: fmt(A) }),
+        card: t("surprise.after.card", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months }),
+        skip: car ? t("surprise.after.skipCar") : t("surprise.after.skipDental")
+      }[S.c.surprise];
+      const to = path().gap > 0 ? "cut" : "food";
+      return `${dots()}<p class="kicker">${t("surprise.kicker")}</p>
+        <h2>${title}</h2>
+        <div class="note ${S.c.surprise === "pay" ? "" : "bad"}">${line}</div>
+        <div class="actions">${next(to, t("surprise.next"), "go")}</div>`;
     }
-    return `${dots()}<p class="kicker">Day 17 · Something comes up</p>
+    const n = car
+      ? notif("wrench", "red", t("surprise.carApp"), t("surprise.carNotifTitle"), t("surprise.carNotif", { amount: fmt(A) }))
+      : notif("tooth", "red", t("surprise.dentalApp"), t("surprise.dentalNotifTitle"), t("surprise.dentalNotif", { amount: fmt(A) }));
+    const cov = CONFIG.stats.cover400WithCash;
+    return `${dots()}<p class="kicker">${t("surprise.kicker")}</p>
       ${n}
-      <h2>${car ? "The car needs work." : "Your kid's tooth hurts."}</h2>
-      <p class="muted">Only ${CONFIG.stats.cover400WithCash}% of U.S. adults could cover this with cash.<span class="cite">(Federal Reserve, 2025)</span></p>
+      <h2>${title}</h2>
+      <div class="figure">${grid100(Math.round(cov))}<p class="cap">${t("surprise.stat", { pct: cov })}${cite("Federal Reserve, 2025")}</p></div>
       <div class="opts">
-      ${opt("surprise", "pay", "Pay it now", fmt(CONFIG.surprise.amount), "No debt. It comes out of what's left for food.", "No debt")}
-      ${opt("surprise", "card", "Put it on a credit card", fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
-        `At ${Math.round(CONFIG.surprise.cardAPR * 100)}% interest, ${fmt(CONFIG.surprise.amount)} becomes about ${fmt(p.total)} over ${p.months} months.<span class="cite">(estimate)</span>`)}
-      ${opt("surprise", "skip", "Skip it", "$0", car ? "Keep driving and hope." : "Wait and hope it gets better.")}
+      ${opt({ act: "surprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), cost: A, tag: t("tag.noDebt") })}
+      ${opt({ act: "surprise", val: "card", ico: "card", title: t("surprise.card"), price: fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
+        sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate"), cost: CONFIG.surprise.cardMonthlyPayment })}
+      ${opt({ act: "surprise", val: "skip", ico: "skip", title: t("surprise.skip"), price: "$0", sub: car ? t("surprise.skip.subCar") : t("surprise.skip.subDental") })}
+      </div>`;
+  },
+
+  cut() {
+    const r = path();
+    if (S.c.cut === "food") {
+      return `${dots()}<p class="kicker">${t("cut.kicker")}</p>
+        <h2>${t("cut.title")}</h2>
+        <div class="note bad" style="font-size:17px">${t("cut.yes")}</div>
+        <div class="actions">${next("food", t("cut.next"), "go")}</div>`;
+    }
+    const car = S.c.transport === "car";
+    return `${dots()}<p class="kicker">${t("cut.kicker")}</p>
+      <h2>${t("cut.title")}</h2>
+      <p class="lead">${t("cut.lead", { gap: `<span class="red">${fmt(r.gap)}</span>` })}</p>
+      <div class="opts" id="cutOpts">
+      ${opt({ act: "cut", val: "rent", ico: "home", title: t("cut.rent"), price: fmt(r.housing) })}
+      ${opt({ act: "cut", val: "care", ico: "kid", title: t("cut.care"), price: fmt(r.care) })}
+      ${opt({ act: "cut", val: "transport", ico: car ? "car" : "bus", title: t("cut.transport"), price: fmt(r.transport) })}
+      ${opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "" })}
+      ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
       </div>`;
   },
 
@@ -541,21 +885,25 @@ const screens = {
     const bus = S.c.transport === "bus";
     const D = CONFIG.daysInMonth;
     const cells = Array.from({ length: D }, (_, i) => `<div>${i + 1}</div>`).join("");
-    setTimeout(() => animateCalendar(r), 350);
-    return `${dots()}<p class="kicker">Day 1–30 · Groceries</p>
-      <h2>Will the food last?</h2>
-      <div class="math">
-        <span>Cash left after bills</span><b class="${r.leftover < 0 ? "red" : ""}">${fmt(r.leftover)}</b>
-        ${r.leftover < 0 ? `<span class="small red" style="grid-column:1/-1;margin-top:-4px">That's rent and bills you can't pay. Nothing left for food.</span>` : ""}
-        <span>SNAP (food only)</span><b>+${fmt(r.snap)}</b>
-        <span><b style="font-family:var(--sans);text-align:left">Food budget</b></span><b>${fmt(r.foodMoney)}</b>
-        <span>Cheapest healthy diet${bus ? ", corner-store prices" : ""}</span><b>${fmt(r.need)}</b>
-        <span class="cite">(${CONFIG.food.cite}${bus ? "; +25% estimate" : ""})</span>
+    const max = Math.max(r.need, r.foodMoney);
+    setTimeout(() => animateCalendar(r), 500);
+    growBars();
+    return `${dots()}<p class="kicker">${t("food.kicker")}</p>
+      <h2>${t("food.title")}</h2>
+      <div class="plate">
+        <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#fff" stroke="#e3ddd0" stroke-width="2"/><circle cx="40" cy="40" r="24" fill="none" stroke="#e3ddd0" stroke-width="2"/><path d="M40 16a24 24 0 0 1 0 48z" fill="var(--accent-soft)"/></svg>
+        <div><div class="amt">$${r.perMeal.toFixed(2)}</div><div class="per">${t("food.perMeal")}</div></div>
+      </div>
+      <p class="small muted">${t("food.perMealNote")}${bus ? " " + t("food.perMealBus") : ""}${cite(CONFIG.food.cite + (bus ? "; +25% estimate" : ""))}</p>
+      ${r.billsBehind > 0 ? `<div class="note bad">${t("food.behind", { amount: fmt(r.billsBehind) })}</div>` : ""}
+      <div class="figure">
+        ${hbar(`${t("food.budget")} <span class="muted small">(${t("food.budgetDetail", { cash: fmt(Math.max(0, r.leftover)), snap: fmt(r.snap) })})</span>`, fmt(r.foodMoney), r.foodMoney / max, "acc")}
+        ${hbar(t("food.need"), fmt(r.need), r.need / max, "")}
       </div>
       <div class="cal" id="cal">${cells}</div>
-      <div class="cal-key"><span><i style="background:var(--accent)"></i>Food covered</span><span><i style="background:var(--red-soft)"></i>Not covered</span></div>
+      <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("food.keyOn")}</span><span><i style="background:var(--red-soft)"></i>${t("food.keyOff")}</span></div>
       <div class="verdict" id="verdict"></div>
-      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${next("results", "See the month's receipt", "go")}</div>`;
+      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${next("results", t("food.next"), "go")}</div>`;
   },
 
   results() {
@@ -563,89 +911,116 @@ const screens = {
     const c = city();
     const short = r.gap > 0;
     const p = cardPayoff();
+    const dayTxt = `<span class="red">day ${r.daysFed + 1}</span>`;
+
+    // Headline + meals graphic
+    const meals = Array.from({ length: r.totalMeals }, (_, i) => `<i class="${i >= r.totalMeals - r.mealsSkipped ? "x" : ""}"></i>`).join("");
+    const mealsFig = `<div class="figure"><div class="meals">${meals}</div><div class="meals-key"><span>Day 1</span><span>${t("results.mealsKey")}</span><span>Day ${CONFIG.daysInMonth}</span></div></div>`;
     let head;
     if (r.foodGap > 0) {
-      head = `<p class="headline">The food ran out on <span class="red">day ${r.daysFed + 1}</span>.</p>
-        <div class="big red">${fmt(r.foodGap)}</div>
-        <p class="lead">short of USDA's cheapest healthy diet, <b>even with SNAP</b>.${r.billsBehind > 0 ? ` And <b class="red">${fmt(r.billsBehind)}</b> behind on rent and bills.` : ""}</p>`;
+      head = `<p class="headline">${t("results.leadShort", { day: dayTxt })}</p>
+        <div class="big red">${r.mealsSkipped}</div>
+        <p class="lead" style="margin-bottom:8px"><b>${t("results.mealsSkipped")}</b></p>
+        ${mealsFig}
+        <p>${t("results.mealsNote", { gap: fmt(r.foodGap) })}${r.billsBehind > 0 ? " " + t("results.billsToo", { amount: `<span class="red">${fmt(r.billsBehind)}</span>` }) : ""}</p>`;
     } else if (r.billsBehind > 0) {
-      head = `<p class="headline">SNAP kept food on the table. It can't pay rent.</p>
+      head = `<p class="headline">${t("results.leadBills")}</p>
         <div class="big red">${fmt(r.billsBehind)}</div>
-        <p class="lead">behind on rent and bills this month.</p>`;
-    } else if (r.gap > -1) {
-      head = `<p class="headline">You made it. With <span class="accent">nothing</span> left.</p>
-        <p class="lead">Not a dollar for anything else this month.</p>`;
+        <p class="lead"><b>${t("results.billsBehind")}</b></p>
+        ${mealsFig}`;
     } else {
-      head = `<p class="headline">You made it, with</p>
-        <div class="big accent">${fmt(-r.gap)}</div>
-        <p class="lead">left for everything else this month.</p>`;
+      head = `<p class="headline">${r.gap > -1 ? t("results.leadZero") : t("results.leadOk", { amount: `<span class="accent">${fmt(-r.gap)}</span>` })}</p>
+        ${mealsFig}<p class="small muted">${t("results.mealsAll", { total: r.totalMeals })}</p>`;
     }
-    const noSnap = `<div class="nosnap"><span>Without SNAP</span><b class="${r.gapNoSnap > 0 ? "red" : "accent"}">${r.gapNoSnap > 0 ? fmt(r.gapNoSnap) + " short" : fmt(-r.gapNoSnap) + " to spare"}</b></div>`;
-    const stillOwed = {
-      card: `And the card bill didn't go away. You owe ${fmt(CONFIG.surprise.cardMonthlyPayment)} a month for ${p.months - 1} more months, ${fmt(p.total)} in all. Next month starts ${fmt(CONFIG.surprise.cardMonthlyPayment)} behind.`,
-      skip: `And the ${S.c.transport === "car" ? "repair" : "dental bill"} didn't go away. It's still waiting, and it usually costs more later.`
-    }[S.c.surprise];
-    const owedNote = stillOwed ? `<div class="note bad">${stillOwed}</div>` : "";
-    const raiseLine = S.wageOverride
-      ? `<div class="note">At ${fmtWage(S.wageOverride)}/hr: ${fmtWage(S.wageOverride - c.wage)} more per hour than the real wage of ${fmtWage(c.wage)}.</div>` : "";
-    const ctx = c.stateMinWageNote && !S.wageOverride
-      ? `<p class="small muted">For context: ${c.stateMinWageNote}<span class="cite">(U.S. DOL)</span></p>` : "";
-    const surpriseLabel = { pay: "SURPRISE BILL", card: "CARD PAYMENT", skip: "SURPRISE (UNPAID)" }[S.c.surprise];
+
+    // With vs. without SNAP
+    const ns = r.gapNoSnap, ws = r.gap;
+    const mx = Math.max(Math.abs(ns), Math.abs(ws), 1);
+    const lbl = (g) => g > 0 ? `${fmt(g)} ${t("results.short")}` : `${fmt(-g)} ${t("results.spare")}`;
+    const snapFig = `<p class="section">${t("results.snapTitle")}</p><div class="figure">
+      ${hbar(t("results.withoutSnap"), lbl(ns), Math.abs(ns) / mx, ns > 0 ? "red" : "acc")}
+      ${hbar(`${t("results.withSnap")} <span class="muted small">(+${fmt(r.snap)})</span>`, lbl(ws), Math.abs(ws) / mx, ws > 0 ? "red" : "acc")}
+    </div>`;
+
+    // Where the paycheck went (stacked bar)
+    const surpriseLabel = { pay: t("label.surprisePay"), card: t("label.surpriseCard"), skip: t("label.surpriseSkip") }[S.c.surprise];
+    const items = [
+      [t("label.rent"), r.housing, "var(--s1)"],
+      [t("label.care"), r.care, "var(--s2)"],
+      [S.c.transport === "car" ? t("label.car") : t("label.bus"), r.transport, "var(--s3)"],
+      [t("label.basics"), r.basics, "var(--s4)"],
+      [surpriseLabel, r.surprise, "var(--s5)"]
+    ].filter((x) => x[1] > 0);
+    const spent = items.reduce((a, x) => a + x[1], 0);
+    const scale = Math.max(r.net, spent);
+    const foodCash = Math.max(0, r.leftover);
+    const over = Math.max(0, spent - r.net);
+    const segs = items.map((x) => `<i style="width:0;background:${x[2]}" data-w="${x[1] / scale * 100}"></i>`).join("")
+      + (foodCash > 0 ? `<i style="width:0;background:var(--accent)" data-w="${foodCash / scale * 100}"></i>` : "");
+    const overSeg = over > 0 ? `<i class="over" style="position:absolute;top:0;bottom:0;left:${r.net / scale * 100}%;width:${over / scale * 100}%"></i>` : "";
+    const legend = items.map((x) => `<li><span class="sw" style="background:${x[2]}"></span>${x[0]}<span class="v">${fmt(x[1])}</span><span class="p">${pct(x[1], r.net)}</span></li>`).join("")
+      + (foodCash > 0 ? `<li><span class="sw" style="background:var(--accent)"></span>${t("label.food")}<span class="v">${fmt(foodCash)}</span><span class="p">${pct(foodCash, r.net)}</span></li>` : "")
+      + (over > 0 ? `<li class="red"><span class="sw" style="background:var(--red)"></span>${t("results.over")}<span class="v">${fmt(over)}</span><span class="p"></span></li>` : "");
+    const whereFig = `<p class="section">${t("results.whereTitle")} · ${fmt(r.net)}</p><div class="figure">
+      <div class="stack">${segs}${overSeg}</div>
+      ${over > 0 ? `<div class="stack-mark"><span style="left:${r.net / scale * 100}%">${t("results.paycheckEnds")}</span></div>` : ""}
+      <ul class="legend">${legend}</ul></div>`;
+
+    const owed = S.c.surprise === "card"
+      ? t("results.owedCard", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months - 1, total: fmt(p.total) })
+      : S.c.surprise === "skip" ? (S.c.transport === "car" ? t("results.owedSkipCar") : t("results.owedSkipDental")) : "";
+    const raiseLine = S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : "";
+    const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
+
     const rl = (l, v, cls = "") => `<div class="rl ${cls}"><span>${l}</span><span class="d"></span><span>${v}</span></div>`;
-    const stamp = short ? `<span class="stamp">SHORT</span>` : `<span class="stamp ok">LEFT OVER</span>`;
-    const other = S.city === "fargo" ? "Minneapolis" : "Fargo";
-    return `
-      <p class="kicker">You made ${r.conscious} of 4 budget-conscious choices</p>
-      ${head}
-      ${noSnap}
-      ${owedNote}
-      ${raiseLine}
-      <div class="receipt">
+    const receipt = `<details class="rec"><summary>${t("results.receipt")}</summary><div class="receipt">
         <h3>ONE MONTH</h3>
         <div class="sub">${c.name.toUpperCase()} · ${fmtWage(r.wage)}/HR · 40 HRS/WK</div>
-        ${rl("TAKE-HOME PAY", fmt(r.net))}
-        <hr>
-        ${rl("RENT", "−" + fmt(r.housing))}
-        ${rl("CHILD CARE", "−" + fmt(r.care))}
-        ${rl(S.c.transport === "car" ? "CAR" : "BUS PASS", "−" + fmt(r.transport))}
-        ${rl("BASICS", "−" + fmt(r.basics))}
-        ${rl(surpriseLabel, "−" + fmt(r.surprise))}
-        <hr>
+        ${rl("TAKE-HOME PAY", fmt(r.net))}<hr>
+        ${items.map((x) => rl(x[0].toUpperCase(), "−" + fmt(x[1]))).join("")}<hr>
         ${rl("CASH LEFT", fmt(r.leftover), "tot")}
         ${rl("SNAP / EBT", "+" + fmt(r.snap))}
-        ${rl("FOOD NEEDED", "−" + fmt(r.need))}
-        <hr>
-        <div class="due">${stamp}<span class="${short ? "red" : "accent"}">${fmt(Math.abs(r.gap))}</span></div>
-      </div>
+        ${rl("FOOD NEEDED", "−" + fmt(r.need))}<hr>
+        <div class="due">${short ? `<span class="stamp">SHORT</span>` : `<span class="stamp ok">LEFT OVER</span>`}<span class="${short ? "red" : "accent"}">${fmt(Math.abs(r.gap))}</span></div>
+      </div></details>`;
+
+    growBars();
+    const other = S.city === "fargo" ? "minneapolis" : "fargo";
+    return `<p class="kicker">${t("results.choices", { n: r.conscious })}</p>
+      ${head}
+      ${owed ? `<div class="note bad">${owed}</div>` : ""}
+      ${raiseLine}
+      ${snapFig}
+      ${whereFig}
       ${ctx}
+      ${receipt}
       <div class="actions">
-        ${next("final", "What this means", "go")}
-        ${short && r.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${r.wageToClose}">Replay earning ${fmtWage(r.wageToClose)}/hr</button>` : ""}
-        <button class="btn secondary" data-act="otherCity">Try ${other}</button>
-        <button class="btn link" data-act="replay">Replay from the start</button>
+        ${next("final", t("results.next"), "go")}
+        ${short && r.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${r.wageToClose}">${t("results.raiseBtn", { wage: fmtWage(r.wageToClose) })}</button>` : ""}
+        <button class="btn secondary" data-act="otherCity">${t("results.otherCity", { city: CONFIG.cities[other].name.split(",")[0] })}</button>
+        <button class="btn link" data-act="replay">${t("results.replay")}</button>
       </div>`;
   },
 
   final() {
     const st = CONFIG.stats;
     setTimeout(countUp, 200);
-    return `
-      <p class="kicker">The bigger picture</p>
+    setTimeout(() => {
+      document.querySelectorAll(".g100.fill i").forEach((el, i) => { if (i < Math.round(st.foodInsecure2024)) setTimeout(() => el.classList.add("red"), i * 60); });
+    }, 300);
+    return `<p class="kicker">${t("final.kicker")}</p>
       <div class="stat">
         <div class="big" data-count="${st.foodInsecure2024}" data-dec="1">0%</div>
-        <p>of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.</p>
-        <span class="cite">(USDA ERS, 2025)</span>
+        <p>${t("final.stat")}</p>
+        <div class="figure"><div class="g100 fill">${Array.from({ length: 100 }, () => "<i></i>").join("")}</div>
+        <p class="cap">${t("final.grid", { n: Math.round(st.foodInsecure2024) })}</p>${cite("USDA ERS, 2025")}</div>
       </div>
-      <div class="stat">
-        <div class="big" data-count="${st.cover400WithCash}" data-dec="0">0%</div>
-        <p>of U.S. adults could cover a surprise $400 expense with cash.</p>
-        <span class="cite">(Federal Reserve, 2025)</span>
-      </div>
+      <p class="closing">${t("final.closing")}</p>
       <div class="actions">
-        <button class="btn secondary" data-act="next" data-val="sources">Sources</button>
-        <button class="btn link" data-act="replay">Play again</button>
+        <button class="btn secondary" data-act="next" data-val="sources">${t("final.sources")}</button>
+        <button class="btn link" data-act="replay">${t("final.again")}</button>
       </div>
-      <p class="credit">Build a Budget · Created by Ryan Cooley</p>`;
+      <p class="credit">${t("final.credit")}</p>`;
   },
 
   sources() {
@@ -665,9 +1040,9 @@ const screens = {
         <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
       </ol>
       <div class="panel small">
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), basics (${fmt(CONFIG.basicsMonthly)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${CONFIG.food.convenienceMarkup * 100}%), and credit card terms (${Math.round(CONFIG.surprise.cardAPR * 100)}% APR, ${fmt(CONFIG.surprise.cardMonthlyPayment)}/mo).</p>
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), basics (${fmt(CONFIG.basicsMonthly)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), and credit card terms (${Math.round(CONFIG.surprise.cardAPR * 100)}% APR, ${fmt(CONFIG.surprise.cardMonthlyPayment)}/mo).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
-        <p><b>Food calendar:</b> days covered = food budget ÷ monthly food cost × 30.</p>
+        <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
         <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
       </div>
       <div class="actions"><button class="btn secondary" data-act="next" data-val="final">Back</button></div>`;
@@ -687,9 +1062,9 @@ async function animateCalendar(r) {
   }
   const v = $("verdict");
   if (!v) return;
-  if (r.foodGap > 0) v.innerHTML = `Food runs out on <span class="red">day ${r.daysFed + 1}</span>.`;
-  else if (r.billsBehind > 0) v.innerHTML = `The food lasts. <span class="red">Rent doesn't get paid.</span>`;
-  else v.innerHTML = `The food lasts the month.`;
+  if (r.foodGap > 0) v.innerHTML = t("food.verdictShort", { day: `<span class="red">day ${r.daysFed + 1}</span>` });
+  else if (r.billsBehind > 0) v.innerHTML = t("food.verdictBills", { rent: `<span class="red">${t("food.verdictBillsRent")}</span>` });
+  else v.innerHTML = t("food.verdictOk");
   v.classList.add("show");
   $("foodNext").style.opacity = 1;
 }
@@ -697,8 +1072,8 @@ async function animateCalendar(r) {
 function countUp() {
   document.querySelectorAll("[data-count]").forEach((el) => {
     const to = parseFloat(el.dataset.count), dec = +el.dataset.dec, dur = reduceMotion ? 0 : 1300, t0 = performance.now();
-    const tick = (t) => {
-      const k = dur ? Math.min(1, (t - t0) / dur) : 1;
+    const tick = (now) => {
+      const k = dur ? Math.min(1, (now - t0) / dur) : 1;
       el.textContent = (to * (1 - Math.pow(1 - k, 3))).toFixed(dec) + "%";
       if (k < 1) requestAnimationFrame(tick);
     };
@@ -716,9 +1091,10 @@ function go(name) {
   m.className = "";
   void m.offsetWidth;
   m.className = "enter";
-  window.scrollTo(0, 0);
+  if (!EDITOR) window.scrollTo(0, 0);
   updateMeter();
   if (name === "surprise" && !S.c.surprise) setTimeout(() => { m.className = "shake"; buzz([80, 60, 80]); }, 450);
+  if (EDITOR) EDITOR.syncJump();
 }
 
 function restart(cityKey, wageOverride) {
@@ -727,14 +1103,35 @@ function restart(cityKey, wageOverride) {
   go(cityKey ? "housing" : "intro");
 }
 
+function cutNo(b, val) {
+  const r = path();
+  const msg = {
+    rent: t("cut.rent.no", { gap: fmt(r.gap) }),
+    care: t("cut.care.no", { pay: fmt(r.net), cost: fmt(r.care) }),
+    transport: t("cut.transport.no", { pay: fmt(r.net), cost: fmt(r.transport) }),
+    phone: t("cut.phone.no")
+  }[val];
+  b.classList.add("nope");
+  b.disabled = true;
+  let sub = b.querySelector(".opt-sub");
+  if (!sub) { sub = document.createElement("div"); sub.className = "opt-sub"; b.appendChild(sub); }
+  sub.innerHTML = msg;
+  if (!b.querySelector(".tag")) b.insertAdjacentHTML("beforeend", `<span class="tag no">${t("cut.notOption")}</span>`);
+  buzz(40);
+}
+
 let locked = false;
 const AFTER = { housing: "care", care: "transport", transport: "basics", surprise: "surprise" };
 document.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-act]");
-  if (!b || locked) return;
+  if (!b || locked || b.closest("#editor")) return;
   const { act, val } = b.dataset;
+  if (act === "cut") {
+    if (val !== "food") return cutNo(b, val);
+    locked = true; b.classList.add("picked"); buzz(15); await wait(400); locked = false;
+    S.c.cut = "food"; return go("cut");
+  }
   if (act === "city" || AFTER[act]) {
-    // Choice: highlight, pause a beat, then move on
     locked = true;
     b.classList.add("picked");
     b.parentElement.classList.add("locked");
@@ -753,6 +1150,170 @@ document.addEventListener("click", async (e) => {
   }
 });
 
+/* =====================================================================
+   EDIT PANEL — open the game with ?edit at the end of the URL
+   ===================================================================== */
+let EDITOR = null;
+function startEditor() {
+  const KEY = "build-a-budget-edits";
+  const state = JSON.parse(JSON.stringify(EDITS));
+  try { const d = JSON.parse(localStorage.getItem(KEY) || "null"); if (d) { Object.assign(state.config, d.config || {}); Object.assign(state.text, d.text || {}); } } catch (e) {}
+  applyEdits(state);
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+  // Collect editable fields
+  const dataFields = [];
+  (function walk(o, pre) {
+    for (const k in o) {
+      const v = o[k], p = pre ? pre + "." + k : k;
+      if (v && typeof v === "object") walk(v, p);
+      else if (typeof v === "number" || typeof v === "string") dataFields.push(p);
+    }
+  })(DEFAULTS.config, "");
+  const textFields = Object.keys(DEFAULTS.text);
+
+  const SCREENS = ["intro", "housing", "care", "transport", "basics", "snap", "surprise", "cut", "food", "results", "final", "sources"];
+  const ed = document.createElement("aside");
+  ed.id = "editor";
+  ed.innerHTML = `<div class="ed-top">
+      <h4>Edit panel</h4>
+      <p>Changes show live in the game. They're saved in this browser until you download. When you're done: <b>Download</b>, then upload <b>index.html</b> to GitHub (Add file → Upload files → Commit).</p>
+      <div class="ed-btns"><button class="pri" id="edDl">Download index.html</button><button id="edReset">Reset all</button></div>
+      <select id="edJump" aria-label="Jump to screen">${SCREENS.map((s) => `<option value="${s}">Show screen: ${s}</option>`).join("")}</select>
+      <div class="ed-tabs"><button data-tab="text" class="on">Words</button><button data-tab="data">Numbers &amp; data</button></div>
+      <input id="edSearch" placeholder="Search…" style="margin-top:8px">
+      <div class="ed-count" id="edCount" style="margin-top:6px"></div>
+    </div><div class="ed-list" id="edList"></div>`;
+  document.body.appendChild(ed);
+  document.body.classList.add("editing");
+  const tog = document.createElement("button");
+  tog.id = "edToggle"; tog.textContent = "Edit";
+  tog.onclick = () => ed.classList.toggle("open");
+  document.body.appendChild(tog);
+
+  let tab = "text";
+  const curVal = (kind, p) => kind === "text" ? TEXT[p] : getPath(CONFIG, p);
+  const defVal = (kind, p) => kind === "text" ? DEFAULTS.text[p] : getPath(DEFAULTS.config, p);
+  const store = (kind) => kind === "text" ? state.text : state.config;
+  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+  function renderList() {
+    const q = $("edSearch").value.trim().toLowerCase();
+    const fields = tab === "text" ? textFields : dataFields;
+    let html = "", group = null, shown = 0;
+    for (const p of fields) {
+      const v = curVal(tab, p);
+      if (q && !(p.toLowerCase().includes(q) || String(v).toLowerCase().includes(q))) continue;
+      const g = p.split(".")[tab === "data" && p.startsWith("cities.") ? 1 : 0];
+      if (g !== group) { html += `<div class="ed-group">${g}</div>`; group = g; }
+      const changed = p in store(tab);
+      const isNum = typeof defVal(tab, p) === "number";
+      const input = tab === "text" || (!isNum && String(v).length > 40)
+        ? `<textarea rows="${Math.min(5, Math.ceil(String(v).length / 42) || 1)}">${esc(v)}</textarea>`
+        : `<input ${isNum ? 'type="number" step="any"' : ""} value="${esc(v)}">`;
+      html += `<label class="ed-f ${changed ? "changed" : ""}" data-p="${p}"><span class="ed-l"><i class="chg"></i>${p}<button type="button" class="rs">reset</button></span>${input}</label>`;
+      shown++;
+    }
+    $("edList").innerHTML = html || `<p class="ed-count">No matches.</p>`;
+    const n = Object.keys(state.text).length + Object.keys(state.config).length;
+    $("edCount").textContent = `${shown} fields · ${n} changed`;
+  }
+
+  let timer = null;
+  function rerender() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const keep = meterShown;
+      if (S.screen === "intro" || !S.city) go("intro"); else { go(S.screen); }
+      meterShown = keep;
+    }, 250);
+  }
+
+  $("edList").addEventListener("input", (e) => {
+    const f = e.target.closest(".ed-f"); if (!f) return;
+    const p = f.dataset.p, kind = tab;
+    const isNum = typeof defVal(kind, p) === "number";
+    let v = e.target.value;
+    if (isNum) { if (v === "" || isNaN(+v)) return; v = +v; }
+    if (kind === "text") TEXT[p] = v; else setPath(CONFIG, p, v);
+    if (v === defVal(kind, p)) delete store(kind)[p]; else store(kind)[p] = v;
+    f.classList.toggle("changed", p in store(kind));
+    save(); rerender();
+    const n = Object.keys(state.text).length + Object.keys(state.config).length;
+    $("edCount").textContent = $("edCount").textContent.replace(/\d+ changed/, n + " changed");
+  });
+  $("edList").addEventListener("click", (e) => {
+    const rs = e.target.closest(".rs"); if (!rs) return;
+    e.preventDefault();
+    const f = rs.closest(".ed-f"), p = f.dataset.p, kind = tab, d = defVal(kind, p);
+    if (kind === "text") TEXT[p] = d; else setPath(CONFIG, p, d);
+    delete store(kind)[p];
+    save(); renderList(); rerender();
+  });
+  $("edSearch").addEventListener("input", renderList);
+  ed.querySelectorAll(".ed-tabs button").forEach((b) => b.addEventListener("click", () => {
+    tab = b.dataset.tab;
+    ed.querySelectorAll(".ed-tabs button").forEach((x) => x.classList.toggle("on", x === b));
+    renderList();
+  }));
+  $("edReset").addEventListener("click", () => {
+    if (!confirm("Undo every change in the edit panel?")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    state.config = {}; state.text = {};
+    for (const p of dataFields) setPath(CONFIG, p, getPath(DEFAULTS.config, p));
+    for (const p of textFields) TEXT[p] = DEFAULTS.text[p];
+    renderList(); rerender();
+  });
+  $("edJump").addEventListener("change", (e) => jumpTo(e.target.value));
+  $("edDl").addEventListener("click", () => downloadEdited(state));
+
+  function jumpTo(name) {
+    const order = ["housing", "care", "transport", "basics", "snap", "surprise", "cut", "food", "results", "final", "sources"];
+    const idx = order.indexOf(name);
+    if (idx < 0) { S.city = null; S.c = {}; meterShown = 0; return go("intro"); }
+    if (!S.city) S.city = "fargo";
+    const prev = S.c, c = {};
+    const pick = (k, d) => (c[k] = prev[k] || d);
+    if (idx > 0) pick("housing", "oneBR");
+    if (idx > 1) pick("care", "home");
+    if (idx > 2) pick("transport", "bus");
+    if (idx > 3) c.basics = true;
+    if (idx > 4) c.snap = true;
+    if (idx > 5) pick("surprise", "pay");
+    if (idx > 6) c.cut = "food";
+    S.c = c;
+    go(name);
+  }
+
+  renderList();
+  EDITOR = { syncJump() { const j = $("edJump"); if (j && j.value !== S.screen && [...j.options].some((o) => o.value === S.screen)) j.value = S.screen; } };
+}
+
+async function downloadEdited(state) {
+  const A = "/*EDITS" + "-START*/", B = "/*EDITS" + "-END*/";
+  let src = null;
+  try {
+    const res = await fetch(location.href.split(/[?#]/)[0], { cache: "no-store" });
+    if (res.ok) src = await res.text();
+  } catch (e) {}
+  if (!src || src.indexOf(A) < 0) {
+    const doc = document.documentElement.cloneNode(true);
+    ["#editor", "#edToggle"].forEach((s) => { const n = doc.querySelector(s); if (n) n.remove(); });
+    const sc = doc.querySelector("#screen"); if (sc) sc.innerHTML = "";
+    doc.querySelector("body").removeAttribute("class");
+    src = "<!doctype html>\n" + doc.outerHTML;
+  }
+  const i = src.indexOf(A), j = src.indexOf(B, i);
+  if (i < 0 || j < 0) { alert("Couldn't find the edits block in the file. Nothing was downloaded."); return; }
+  const out = src.slice(0, i + A.length) + JSON.stringify(state, null, 2) + src.slice(j);
+  const url = URL.createObjectURL(new Blob([out], { type: "text/html" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = "index.html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+if (/[?&]edit(=|&|$)/.test(location.search)) startEditor();
 go("intro");
 </script>
 </body>
