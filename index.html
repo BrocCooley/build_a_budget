@@ -85,9 +85,92 @@ p{margin:0 0 14px}
 .opt-price{font:700 16px/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .opt-sub{font-size:14px;color:var(--muted);margin-top:6px}
 .opt.nope .opt-sub{color:var(--red);font-weight:600}
-.share{display:flex;align-items:center;gap:8px;margin-top:9px;font:600 11.5px/1 var(--mono);color:var(--muted)}
-.share .bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
-.share .bar i{display:block;height:100%;background:var(--ink);border-radius:3px}
+/* Rich choice cards: illustration | text | price + mini chart */
+.rich-row{display:flex;align-items:center;gap:14px}
+.rich-row .art{flex:none;width:84px;height:62px;display:grid;place-items:center;background:var(--bg);border-radius:12px}
+.rich-row .mid{flex:1;min-width:0}
+.rich-row .t{font-weight:700;font-size:17px}
+.rich-row .mid .opt-sub{margin-top:3px}
+.rich-row .side{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.opt .extra{margin-top:12px}
+
+/* Pay stub (intro) */
+.stub{margin-top:10px;background:repeating-linear-gradient(0deg,transparent 0 22px,rgba(0,0,0,.03) 22px 23px),var(--paper);border:1px dashed #cfc7b6;border-radius:10px;padding:8px 11px;font:12.5px/1.5 var(--mono)}
+.stub div{display:flex;justify-content:space-between;gap:8px}
+.stub .tot{border-top:1px solid var(--ink);margin-top:4px;padding-top:4px;font-weight:800;font-size:14px}
+.stub .minus{color:var(--red)}
+
+/* Floor plans (housing) */
+.plan{width:78px;height:56px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.plan .bed{fill:var(--accent-soft);stroke:var(--accent)}
+.plan .pillow{fill:#fff;stroke:var(--accent);stroke-width:1}
+.plan .furn{fill:#e9e4d8;stroke:var(--s4);stroke-width:1.2}
+.plan text{font:700 6px var(--mono);fill:var(--muted);stroke:none}
+
+/* Donut (share of paycheck) */
+.donut{width:46px;height:46px}
+.donut .bg{fill:none;stroke:var(--line);stroke-width:6}
+.donut .fg{fill:none;stroke:var(--ink);stroke-width:6;stroke-linecap:butt;transition:stroke-dasharray 1s var(--ease)}
+.donut text{font:800 10px var(--mono);fill:var(--ink)}
+.donut .sub{font:600 5px var(--mono);fill:var(--muted)}
+
+/* Shift blocks (child care, results) */
+.shifts{display:grid;grid-template-columns:repeat(11,1fr);gap:4px}
+.shifts i{height:20px;border-radius:5px;border:1.5px solid var(--line);background-color:var(--card)}
+.shifts i.extra{border:1.5px dashed var(--red)}
+.shift-cap{font-size:13px;color:var(--muted);margin-top:7px}
+
+/* Route maps (transport) */
+.route{width:78px;height:56px;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.route .road{stroke:var(--s4);stroke-width:5}
+.route .lane{stroke:#fff;stroke-width:1.2;stroke-dasharray:3 3}
+.route .line{stroke:var(--accent);stroke-width:2.2;stroke-dasharray:1 5}
+.route .stop{fill:#fff;stroke:var(--accent);stroke-width:1.8}
+.route .pin{fill:var(--ink);stroke:none}
+.route .store{fill:var(--red);stroke:none}
+.route text{font:700 6px var(--mono);fill:var(--muted);stroke:none}
+.ptags{display:flex;align-items:center;gap:6px}
+.ptag{position:relative;flex:1;display:inline-flex;align-items:center;justify-content:space-between;gap:5px;padding:7px 8px 7px 16px;font:600 11px/1 var(--mono);white-space:nowrap;background:var(--card);border:1.5px solid var(--ink);clip-path:polygon(9px 0,100% 0,100% 100%,9px 100%,0 50%)}
+.ptag::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ink);position:absolute;left:7px}
+.ptag.red{border-color:var(--red);color:var(--red);background:var(--red-soft)}
+.ptag.red::before{background:var(--red)}
+.ptags .ar{font:700 16px/1 var(--mono);color:var(--muted)}
+
+/* Pictograms (surprise: people, final: houses) */
+.picto{display:grid;grid-template-columns:repeat(20,1fr);gap:3px 4px;margin:6px 0 10px;max-width:360px}
+.picto svg{width:100%;height:auto;fill:var(--line);transition:fill .3s}
+.picto svg.on{fill:var(--accent)}
+.picto svg.red{fill:var(--red)}
+
+/* Grocery bag (food) */
+.bagwrap{display:flex;align-items:center;gap:18px}
+.bag{width:118px;height:130px;flex:none;overflow:visible}
+.bag .outline{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
+.bag .handle{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.bag .empty{fill:var(--red-soft)}
+.bag .fill{fill:var(--accent);transform-box:view-box;transform-origin:50% 106px;transform:scaleY(0);transition:transform 1.4s var(--ease)}
+.bag .need{stroke:var(--red);stroke-width:1.5;stroke-dasharray:3 3}
+.bag text{font:700 8px var(--mono);fill:var(--red)}
+.bagtxt .pc{font:800 44px/1 var(--mono);letter-spacing:-.03em}
+.bagtxt .lb{font-size:14px;color:var(--muted);margin:2px 0 10px}
+.bagtxt .ln{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:3px 0;border-top:1px dashed var(--line)}
+.bagtxt .ln b{font-family:var(--mono)}
+
+/* SNAP number line (results) */
+.nline{position:relative;height:118px;margin:4px 6px 0}
+.nl-track{position:absolute;left:0;right:0;top:58px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--red-soft),var(--line) 70%,var(--accent-soft))}
+.nl-zero{position:absolute;top:44px;height:32px;border-left:2px solid var(--ink)}
+.nl-zero span{position:absolute;top:-16px;left:-30px;width:60px;text-align:center;font:700 10px/1.2 var(--mono);color:var(--ink)}
+.nl-arrow{position:absolute;top:57px;height:6px;background:var(--accent);border-radius:3px;transition:width 1.1s var(--ease)}
+.nl-arrow::after{content:"";position:absolute;right:-7px;top:-4px;border:7px solid transparent;border-left:9px solid var(--accent);border-right:0}
+.nl-dot{position:absolute;top:52px;width:16px;height:16px;margin-left:-8px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--ink)}
+.nl-dot.red{background:var(--red)}
+.nl-dot.acc{background:var(--accent)}
+.nl-dot span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 11px/1.25 var(--mono);text-align:center}
+.nl-dot.red span{bottom:24px;color:var(--red)}
+.nl-dot.acc span{top:24px;color:var(--accent-deep)}
+.nl-dot.edgeL span{left:-6px;transform:none;text-align:left}
+.nl-dot.edgeR span{left:auto;right:-6px;transform:none;text-align:right}
 .tag{display:inline-block;font:700 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:5px;background:var(--accent-soft);color:var(--accent-deep);margin-top:9px}
 .tag.no{background:var(--red);color:#fff}
 
@@ -176,7 +259,7 @@ p{margin:0 0 14px}
 .legend li{display:flex;align-items:center;gap:9px;padding:5px 0}
 .legend .sw{width:12px;height:12px;border-radius:3px;flex:none}
 .legend .v{margin-left:auto;font-family:var(--mono);font-weight:700}
-.legend .p{width:44px;text-align:right;font:600 12px/1 var(--mono);color:var(--muted)}
+.legend .p{width:78px;text-align:right;font:600 12px/1 var(--mono);color:var(--muted)}
 
 /* ---------- Food ---------- */
 .plate{display:flex;align-items:center;gap:16px;margin:6px 0 14px}
@@ -390,10 +473,12 @@ const TEXT = {
   "intro.tag3": "Cashier, 40 hrs/week",
   "intro.lead": "Make the smart choice at every step. Then see if the food lasts.",
   "intro.pick": "Choose your city",
-  "intro.cityLine": "{label} → **{pay}**/mo after payroll tax",
+  "intro.stubPay": "{wage}/hr × {hours} hrs",
+  "intro.stubTax": "Payroll tax (7.65%)",
+  "intro.stubNet": "Take-home / month",
   "replay.banner": "Replay: this time you earn **{wage}/hr** instead of {oldWage}. Same choices. Let's see.",
 
-  "share": "{pct} of your paycheck",
+  "donut.ofPay": "OF PAY",
   "tag.cheaper": "Cheaper",
   "tag.noDebt": "No debt",
 
@@ -412,13 +497,18 @@ const TEXT = {
   "care.center.sub": "Set hours, trained staff.",
   "care.home": "Home-based daycare",
   "care.home.sub": "A smaller group in a neighbor's home.",
+  "care.shifts": "**{n} of your {total} shifts** each month go to paying for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
   "transport.title": "Car or bus?",
   "transport.car": "Keep your old car",
   "transport.car.sub": "Payment, insurance, gas.",
   "transport.bus": "Take the bus",
-  "transport.bus.sub": "Catch: without a car, you shop at the corner store. Food costs about 25% more.",
+  "transport.bus.sub": "Catch: no car means groceries come from the corner store.",
+  "transport.grocery": "Grocery store",
+  "transport.corner": "Corner store",
+  "transport.home": "HOME",
+  "transport.work": "WORK",
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
@@ -482,6 +572,9 @@ const TEXT = {
   "food.budget": "Your food budget",
   "food.budgetDetail": "{cash} cash + {snap} SNAP",
   "food.need": "Cheapest healthy diet",
+  "food.bagPct": "of the groceries you need",
+  "food.bagFull": "The bag is full",
+  "food.missing": "MISSING {amount}",
   "food.behind": "You're already **{amount}** behind on rent and bills. SNAP can't pay those.",
   "food.keyOn": "Food covered",
   "food.keyOff": "Not covered",
@@ -507,9 +600,13 @@ const TEXT = {
   "results.withoutSnap": "Without SNAP",
   "results.short": "short",
   "results.spare": "to spare",
-  "results.whereTitle": "Where the paycheck went",
-  "results.paycheckEnds": "paycheck ends",
+  "results.breakEven": "BREAK EVEN",
+  "results.snapCap": "SNAP moved you **{amount}** closer to breaking even.",
+  "results.whereTitle": "Who your shifts paid for",
+  "results.shiftsKey": "Each block is one 8-hour shift. You work about {n} a month.",
+  "results.shiftsOver": "Dashed red blocks are shifts you'd need on top of full time to cover it all.",
   "results.over": "Over by",
+  "results.shiftsUnit": "shifts",
   "results.owedCard": "And the card bill didn't go away. You owe {payment} a month for {months} more months, {total} in all. Next month starts {payment} behind.",
   "results.owedSkipCar": "And the repair didn't go away. It's still waiting, and it usually costs more later.",
   "results.owedSkipDental": "And the dental bill didn't go away. It's still waiting, and it usually costs more later.",
@@ -731,34 +828,123 @@ const dots = () => {
   const i = FLOW.indexOf(S.screen);
   return `<div class="dots" aria-label="Step ${i + 1} of ${FLOW.length}">${FLOW.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join("")}</div>`;
 };
-// Choice card: icon, title, price, sub-line, paycheck-share bar, tag
-function opt({ act, val, ico, title, price, sub, cost, tag, tagCls }) {
-  const share = cost != null && S.city
-    ? `<div class="share"><span class="bar"><i style="width:${Math.min(100, cost / meterMax() * 100)}%"></i></span><span>${t("share", { pct: pct(cost, meterMax()) })}</span></div>` : "";
+// Choice card. Simple: icon, title, price, sub-line, tag.
+// Rich (when `art` is given): illustration | title + sub | price + side chart, then an optional full-width `extra`.
+function opt({ act, val, ico, title, price, sub, tag, tagCls, art, side, extra }) {
+  const tagHtml = tag ? `<span class="tag ${tagCls || ""}">${tag}</span>` : "";
+  if (art) {
+    return `<button class="opt" data-act="${act}" data-val="${val}">
+      <div class="rich-row"><div class="art">${art}</div>
+        <div class="mid"><div class="t">${title}</div>${sub ? `<div class="opt-sub">${sub}</div>` : ""}${tagHtml}</div>
+        <div class="side"><span class="opt-price">${price}</span>${side || ""}</div></div>
+      ${extra ? `<div class="extra">${extra}</div>` : ""}</button>`;
+  }
   return `<button class="opt" data-act="${act}" data-val="${val}">
     <div class="opt-top">${ico ? `<span class="opt-ico">${icon(ico)}</span>` : ""}<span class="t">${title}</span><span class="opt-price">${price}</span></div>
-    ${sub ? `<div class="opt-sub">${sub}</div>` : ""}${share}${tag ? `<span class="tag ${tagCls || ""}">${tag}</span>` : ""}</button>`;
+    ${sub ? `<div class="opt-sub">${sub}</div>` : ""}${extra ? `<div class="extra">${extra}</div>` : ""}${tagHtml}</button>`;
+}
+
+/* ---------- Graphics ---------- */
+const shiftsPerMonth = () => CONFIG.hoursPerYear / 12 / 8;   // 8-hour shifts in a month of full-time work
+const toShifts = (amount) => amount / meterMax() * shiftsPerMonth();
+
+// Donut: share of take-home pay
+const donut = (frac) => {
+  const p = Math.max(0, Math.min(1, frac)) * 100;
+  return `<svg class="donut" viewBox="0 0 42 42" aria-label="${Math.round(p)}% of pay"><circle class="bg" cx="21" cy="21" r="15.9155"/>
+    <circle class="fg" cx="21" cy="21" r="15.9155" stroke-dasharray="0 100" data-dash="${p} ${100 - p}" transform="rotate(-90 21 21)"/>
+    <text x="21" y="22" text-anchor="middle">${Math.round(p)}%</text><text class="sub" x="21" y="29" text-anchor="middle">${t("donut.ofPay")}</text></svg>`;
+};
+
+// Floor plans
+const plan1 = `<svg class="plan" viewBox="0 0 80 58" aria-hidden="true">
+  <rect x="2" y="2" width="76" height="54" rx="3"/><path d="M40 2v20M40 32v24"/>
+  <rect class="bed" x="7" y="7" width="17" height="24" rx="2"/><rect class="pillow" x="9" y="9" width="13" height="5" rx="1.5"/>
+  <rect class="bed" x="27" y="9" width="9" height="15" rx="2"/><rect class="pillow" x="28.5" y="10.5" width="6" height="3.5" rx="1"/>
+  <rect class="furn" x="47" y="7" width="26" height="6" rx="1"/><rect class="furn" x="50" y="40" width="22" height="9" rx="2"/>
+  <text x="9" y="50">1 ROOM</text></svg>`;
+const plan2 = `<svg class="plan" viewBox="0 0 80 58" aria-hidden="true">
+  <rect x="2" y="2" width="76" height="54" rx="3"/><path d="M28 2v18M28 30v26M2 34h14M54 2v18M54 30v26"/>
+  <rect class="bed" x="6" y="6" width="16" height="22" rx="2"/><rect class="pillow" x="8" y="8" width="12" height="5" rx="1.5"/>
+  <rect class="bed" x="34" y="7" width="11" height="16" rx="2"/><rect class="pillow" x="35.5" y="8.5" width="8" height="3.5" rx="1"/>
+  <rect class="furn" x="58" y="7" width="16" height="6" rx="1"/><rect class="furn" x="58" y="42" width="16" height="8" rx="2"/>
+  <text x="31" y="50">2 ROOMS</text></svg>`;
+
+// Route maps
+const routeCar = () => `<svg class="route" viewBox="0 0 80 58" aria-hidden="true">
+  <path class="road" d="M10 46 C 30 46, 46 14, 70 14"/><path class="lane" d="M10 46 C 30 46, 46 14, 70 14"/>
+  <rect class="pin" x="3" y="40" width="12" height="12" rx="2"/><rect class="pin" x="65" y="8" width="12" height="12" rx="2"/>
+  <text x="2" y="38">${t("transport.home")}</text><text x="60" y="30">${t("transport.work")}</text></svg>`;
+const routeBus = () => `<svg class="route" viewBox="0 0 80 58" aria-hidden="true">
+  <path class="line" d="M10 46 H 34 V 14 H 70"/>
+  <circle class="stop" cx="22" cy="46" r="2.6"/><circle class="stop" cx="34" cy="30" r="2.6"/><circle class="stop" cx="52" cy="14" r="2.6"/>
+  <rect class="pin" x="3" y="40" width="12" height="12" rx="2"/><rect class="pin" x="65" y="8" width="12" height="12" rx="2"/>
+  <rect class="store" x="40" y="38" width="10" height="9" rx="1.5"/><path d="M40 41h10" stroke="#fff" stroke-width="1"/>
+  <text x="2" y="38">${t("transport.home")}</text><text x="60" y="30">${t("transport.work")}</text><text x="38" y="55" style="fill:var(--red)">STORE</text></svg>`;
+
+// Shift blocks: segs = [{v: shifts, color}], total = shifts in a full-time month
+function shiftBlocks(segs, total) {
+  const sum = segs.reduce((a, s) => a + s.v, 0);
+  const cells = Math.max(Math.ceil(total - 1e-9), Math.ceil(sum - 1e-9));
+  let html = "";
+  for (let k = 0; k < cells; k++) {
+    const stops = []; let acc = 0;
+    for (const s of segs) {
+      const a = Math.max(k, acc), b = Math.min(k + 1, acc + s.v);
+      if (b > a) stops.push(`${s.color} ${((a - k) * 100).toFixed(1)}% ${((b - k) * 100).toFixed(1)}%`);
+      acc += s.v;
+    }
+    const filled = Math.min(1, Math.max(0, sum - k));
+    if (filled < 1) stops.push(`transparent ${(filled * 100).toFixed(1)}% 100%`);
+    const bg = stops.length ? `background-image:linear-gradient(90deg,${stops.join(",")})` : "";
+    html += `<i class="${k >= Math.ceil(total - 1e-9) ? "extra" : ""}" style="${bg}"></i>`;
+  }
+  return `<div class="shifts">${html}</div>`;
+}
+
+// 100-unit pictogram (people or houses)
+const PERSON = '<circle cx="6" cy="3.2" r="2.6"/><path d="M1.5 16v-5.5a4.5 4.5 0 0 1 9 0V16z"/>';
+const HOUSE = '<path d="M0.8 7.2 6 2.2l5.2 5V14H0.8z"/>';
+const picto = (shape, vb, n, cls) => `<div class="picto">${Array.from({ length: 100 }, (_, i) =>
+  `<svg viewBox="${vb}" class="${i < n ? cls : ""}" aria-hidden="true">${shape}</svg>`).join("")}</div>`;
+
+// Grocery bag filled to frac of what's needed
+function groceryBag(frac, missing) {
+  const f = Math.max(0, Math.min(1, frac));
+  const needY = 30;   // top of bag = 100% of need
+  return `<svg class="bag" viewBox="0 0 100 112" aria-hidden="true">
+    <defs><clipPath id="bagClip"><path d="M14 30h72l-6 76H20z"/></clipPath></defs>
+    <path class="handle" d="M36 30v-9a14 14 0 0 1 28 0v9"/>
+    <g clip-path="url(#bagClip)"><rect class="empty" x="0" y="30" width="100" height="76"/><rect class="fill" x="0" y="30" width="100" height="76" data-scale="${f}"/></g>
+    <path class="outline" d="M14 30h72l-6 76H20z"/>
+    ${f < 1 ? `<path class="need" d="M8 ${needY + (1 - f) * 76}H92"/>` : ""}
+  </svg>`;
+}
+
+function animateGraphics() {
+  requestAnimationFrame(() => setTimeout(() => {
+    document.querySelectorAll("[data-w]").forEach((el) => { el.style.width = el.dataset.w + "%"; });
+    document.querySelectorAll(".donut .fg[data-dash]").forEach((el) => el.setAttribute("stroke-dasharray", el.dataset.dash));
+    document.querySelectorAll(".bag .fill[data-scale]").forEach((el) => { el.style.transform = `scaleY(${el.dataset.scale})`; });
+  }, 120));
 }
 const notif = (ico, cls, app, title, text) =>
   `<div class="notif" role="status"><div class="notif-icon ${cls}">${icon(ico)}</div><div class="notif-body"><div class="notif-head"><span>${app}</span><span>now</span></div><div class="notif-title">${title}</div><div class="notif-text">${text}</div></div></div>`;
 const next = (to, label, cls = "") => `<button class="btn ${cls}" data-act="next" data-val="${to}">${label} <span class="arr">→</span></button>`;
 const cite = (s) => s ? `<span class="cite">(${s})</span>` : "";
-const grid100 = (n, cls = "on") => `<div class="g100">${Array.from({ length: 100 }, (_, i) => `<i class="${i < n ? cls : ""}"></i>`).join("")}</div>`;
-const hbar = (label, value, frac, cls) =>
-  `<div class="hbar"><div class="row"><span>${label}</span><b class="${cls === "red" ? "red" : ""}">${value}</b></div><div class="track"><i class="${cls || ""}" data-w="${Math.max(0, Math.min(100, frac * 100))}"></i></div></div>`;
-function growBars() {
-  requestAnimationFrame(() => setTimeout(() => {
-    document.querySelectorAll("[data-w]").forEach((el) => { el.style.width = el.dataset.w + "%"; });
-  }, 80));
-}
 
 /* ---------- Screens ---------- */
 const screens = {
   intro() {
     const cityBtn = (key) => {
       const c = CONFIG.cities[key];
+      const { gross, net } = takeHomeFor(c.wage);
+      const stub = `<div class="stub">
+        <div><span>${t("intro.stubPay", { wage: fmtWage(c.wage), hours: Math.round(CONFIG.hoursPerYear / 12) })}</span><span>${fmt(gross)}</span></div>
+        <div><span>${t("intro.stubTax")}</span><span class="minus">−${fmt(gross - net)}</span></div>
+        <div class="tot"><span>${t("intro.stubNet")}</span><span>${fmt(net)}</span></div></div>`;
       return opt({ act: "city", val: key, ico: "homeBig", title: c.name, price: fmtWage(c.wage) + "/hr",
-        sub: t("intro.cityLine", { label: c.wageLabel, pay: fmt(takeHomeFor(c.wage).net) }) + cite(c.wageCite) });
+        sub: c.wageLabel + cite(c.wageCite), extra: stub });
     };
     return `<div class="hero">
       <p class="kicker">${t("intro.kicker")}</p>
@@ -776,19 +962,25 @@ const screens = {
       <h2>${t("housing.title")}</h2>
       <p class="muted">${t("housing.sub", { city: city().name })}${cite(city().rentCite)}</p>
       <div class="opts">
-      ${opt({ act: "housing", val: "oneBR", ico: "home", title: t("housing.oneBR"), price: fmt(r.oneBR), sub: t("housing.oneBR.sub"), cost: r.oneBR, tag: t("tag.cheaper") })}
-      ${opt({ act: "housing", val: "twoBR", ico: "homeBig", title: t("housing.twoBR"), price: fmt(r.twoBR), sub: t("housing.twoBR.sub"), cost: r.twoBR })}
+      ${opt({ act: "housing", val: "oneBR", art: plan1, title: t("housing.oneBR"), price: fmt(r.oneBR), sub: t("housing.oneBR.sub"), side: donut(r.oneBR / meterMax()), tag: t("tag.cheaper") })}
+      ${opt({ act: "housing", val: "twoBR", art: plan2, title: t("housing.twoBR"), price: fmt(r.twoBR), sub: t("housing.twoBR.sub"), side: donut(r.twoBR / meterMax()) })}
       </div>`;
   },
 
   care() {
     const cc = city().childCare, ct = city();
+    const total = shiftsPerMonth();
+    const shiftInfo = (cost) => {
+      const n = toShifts(cost);
+      return shiftBlocks([{ v: n, color: "var(--ink)" }], total)
+        + `<div class="shift-cap">${t("care.shifts", { n: n.toFixed(1), total: Math.round(total) })}</div>`;
+    };
     return `${dots()}<p class="kicker">${t("care.kicker")}</p>
       <h2>${t("care.title")}</h2>
       <p class="muted">${t("care.sub")}</p>
       <div class="opts">
-      ${opt({ act: "care", val: "center", ico: "kid", title: t("care.center"), price: fmt(cc.center), sub: t("care.center.sub") + cite(ct.childCareCiteCenter), cost: cc.center })}
-      ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome), cost: cc.home, tag: t("tag.cheaper") })}
+      ${opt({ act: "care", val: "center", ico: "kid", title: t("care.center"), price: fmt(cc.center), sub: t("care.center.sub") + cite(ct.childCareCiteCenter), extra: shiftInfo(cc.center) })}
+      ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome), extra: shiftInfo(cc.home), tag: t("tag.cheaper") })}
       </div>`;
   },
 
@@ -796,8 +988,9 @@ const screens = {
     return `${dots()}<p class="kicker">${t("transport.kicker")}</p>
       <h2>${t("transport.title")}</h2>
       <div class="opts">
-      ${opt({ act: "transport", val: "car", ico: "car", title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate"), cost: CONFIG.transport.carMonthly })}
-      ${opt({ act: "transport", val: "bus", ico: "bus", title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate"), cost: city().busPass, tag: t("tag.cheaper") })}
+      ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate") })}
+      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate"), tag: t("tag.cheaper"),
+        extra: `<div class="ptags"><span class="ptag">${t("transport.grocery")} <b>${fmt(CONFIG.food.usdaMonthly)}</b></span><span class="ar">→</span><span class="ptag red">${t("transport.corner")} <b>${fmt(CONFIG.food.usdaMonthly * (1 + CONFIG.food.convenienceMarkup))}</b></span></div>` })}
       </div>`;
   },
 
@@ -850,11 +1043,11 @@ const screens = {
     return `${dots()}<p class="kicker">${t("surprise.kicker")}</p>
       ${n}
       <h2>${title}</h2>
-      <div class="figure">${grid100(Math.round(cov))}<p class="cap">${t("surprise.stat", { pct: cov })}${cite("Federal Reserve, 2025")}</p></div>
+      <div class="figure">${picto(PERSON, "0 0 12 16", Math.round(cov), "on")}<p class="cap">${t("surprise.stat", { pct: cov })}${cite("Federal Reserve, 2025")}</p></div>
       <div class="opts">
-      ${opt({ act: "surprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), cost: A, tag: t("tag.noDebt") })}
+      ${opt({ act: "surprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), tag: t("tag.noDebt") })}
       ${opt({ act: "surprise", val: "card", ico: "card", title: t("surprise.card"), price: fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
-        sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate"), cost: CONFIG.surprise.cardMonthlyPayment })}
+        sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate") })}
       ${opt({ act: "surprise", val: "skip", ico: "skip", title: t("surprise.skip"), price: "$0", sub: car ? t("surprise.skip.subCar") : t("surprise.skip.subDental") })}
       </div>`;
   },
@@ -885,20 +1078,28 @@ const screens = {
     const bus = S.c.transport === "bus";
     const D = CONFIG.daysInMonth;
     const cells = Array.from({ length: D }, (_, i) => `<div>${i + 1}</div>`).join("");
-    const max = Math.max(r.need, r.foodMoney);
-    setTimeout(() => animateCalendar(r), 500);
-    growBars();
+    const frac = r.foodMoney / r.need;
+    setTimeout(() => animateCalendar(r), 900);
     return `${dots()}<p class="kicker">${t("food.kicker")}</p>
       <h2>${t("food.title")}</h2>
       <div class="plate">
-        <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#fff" stroke="#e3ddd0" stroke-width="2"/><circle cx="40" cy="40" r="24" fill="none" stroke="#e3ddd0" stroke-width="2"/><path d="M40 16a24 24 0 0 1 0 48z" fill="var(--accent-soft)"/></svg>
+        <svg viewBox="0 0 100 80" aria-hidden="true" style="width:96px"><g fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round">
+          <path d="M10 10v18a5 5 0 0 0 10 0V10M15 10v60"/><path d="M88 70V10c-6 4-8 14-8 26h8"/></g>
+          <circle cx="50" cy="40" r="27" fill="#fff" stroke="var(--line)" stroke-width="2.5"/><circle cx="50" cy="40" r="18" fill="var(--bg)" stroke="var(--line)" stroke-width="1.5"/></svg>
         <div><div class="amt">$${r.perMeal.toFixed(2)}</div><div class="per">${t("food.perMeal")}</div></div>
       </div>
       <p class="small muted">${t("food.perMealNote")}${bus ? " " + t("food.perMealBus") : ""}${cite(CONFIG.food.cite + (bus ? "; +25% estimate" : ""))}</p>
       ${r.billsBehind > 0 ? `<div class="note bad">${t("food.behind", { amount: fmt(r.billsBehind) })}</div>` : ""}
-      <div class="figure">
-        ${hbar(`${t("food.budget")} <span class="muted small">(${t("food.budgetDetail", { cash: fmt(Math.max(0, r.leftover)), snap: fmt(r.snap) })})</span>`, fmt(r.foodMoney), r.foodMoney / max, "acc")}
-        ${hbar(t("food.need"), fmt(r.need), r.need / max, "")}
+      <div class="figure bagwrap">
+        ${groceryBag(frac, t("food.missing", { amount: fmt(r.foodGap) }))}
+        <div class="bagtxt" style="flex:1">
+          <div class="pc ${frac < 1 ? "red" : "accent"}">${Math.min(100, Math.floor(frac * 100))}%</div>
+          <div class="lb">${frac >= 1 ? t("food.bagFull") : t("food.bagPct")}</div>
+          ${frac < 1 ? `<div class="ln red" style="border-top:0;font-weight:700;font-family:var(--mono);font-size:12px">${t("food.missing", { amount: fmt(r.foodGap) })}</div>` : ""}
+          <div class="ln"><span>${t("food.budget")}</span><b>${fmt(r.foodMoney)}</b></div>
+          <div class="ln small muted"><span>${t("food.budgetDetail", { cash: fmt(Math.max(0, r.leftover)), snap: fmt(r.snap) })}</span></div>
+          <div class="ln"><span>${t("food.need")}</span><b>${fmt(r.need)}</b></div>
+        </div>
       </div>
       <div class="cal" id="cal">${cells}</div>
       <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("food.keyOn")}</span><span><i style="background:var(--red-soft)"></i>${t("food.keyOff")}</span></div>
@@ -933,16 +1134,26 @@ const screens = {
         ${mealsFig}<p class="small muted">${t("results.mealsAll", { total: r.totalMeals })}</p>`;
     }
 
-    // With vs. without SNAP
-    const ns = r.gapNoSnap, ws = r.gap;
-    const mx = Math.max(Math.abs(ns), Math.abs(ws), 1);
+    // With vs. without SNAP: number line with break-even at zero
+    const vNo = -r.gapNoSnap, vYes = -r.gap;           // negative = short
+    const lo = Math.min(vNo, vYes, 0), hi = Math.max(vNo, vYes, 0);
+    const pad = Math.max(40, (hi - lo) * 0.12);
+    const pos = (v) => ((v - (lo - pad)) / ((hi + pad) - (lo - pad)) * 100);
     const lbl = (g) => g > 0 ? `${fmt(g)} ${t("results.short")}` : `${fmt(-g)} ${t("results.spare")}`;
+    const edge = (p) => (p < 18 ? "edgeL" : p > 82 ? "edgeR" : "");
+    const pNo = pos(vNo), pYes = pos(vYes);
     const snapFig = `<p class="section">${t("results.snapTitle")}</p><div class="figure">
-      ${hbar(t("results.withoutSnap"), lbl(ns), Math.abs(ns) / mx, ns > 0 ? "red" : "acc")}
-      ${hbar(`${t("results.withSnap")} <span class="muted small">(+${fmt(r.snap)})</span>`, lbl(ws), Math.abs(ws) / mx, ws > 0 ? "red" : "acc")}
+      <div class="nline">
+        <div class="nl-track"></div>
+        <div class="nl-zero" style="left:${pos(0)}%"><span>${t("results.breakEven")}</span></div>
+        <div class="nl-arrow" style="left:${Math.min(pNo, pYes)}%;width:0" data-w="${Math.abs(pYes - pNo)}"></div>
+        <div class="nl-dot red ${edge(pNo)}" style="left:${pNo}%"><span>${t("results.withoutSnap")}<br><b>${lbl(r.gapNoSnap)}</b></span></div>
+        <div class="nl-dot acc ${edge(pYes)}" style="left:${pYes}%"><span>${t("results.withSnap")}<br><b>${lbl(r.gap)}</b></span></div>
+      </div>
+      <p class="cap">${t("results.snapCap", { amount: "+" + fmt(r.gapNoSnap - r.gap) })}${cite(CONFIG.snap.cite)}</p>
     </div>`;
 
-    // Where the paycheck went (stacked bar)
+    // Who your shifts paid for (shift blocks)
     const surpriseLabel = { pay: t("label.surprisePay"), card: t("label.surpriseCard"), skip: t("label.surpriseSkip") }[S.c.surprise];
     const items = [
       [t("label.rent"), r.housing, "var(--s1)"],
@@ -952,18 +1163,29 @@ const screens = {
       [surpriseLabel, r.surprise, "var(--s5)"]
     ].filter((x) => x[1] > 0);
     const spent = items.reduce((a, x) => a + x[1], 0);
-    const scale = Math.max(r.net, spent);
     const foodCash = Math.max(0, r.leftover);
     const over = Math.max(0, spent - r.net);
-    const segs = items.map((x) => `<i style="width:0;background:${x[2]}" data-w="${x[1] / scale * 100}"></i>`).join("")
-      + (foodCash > 0 ? `<i style="width:0;background:var(--accent)" data-w="${foodCash / scale * 100}"></i>` : "");
-    const overSeg = over > 0 ? `<i class="over" style="position:absolute;top:0;bottom:0;left:${r.net / scale * 100}%;width:${over / scale * 100}%"></i>` : "";
-    const legend = items.map((x) => `<li><span class="sw" style="background:${x[2]}"></span>${x[0]}<span class="v">${fmt(x[1])}</span><span class="p">${pct(x[1], r.net)}</span></li>`).join("")
-      + (foodCash > 0 ? `<li><span class="sw" style="background:var(--accent)"></span>${t("label.food")}<span class="v">${fmt(foodCash)}</span><span class="p">${pct(foodCash, r.net)}</span></li>` : "")
-      + (over > 0 ? `<li class="red"><span class="sw" style="background:var(--red)"></span>${t("results.over")}<span class="v">${fmt(over)}</span><span class="p"></span></li>` : "");
-    const whereFig = `<p class="section">${t("results.whereTitle")} · ${fmt(r.net)}</p><div class="figure">
-      <div class="stack">${segs}${overSeg}</div>
-      ${over > 0 ? `<div class="stack-mark"><span style="left:${r.net / scale * 100}%">${t("results.paycheckEnds")}</span></div>` : ""}
+    const spm = shiftsPerMonth();
+    const sh = (amt) => amt / r.net * spm;
+    // Bills fill the shifts first; anything past the paycheck spills into red "extra" shifts
+    const segsS = items.map((x) => ({ v: sh(x[1]), color: x[2] }));
+    if (foodCash > 0) segsS.push({ v: sh(foodCash), color: "var(--accent)" });
+    if (over > 0) { // recolor the part beyond the paycheck red
+      let acc = 0; const out = [];
+      for (const s of segsS) {
+        const inside = Math.max(0, Math.min(s.v, spm - acc));
+        if (inside > 0) out.push({ v: inside, color: s.color });
+        acc += s.v;
+      }
+      out.push({ v: sh(over), color: "var(--red)" });
+      segsS.length = 0; segsS.push(...out);
+    }
+    const legend = items.map((x) => `<li><span class="sw" style="background:${x[2]}"></span>${x[0]}<span class="v">${fmt(x[1])}</span><span class="p">${sh(x[1]).toFixed(1)} ${t("results.shiftsUnit")}</span></li>`).join("")
+      + (foodCash > 0 ? `<li><span class="sw" style="background:var(--accent)"></span>${t("label.food")}<span class="v">${fmt(foodCash)}</span><span class="p">${sh(foodCash).toFixed(1)} ${t("results.shiftsUnit")}</span></li>` : "")
+      + (over > 0 ? `<li class="red"><span class="sw" style="background:var(--red)"></span>${t("results.over")}<span class="v">${fmt(over)}</span><span class="p">${sh(over).toFixed(1)} ${t("results.shiftsUnit")}</span></li>` : "");
+    const whereFig = `<p class="section">${t("results.whereTitle")}</p><div class="figure">
+      ${shiftBlocks(segsS, spm)}
+      <p class="shift-cap">${t("results.shiftsKey", { n: Math.round(spm) })}${over > 0 ? " " + t("results.shiftsOver") : ""}</p>
       <ul class="legend">${legend}</ul></div>`;
 
     const owed = S.c.surprise === "card"
@@ -984,7 +1206,6 @@ const screens = {
         <div class="due">${short ? `<span class="stamp">SHORT</span>` : `<span class="stamp ok">LEFT OVER</span>`}<span class="${short ? "red" : "accent"}">${fmt(Math.abs(r.gap))}</span></div>
       </div></details>`;
 
-    growBars();
     const other = S.city === "fargo" ? "minneapolis" : "fargo";
     return `<p class="kicker">${t("results.choices", { n: r.conscious })}</p>
       ${head}
@@ -1006,13 +1227,13 @@ const screens = {
     const st = CONFIG.stats;
     setTimeout(countUp, 200);
     setTimeout(() => {
-      document.querySelectorAll(".g100.fill i").forEach((el, i) => { if (i < Math.round(st.foodInsecure2024)) setTimeout(() => el.classList.add("red"), i * 60); });
+      document.querySelectorAll(".picto.fill svg").forEach((el, i) => { if (i < Math.round(st.foodInsecure2024)) setTimeout(() => el.classList.add("red"), i * 70); });
     }, 300);
     return `<p class="kicker">${t("final.kicker")}</p>
       <div class="stat">
         <div class="big" data-count="${st.foodInsecure2024}" data-dec="1">0%</div>
         <p>${t("final.stat")}</p>
-        <div class="figure"><div class="g100 fill">${Array.from({ length: 100 }, () => "<i></i>").join("")}</div>
+        <div class="figure">${picto(HOUSE, "0 0 12 14", 0, "").replace('class="picto"', 'class="picto fill"')}
         <p class="cap">${t("final.grid", { n: Math.round(st.foodInsecure2024) })}</p>${cite("USDA ERS, 2025")}</div>
       </div>
       <p class="closing">${t("final.closing")}</p>
@@ -1093,6 +1314,7 @@ function go(name) {
   m.className = "enter";
   if (!EDITOR) window.scrollTo(0, 0);
   updateMeter();
+  animateGraphics();
   if (name === "surprise" && !S.c.surprise) setTimeout(() => { m.className = "shake"; buzz([80, 60, 80]); }, 450);
   if (EDITOR) EDITOR.syncJump();
 }
