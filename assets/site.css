@@ -119,6 +119,9 @@ tr.hl td{background:#fff3c4}
 .btn.ghost:hover{background:var(--card);color:var(--ink)}
 .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
 
+.home-game{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start}
+@media (max-width:860px){.home-game{grid-template-columns:1fr}}
+
 /* ---------- What Now ---------- */
 .res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .res-col h3{font-size:20px;margin:0 0 10px}
