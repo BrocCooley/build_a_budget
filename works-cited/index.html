@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Works Cited · {site}</title>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-page="works-cited">
+<header id="site-header"></header>
+
+<main id="main" class="wrap">
+  <div class="page-head">
+    <h1>Works Cited</h1>
+  </div>
+  <ul class="works" id="works"></ul>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="../site-config.js"></script>
+<script src="../content.js"></script>
+<script src="../assets/site.js"></script>
+<script src="../assets/works-cited.js"></script>
+<script>
+  (function () {
+    var esc = SITE.esc;
+    // *italics*, plus clickable URLs
+    function render(text, url) {
+      var html = esc(text).replace(/\*(.+?)\*/g, "<em>$1</em>");
+      return html.replace(/((?:https?:\/\/|www\.)[^\s<]+?|[a-z0-9-]+(?:\.[a-z0-9-]+)+\/[^\s<]*?)(\.?)(?=\s|$)/gi, function (m, link, dot) {
+        var href = url || (/^https?:/i.test(link) ? link : "https://" + link);
+        return '<a href="' + href + '" target="_blank" rel="noopener">' + link + "</a>" + dot;
+      });
+    }
+    var items = (window.WORKS_CITED || []).slice();
+    ((window.CONTENT && CONTENT.works_cited_extra) || []).forEach(function (e) {
+      if (typeof e === "string" && e.trim()) items.push({ text: e.trim() });
+      else if (e && e.text) items.push(e);
+    });
+    // MLA: alphabetical by first word, ignoring quotation marks, italics markers, and A / An / The
+    var key = function (s) { return s.replace(/^[\s"“*]+/, "").replace(/^(the|a|an)\s+/i, "").toLowerCase(); };
+    items.sort(function (a, b) { return key(a.text).localeCompare(key(b.text)); });
+    document.getElementById("works").innerHTML = items.map(function (it) {
+      return "<li>" + render(it.text, it.url) + (it.verify ? ' <span class="verify" title="' + esc(it.verify) + '">[VERIFY]</span>' : "") + "</li>";
+    }).join("");
+  })();
+</script>
+</body>
+</html>

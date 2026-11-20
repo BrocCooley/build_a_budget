@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map · {site}</title>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-page="map">
+<header id="site-header"></header>
+
+<main id="main" class="wrap">
+  <div class="page-head">
+    <p class="kicker">Map · 2022–2024 average</p>
+    <h1>Food insecurity by state</h1>
+    <p class="lede">Percent of households that were food insecure, averaged over 2022–2024. Hover over a state, tap it on a phone, or use the menu to see its numbers. North Dakota and Minnesota are outlined in gold.</p>
+  </div>
+
+  <div class="map-layout">
+    <div>
+      <div class="map-box" id="mapBox">
+        <svg id="usmap" viewBox="0 0 975 610" role="group" aria-label="Map of U.S. states colored by food insecurity rate. Each state can be focused with the Tab key."></svg>
+        <div class="tip" id="tip" aria-hidden="true"></div>
+        <div class="legend" id="legend" aria-label="Legend"></div>
+      </div>
+      <span class="cite">Data: (USDA ERS, 2025). State figures are 3-year averages, 2022–2024. Boundaries: (U.S. Census Bureau, 2017).</span>
+      <div class="callouts" id="callouts"></div>
+    </div>
+
+    <aside class="panel" aria-live="polite">
+      <label for="stateSelect" class="kicker" style="display:block;margin:0">Choose a state</label>
+      <select id="stateSelect"></select>
+      <div id="info"><p class="muted">Loading data…</p></div>
+    </aside>
+  </div>
+
+  <details class="table">
+    <summary>View all states as a table</summary>
+    <div id="tableWrap"></div>
+    <span class="cite" style="margin-bottom:12px">(USDA ERS, 2025). Margins of error are at 90% confidence. "Food insecurity different from U.S.?" is the ERS test of statistical significance at 90% confidence.</span>
+  </details>
+
+  <section class="section">
+    <div data-content="map_takeaway"></div>
+  </section>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="../site-config.js"></script>
+<script src="../content.js"></script>
+<script src="../assets/site.js"></script>
+<script src="../assets/map.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@ const fs = require("fs");
 const vm = require("vm");
 const path = require("path");
 
-const html = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
+const html = fs.readFileSync(path.join(__dirname, "..", "game", "play", "index.html"), "utf8");
 const start = html.indexOf("const CONFIG");
 const end = html.indexOf("// </calc>");
 if (start < 0 || end < 0) throw new Error("Could not find CONFIG / calc block in index.html");
