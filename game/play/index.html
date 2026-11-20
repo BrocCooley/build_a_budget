@@ -447,7 +447,7 @@ const CONFIG = {
   cities: {
     fargo: {
       name: "Fargo, ND",
-      wage: 16.07,               // BLS OEWS May 2025, median hourly wage, Cashiers (41-2011), Fargo ND-MN metro
+      wage: 16.07,               // BLS OEWS May 2025, median hourly wage, Cashiers (41-2011), Fargo ND-MN metro (BLS series OEUM002202000000041201108 = 16.07, checked Nov 2026)
       wageLabel: "Median cashier pay",
       wageCite: "BLS, 2025",
       rent: {
@@ -456,11 +456,11 @@ const CONFIG = {
       },
       rentCite: "HUD, 2026",
       childCare: {
-        center: 873,             // Child Care Aware of America / First Five Years Fund — center care, 4-year-old, ND (monthly)
-        home: 847                // Child Care Aware of America / First Five Years Fund — family/home-based care, 4-year-old, ND (monthly)
+        center: 906,             // Child Care Aware of America, 2024 Affordability Analysis, Table I: ND center, 4-year-old, $10,869/yr ÷ 12
+        home: 789                // Child Care Aware of America, 2024 Affordability Analysis, Table II: ND family child care, 4-year-old, $9,473/yr ÷ 12
       },
-      childCareCiteCenter: "Child Care Aware",
-      childCareCiteHome: "Child Care Aware",
+      childCareCiteCenter: "Child Care Aware, 2024",
+      childCareCiteHome: "Child Care Aware, 2024",
       busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
       stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
       stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009."
@@ -476,11 +476,11 @@ const CONFIG = {
       },
       rentCite: "HUD, 2026",
       childCare: {
-        center: 1500,            // Economic Policy Institute, via Minnesota Reformer (2025) — center care, 4-year-old
-        home: 950                // ESTIMATE — home-based care, 4-year-old, Minneapolis
+        center: 1311,            // Child Care Aware of America, 2024 Affordability Analysis, Table I: MN center, 4-year-old, $15,733/yr ÷ 12 (statewide; Minneapolis likely higher)
+        home: 748                // Child Care Aware of America, 2024 Affordability Analysis, Table II: MN family child care, 4-year-old, $8,978/yr ÷ 12 (statewide)
       },
-      childCareCiteCenter: "EPI, 2025",
-      childCareCiteHome: "estimate",
+      childCareCiteCenter: "Child Care Aware, 2024",
+      childCareCiteHome: "Child Care Aware, 2024",
       busPass: 76,               // ESTIMATE — Metro Transit monthly pass
       stateMinWage: null,
       stateMinWageNote: ""
@@ -516,7 +516,7 @@ const CONFIG = {
     standardDeduction: 217,      // USDA FNS FY2027 COLA memo — standard deduction, households of 1–3
     excessShelterCap: 769,       // USDA FNS FY2027 COLA memo — max excess shelter deduction (no elderly/disabled member)
     benefitReduction: 0.30,      // Benefit = max allotment − 30% of net income
-    grossLimit2Person: 3608,     // 200% of poverty, 2-person household (ND DHS SNAP Manual, Appendix B, eff. 10/1/2026). ND and MN both use 200% under broad-based categorical eligibility — VERIFY MN
+    grossLimit2Person: 3608,     // 200% of poverty, 2-person household (ND DHS SNAP Manual, Appendix B, eff. 10/1/2026). MN also uses 200% (Minn. Stat. 142F.101; USDA BBCE chart)
     // Child care is fully deductible (dependent care deduction).
     // Shelter cost = HUD Fair Market Rent, which already includes tenant-paid utilities, so no separate utility allowance is added.
     cite: "USDA, 2026"
@@ -537,9 +537,9 @@ const CONFIG = {
     { id: "car",     annualChance: 0.30, min: 1000, max: 1999, carOnly: true },  // "A major vehicle repair or replacement": 30%; median $1,000–$1,999
     { id: "medical", annualChance: 0.21, min: 1000, max: 1999 },                 // "Unexpected major medical expenses": 21%; median $1,000–$1,999
     { id: "phone",   annualChance: 0.18, min: 500,  max: 999 },                  // "A mobile phone or computer repair or replacement": 18%; median $500–$999
+    { id: "home",    annualChance: 0.22, min: 1000, max: 1999 },                 // "A major house or appliance repair": 22%; median $1,000–$1,999
     { id: "legal",   annualChance: 0.10, min: 2000, max: 4999 }                  // "Legal expenses, taxes, or fines": 10%; median $2,000–$4,999
-    // Left out (generous to the player): "major house or appliance repair" (22%) — renters' landlords usually cover these;
-    // "childcare cost increases" (3%) and "other" (6%) — the survey gives no cost.
+    // Left out: "childcare cost increases" (3%) and "other" (6%) — the survey gives no cost for them.
   ],
 
   card: {
@@ -650,6 +650,10 @@ const TEXT = {
   "ev.phone.title": "Your phone dies",
   "ev.phone.text": "Your manager texts the schedule. A replacement is **{cost}**.",
   "ev.phone.short": "Phone replacement",
+  "ev.home.app": "Landlord",
+  "ev.home.title": "Something at home breaks",
+  "ev.home.text": "A broken appliance, or a repair your lease makes you pay for: **{cost}**.",
+  "ev.home.short": "Home or appliance repair",
   "ev.legal.app": "Mail",
   "ev.legal.title": "A bill you didn't see coming",
   "ev.legal.text": "A fine, a court fee, or back taxes: **{cost}**.",
@@ -1635,8 +1639,7 @@ const screens = {
         <li>U.S. Bureau of Labor Statistics. <i>Occupational Employment and Wage Statistics, May 2025: Cashiers (41-2011), Fargo, ND-MN.</i> <a href="https://www.bls.gov/oes/" target="_blank" rel="noopener">bls.gov/oes</a></li>
         <li>City of Minneapolis. <i>Minimum Wage, rate effective January 1, 2026.</i> <a href="https://www.minneapolismn.gov/" target="_blank" rel="noopener">minneapolismn.gov</a></li>
         <li>U.S. Department of Housing and Urban Development. <i>FY2026 Fair Market Rents</i> (Fargo, ND-MN MSA; Minneapolis-St. Paul-Bloomington, MN-WI MSA). <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank" rel="noopener">huduser.gov</a></li>
-        <li>Child Care Aware of America / First Five Years Fund. <i>Child care costs, North Dakota.</i> <a href="https://www.ffyf.org/" target="_blank" rel="noopener">ffyf.org</a></li>
-        <li>Economic Policy Institute, via <i>Minnesota Reformer</i> (2025). <i>Cost of child care in Minnesota.</i> <a href="https://minnesotareformer.com/" target="_blank" rel="noopener">minnesotareformer.com</a></li>
+        <li>Child Care Aware of America. <i>2024 Affordability Analysis</i>, Tables I and II (full-time price, 4-year-old, center and family child care, by state). Statewide averages. <a href="https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf" target="_blank" rel="noopener">childcareaware.org</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>USDA Food Plans: Cost of Food Report (Thrifty Food Plan), January 2026.</i> <a href="https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports" target="_blank" rel="noopener">fns.usda.gov</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>SNAP Fiscal Year 2027 Cost-of-Living Adjustments.</i> <a href="https://www.fns.usda.gov/snap/allotment/cola" target="_blank" rel="noopener">fns.usda.gov</a></li>
         <li>North Dakota Department of Health and Human Services. <i>SNAP Policy Manual, Appendix B: Table of Standards</i> (effective Oct. 1, 2026). <a href="https://www.nd.gov/dhs/policymanuals/SNAP/" target="_blank" rel="noopener">nd.gov</a></li>
@@ -1650,11 +1653,11 @@ const screens = {
       </ol>
       <div class="panel small">
         <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is MIT's "other necessities" for one adult and one child (clothing, housekeeping supplies, personal care, household furnishings). MIT's health care and "civic" costs are left out: at this income the child would likely be covered by Medicaid or CHIP, and civic costs could be called optional.</p>
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
-        <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out because they would only make things harder: home or appliance repairs (22%; renters' landlords usually cover these), child care cost increases and "other" (no cost given). The rolls come from a replay code (seed), not from how the player is doing.</p>
+        <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
-        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax. North Dakota has no state family credits; no ND income tax is owed at this income [VERIFY]. The EITC uses the formula rather than the IRS table, so it can differ by a few dollars.</p>
+        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax. North Dakota has no state family credits; no ND income tax is owed at this income (North Dakota's 0% bracket covers head-of-household taxable income up to about $65,000). The EITC uses the formula rather than the IRS table, so it can differ by a few dollars.</p>
         <p><b>Credit card:</b> ${Math.round(CONFIG.card.apr * 100)}% APR; minimum payment is the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimates). No credit limit is modeled, which is generous to the player.</p>
         <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
@@ -1666,7 +1669,7 @@ const screens = {
 
 /* ---------- The year: helpers ---------- */
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const EV_ICON = { car: "wrench", medical: "med", phone: "phone", legal: "card" };
+const EV_ICON = { car: "wrench", medical: "med", phone: "phone", home: "home", legal: "card" };
 function yearStart() { return startSavingsAmount(S.c.savings, S.city, S.c, S.wageOverride); }
 function yearSim() { return simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, { wage: S.wageOverride }); }
 function seedFromUrl() { const m = location.search.match(/[?&]seed=(\d{1,9})/); return m ? +m[1] : null; }
