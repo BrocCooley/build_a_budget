@@ -311,6 +311,54 @@ details.rec[open] summary::after{content:"−"}
 .mlab{font:700 12px/1.2 var(--mono);margin-top:8px}
 .mev{font-size:12px;color:var(--muted);line-height:1.3;margin-top:2px}
 
+/* ---------- The year ---------- */
+.cardpill{font:700 11.5px/1.2 var(--mono);color:#fff;background:var(--red);border-radius:6px;padding:5px 7px;align-self:center;white-space:nowrap}
+.cardpill span{opacity:.85;font-weight:600}
+.cardpill em{font-style:normal;margin-left:4px;padding-left:6px;border-left:1px solid rgba(255,255,255,.5)}
+.ytrack{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:4px 0 18px}
+.ym{position:relative;height:38px;border-radius:8px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;font:700 12px/1 var(--mono);color:var(--faint);transition:background .3s,border-color .3s}
+.ym.ok{background:var(--accent);border-color:var(--accent);color:#fff}
+.ym.bad{background:var(--red);border-color:var(--red);color:#fff}
+.ym.now{border-color:var(--ink);border-width:2.5px;color:var(--ink)}
+.ym .ev{position:absolute;top:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--ink);color:#fff;font:800 10px/15px var(--mono);text-align:center;font-style:normal}
+.ym .rf{position:absolute;bottom:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:#e9d9a6;color:var(--ink);font:800 10px/15px var(--mono);text-align:center;font-style:normal}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin:0 0 14px;animation:rise .35s var(--ease) both}
+.ml{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.ml:last-child{border-bottom:0}
+.ml b{font-family:var(--mono);white-space:nowrap}
+.ml.plus b{color:var(--accent)}
+.ml.muted{color:var(--muted)}
+.ml.tot{font-weight:700}
+.ml.tot b{font-size:17px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 18px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.tile b{display:block;font:800 28px/1.1 var(--mono);letter-spacing:-.02em}
+.tile b small{font-size:15px;color:var(--muted)}
+.tile span{display:block;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.3}
+.ychart{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:stretch}
+.yc{display:flex;flex-direction:column;align-items:center}
+.yc .yup{height:72px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-bottom:2px solid var(--ink)}
+.yc .ydn{height:72px;width:100%;display:flex;align-items:flex-start;justify-content:center}
+.yc i{display:block;width:70%;border-radius:3px}
+.yc .yup i{background:var(--accent);border-radius:3px 3px 0 0}
+.yc .ydn i{background:var(--red);border-radius:0 0 3px 3px}
+.yc span{font:700 11px/1 var(--mono);color:var(--muted);margin-top:4px}
+.ygrid{display:flex;flex-direction:column;gap:3px}
+.yrow{display:grid;grid-template-columns:30px repeat(30,1fr);gap:1.5px;align-items:center}
+.yrow span{font:600 10px/1 var(--mono);color:var(--muted)}
+.yrow i{aspect-ratio:1;border-radius:1.5px;background:var(--accent)}
+.yrow i.x{background:var(--red)}
+.pbar{margin:10px 0}
+.pbar .row{display:flex;justify-content:space-between;font-size:15px;margin-bottom:5px}
+.pbar .row b{font:800 17px/1 var(--mono)}
+.pbar .row b.red{color:var(--red)}
+.pbar .row b.acc{color:var(--accent)}
+.pbar .track{height:14px;background:var(--bg);border-radius:7px;overflow:hidden}
+.pbar .track i{display:block;height:100%;width:0;border-radius:7px;transition:width 1s var(--ease)}
+.pbar .track i.red{background:var(--red)}
+.pbar .track i.acc{background:var(--accent)}
+.opt.nope[disabled]{opacity:.55;animation:none}
+
 /* ---------- Final ---------- */
 .stat .big{font-size:76px}
 .stat p{font-size:17px}
@@ -378,6 +426,7 @@ body.editmode .tk.tk-locked:hover{background:rgba(0,0,0,.05);box-shadow:0 0 0 2p
     <div class="meter-main">
       <span class="meter-amt" id="meterAmt">$0</span>
       <span class="ebt" id="ebt" hidden></span>
+      <span class="cardpill" id="cardPill" hidden></span>
       <span class="meter-delta" id="meterDelta"></span>
     </div>
     <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
@@ -442,7 +491,9 @@ const CONFIG = {
     carMonthly: 350              // ESTIMATE — insurance + gas + payment on an older car
   },
 
-  basicsMonthly: 100,            // ESTIMATE — phone, toiletries, kid's clothes
+  basicsMonthly: 689,            // MIT Living Wage Calculator (data updated Feb 15, 2026), 1 adult + 1 child, "Other" necessities: $8,272/yr ÷ 12.
+                                 // Clothing, housekeeping supplies, personal care, household furnishings & equipment. Same in Fargo and Minneapolis.
+  basicsCite: "MIT Living Wage, 2026",
 
   surprise: {
     amount: 400,                 // Matches the Federal Reserve SHED "$400 emergency" benchmark
@@ -472,7 +523,53 @@ const CONFIG = {
   },
 
   daysInMonth: 30,
-  maxMonths: 3,                  // GAME DESIGN LIMIT (not data): follow the household for up to this many months
+  /* ---------- A full year ---------- */
+  year: {
+    months: 12,                  // January–December
+    refundMonth: 2,              // March (0 = January). Most refunds arrive Feb–Mar — ESTIMATE of timing
+    runs: 1000                   // how many simulated years for the "1,000 years" summary
+  },
+
+  // Unexpected expenses. Chance = share of U.S. adults who had this expense in the prior 12 months.
+  // Cost = drawn evenly from the survey's MEDIAN cost range for that expense.
+  // Source: Federal Reserve, Economic Well-Being of U.S. Households in 2025 (May 2026), Table 23 and text.
+  events: [
+    { id: "car",     annualChance: 0.30, min: 1000, max: 1999, carOnly: true },  // "A major vehicle repair or replacement": 30%; median $1,000–$1,999
+    { id: "medical", annualChance: 0.21, min: 1000, max: 1999 },                 // "Unexpected major medical expenses": 21%; median $1,000–$1,999
+    { id: "phone",   annualChance: 0.18, min: 500,  max: 999 },                  // "A mobile phone or computer repair or replacement": 18%; median $500–$999
+    { id: "legal",   annualChance: 0.10, min: 2000, max: 4999 }                  // "Legal expenses, taxes, or fines": 10%; median $2,000–$4,999
+    // Left out (generous to the player): "major house or appliance repair" (22%) — renters' landlords usually cover these;
+    // "childcare cost increases" (3%) and "other" (6%) — the survey gives no cost.
+  ],
+
+  card: {
+    apr: 0.22,                   // ESTIMATE — typical credit card interest rate
+    minPaymentFloor: 40,         // ESTIMATE — minimum payment is the larger of $40 or (interest + 1% of the balance)
+    minPaymentPct: 0.01,         // ESTIMATE
+    creditLimit: null            // No limit modeled (no sourced figure found). Generous to the player.
+  },
+
+  savings: {
+    // Starting savings options. Context: 39% of adults with family income $25,000–$49,999 had 3 months of
+    // expenses saved (Federal Reserve, Economic Well-Being of U.S. Households in 2025, Table 27).
+    options: [0, 500, "3mo"],
+    threeMonthShare25to50k: 39
+  },
+
+  // Tax refund, paid once a year (tax year 2025 rules). The game's monthly take-home already assumes
+  // only payroll tax is withheld, so income tax owed is subtracted here, at tax time.
+  tax: {
+    stdDeductionHoH: 23625,      // 2025 federal standard deduction, head of household
+    bracket10Top: 17000,         // 2025 head of household: 10% up to $17,000, then 12%
+    eitc: { rate: 0.34, max: 4328, phaseoutStart: 23350, phaseoutRate: 0.1598 },  // 2025 EITC, 1 child (IRS Rev. Proc. 2024-40). Formula, not the IRS table: within a few dollars
+    ctc: { perChild: 2200, refundableMax: 1700, earnedRate: 0.15, earnedFloor: 2500 }, // 2025 Child Tax Credit
+    cdctc: { expenseLimit: 3000, maxRate: 0.35, minRate: 0.20, startAGI: 15000, step: 2000 }, // 2025 Child and Dependent Care Credit, 1 child
+    mn: {                        // Minnesota (Minneapolis only). North Dakota: no state family credits; no ND income tax at this income (0% bracket) — VERIFY
+      stdDeductionHoH: 22500, rate1: 0.0535,              // 2025 MN head of household standard deduction; 5.35% bracket (to $40,100)
+      ctcPerChild: 1750, wfcRate: 0.04, wfcEarnedCap: 9480, // 2025 MN Child Tax Credit + Working Family Credit (refundable)
+      phaseoutStart: 31950, phaseoutRate: 0.12            // reduced by 12% of income over $31,950 (non-joint filers)
+    }
+  },
 
   stats: {
     foodInsecure2024: 13.7,      // USDA ERS, Household Food Security in the United States in 2024 — final edition of the report
@@ -488,14 +585,117 @@ const CONFIG = {
 const TEXT = {
   "meter.label": "Money left this month",
 
-  "intro.kicker": "Build a Budget · a 2-minute game",
+  "meter.labelYear": "Cash on hand",
+
+  "savings.kicker": "Day 12 · Before the year starts",
+  "savings.title": "How much do you have saved?",
+  "savings.sub": "Pick where you start. Your year begins in January.",
+  "savings.zero": "Nothing saved",
+  "savings.zero.sub": "Paycheck to paycheck.",
+  "savings.some": "A little cushion",
+  "savings.some.sub": "Enough for a small emergency.",
+  "savings.three": "Three months of expenses",
+  "savings.three.sub": "A full emergency fund.",
+  "savings.context": "**{pct} in 100** adults with family income of $25,000–$49,999 had three months of expenses saved.",
+
+  "year.kicker": "Your year · {city}",
+  "year.intro": "Same job, same rent, same bills every month. Pay comes in, bills go out, and life happens. Quiet months play by themselves. The game stops when something needs you.",
+  "year.fair": "Emergencies are rolled at random from real yearly odds. They don't know how much money you have.",
+  "year.start": "Start January",
+  "year.continue": "Keep going",
+  "year.seeResults": "See your year",
+  "year.pause": "Pause",
+  "year.autoplay": "Auto-play the quiet months",
+  "year.cutLead": "It's {month}. Even with SNAP, you're {gap} short for food this month. What do you cut?",
+  "year.behind": "In {month}, the paycheck didn't cover all the bills. You fell **{amount}** behind on rent and bills.",
+
+  "mc.pay": "Paycheck",
+  "mc.refund": "Tax refund",
+  "mc.bills": "Rent, child care, transport, basics",
+  "mc.cardPay": "Credit card minimum payment",
+  "mc.catchup": "Catching up on late bills",
+  "mc.food": "Food ({snap} SNAP + {cash} cash)",
+  "mc.skipped": "{n} meals skipped",
+  "mc.covered": "Covered",
+  "mc.behind": "Bills you couldn't pay",
+  "mc.end": "Cash at month's end",
+
+  "refund.app": "IRS",
+  "refund.title": "Your tax refund arrived",
+  "refund.text": "**{amount}** from the Earned Income Tax Credit and child credits.",
+  "refund.eitc": "Earned Income Tax Credit",
+  "refund.ctc": "Child Tax Credit + child care credit",
+  "refund.fedtax": "Federal income tax owed",
+  "refund.mn": "Minnesota child + working family credits",
+  "refund.mntax": "Minnesota income tax owed",
+  "refund.total": "Refund",
+  "refund.cite": "(IRS and Minnesota Dept. of Revenue, 2025 tax rules)",
+  "refund.catchup": "First, **{amount}** went to bills you were behind on.",
+
+  "ev.stat": "**{pct} in 100** adults had a {what} in the past year.",
+  "ev.savings": "Pay from savings",
+  "ev.savings.sub": "You have {cash} in cash.",
+  "ev.savings.no": "You only have {cash}. Not enough.",
+  "ev.card": "Put it on the credit card",
+  "ev.card.sub": "Card balance becomes {bal}. Minimum payment about {pay}/mo at {apr} interest.",
+  "ev.car.app": "Auto shop",
+  "ev.car.title": "The car won't start",
+  "ev.car.text": "The repair is **{cost}**. Without the car, you can't get to work.",
+  "ev.car.short": "Car repair",
+  "ev.medical.app": "Clinic",
+  "ev.medical.title": "An unexpected medical bill",
+  "ev.medical.text": "Your kid gets sick and needs care. The bill comes to **{cost}**.",
+  "ev.medical.short": "Medical bill",
+  "ev.phone.app": "Phone store",
+  "ev.phone.title": "Your phone dies",
+  "ev.phone.text": "Your manager texts the schedule. A replacement is **{cost}**.",
+  "ev.phone.short": "Phone replacement",
+  "ev.legal.app": "Mail",
+  "ev.legal.title": "A bill you didn't see coming",
+  "ev.legal.text": "A fine, a court fee, or back taxes: **{cost}**.",
+  "ev.legal.short": "Fine or legal bill",
+
+  "yres.leadDebt": "You ended the year {amount} in debt.",
+  "yres.leadHungry": "You stayed out of debt, but the food didn't last.",
+  "yres.leadOk": "You made it through the year.",
+  "yres.redMonths": "months in the red",
+  "yres.meals": "meals skipped",
+  "yres.short": "short on food, all year",
+  "yres.card": "credit card debt ({interest} in interest)",
+  "yres.behind": "behind on rent and bills",
+  "yres.cash": "cash left in December",
+  "yres.whyTitle": "Why food had to give",
+  "yres.why": "Every month, rent, child care, getting to work and basics came first. Skip any of them and you lose your home or your job. Food is the one bill nobody comes to collect. Even with SNAP, a normal month here comes up **{gap}** short.",
+  "yres.yearTitle": "Your year, month by month",
+  "yres.chartCash": "Cash",
+  "yres.chartDebt": "Debt (card + late bills)",
+  "yres.refundRanOut": "Your tax refund (**{amount}** in March) helped, but by {month} you were short again.",
+  "yres.refundLasted": "Your tax refund (**{amount}** in March) carried you through December.",
+  "yres.mealsTitle": "Every day of the year",
+  "yres.eventsTitle": "What happened",
+  "yres.noEvents": "No emergencies this year.",
+  "yres.onCard": "on the card",
+  "yres.fromSavings": "from savings",
+  "yres.noSnap": "The same year without SNAP ({snap}/mo): **{meals}** meals skipped and **{debt}** in debt.",
+  "yres.mcTitle": "{n} more years like yours",
+  "yres.mcDebt": "Years that ended in debt",
+  "yres.mcHungry": "Years with skipped meals",
+  "yres.mcMedian": "In a typical year: {debt} in debt, {meals} meals skipped.",
+  "yres.mcNote": "Same household, {n} new random years with the same real odds. Emergencies paid from savings when possible, otherwise the card.",
+  "yres.seed": "Replay code: {seed}. Anyone can replay this exact year by adding ?seed={seed} to the game's link.",
+  "yres.newYear": "Play a new random year",
+  "yres.sameYear": "Replay this exact year",
+  "yres.raiseBtn": "Replay earning {wage}/hr",
+
+
+  "intro.kicker": "Build a Budget · a 4-minute game",
   "intro.title1": "One paycheck.",
   "intro.title2": "Thirty days.",
   "intro.title3": "Make it work.",
   "intro.tag1": "Single parent",
   "intro.tag2": "Kid, age 4",
   "intro.tag3": "Cashier, 40 hrs/week",
-  "intro.lead": "Make the smart choice at every step. Then see if the food lasts.",
+  "intro.lead": "Set up your budget. Then live a year of it and see if the food lasts.",
   "intro.pick": "Choose your city",
   "intro.stubPay": "{wage}/hr × {hours} hrs",
   "intro.stubTax": "Payroll tax (7.65%)",
@@ -536,10 +736,11 @@ const TEXT = {
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
-  "basics.phone": "Phone bill",
-  "basics.supplies": "Toiletries and household supplies",
-  "basics.clothes": "Kid's clothes (they keep growing)",
-  "basics.total": "Basics",
+  "basics.sub": "What a family of two needs each month, at the lowest cost.",
+  "basics.phone": "Clothes for you and your kid",
+  "basics.supplies": "Soap, toothpaste, laundry and cleaning supplies",
+  "basics.clothes": "Sheets, towels, and replacing what breaks",
+  "basics.total": "Basic necessities",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
@@ -607,26 +808,10 @@ const TEXT = {
   "food.verdictBillsRent": "Rent doesn't get paid.",
   "food.verdictOk": "The food lasts the month.",
   "food.next": "See your month",
-  "food.nextMonth": "Play month {n}",
-  "food.stopHere": "Stop here and see results",
-  "food.carry": "You carry {amount} into month {n}.",
 
-  "month.prefix": "Month {n} · ",
-  "month.kicker": "Month {n} · Day 1",
-  "month.title": "Month {n}",
-  "month.same": "Same job, same pay, same rent and bills.",
-  "month.carry": "You start the month with **{cash}** saved",
-  "month.carrySnap": " and **{snap}** still on your EBT card",
-  "month.snap": "SNAP reloads",
-  "month.returnCarTitle": "The car still needs work",
-  "month.returnCar": "You skipped the repair last month. It's still there: **{amount}**.",
-  "month.returnDentalTitle": "The filling still needs doing",
-  "month.returnDental": "You skipped the dentist last month. Your kid still needs the filling: **{amount}**.",
-  "month.returnNote": "Same price as last month. Problems like this often cost more when they wait, but the game doesn't add costs it can't source.",
-  "month.quiet": "No surprise bills this month.",
-  "month.next": "Get through the month",
 
   "results.choices": "You made {n} of 4 budget-conscious choices",
+  "results.choices3": "You made {n} of 3 budget-conscious choices",
   "results.leadShort": "You did everything you could. The food ran out on {day}.",
   "results.leadShortSome": "The food ran out on {day}.",
   "results.mealsSkipped": "meals skipped this month",
@@ -649,26 +834,6 @@ const TEXT = {
   "results.shiftsKey": "Each block is one 8-hour shift. You work about {n} a month.",
   "results.shiftsOver": "Dashed red blocks are shifts you'd need on top of full time to cover it all.",
   "results.over": "Over by",
-  "results.multiLeadRed": "You stayed out of the red for {k}. In month {m}, the money ran out.",
-  "results.multiLeadOk": "You made it through {n} months.",
-  "results.multiSaved": "saved. That's your whole cushion for the next surprise.",
-  "results.inMonth": "in month {m}",
-  "results.mealsSkippedIn": "meals skipped in month {m}",
-  "results.monthWord": "month",
-  "results.monthsWord": "months",
-  "results.monthShort": "Month {n}",
-  "results.monthsTitle": "Month by month",
-  "results.stripCap": "Money left at the end of each month after food (cash plus unused SNAP). Red means short.",
-  "results.evNone": "No surprise",
-  "results.evPaid": "Paid the bill",
-  "results.evCard": "Bill on the card",
-  "results.evSkipCar": "Skipped the repair",
-  "results.evSkipDental": "Skipped the dentist",
-  "results.stillSkipped": "The {what} still isn't done. You skipped it {k} times.",
-  "results.whatCar": "car repair",
-  "results.whatDental": "filling",
-  "results.stillOwe": "You still owe about **{amount}** on the credit card.",
-  "results.capNote": "The game follows you for up to {n} months. Every month uses the same real costs. The only new costs come from your own earlier choices.",
   "results.shiftsUnit": "shifts",
   "results.owedCard": "And the card bill didn't go away. You owe {payment} a month for {months} more months, {total} in all. Next month starts {payment} behind.",
   "results.owedSkipCar": "And the repair didn't go away. It's still waiting, and it usually costs more later.",
@@ -792,75 +957,166 @@ function computePath(cityKey, c, wageOverride) {
   }
   return r;
 }
-/* ---------- Multiple months ----------
-   Honest rules, no new invented costs:
-   • Every month repeats the same pay, rent, child care, transport, basics, and SNAP.
-   • The only new costs come from the player's own earlier choices:
-       – a skipped bill comes back the next month at the same price (CONFIG.surprise.amount);
-       – each credit-card charge is paid off on its real schedule (cardSchedule()).
-   • Money left after food carries into the next month: cash, and unused SNAP (it stays on the EBT card).
-   • Stop when a month ends in the red, or after CONFIG.maxMonths.
-   mc = { 2: "pay" | "card" | "skip", 3: ... } — the player's choice for a returning bill in that month. */
-function cardSchedule() {
-  const s = CONFIG.surprise, r = s.cardAPR / 12, pays = [];
-  let bal = s.amount;
-  while (bal > 0.005 && pays.length < 600) { bal += bal * r; const p = Math.min(s.cardMonthlyPayment, bal); bal -= p; pays.push(p); }
-  return pays;
+/* ---------- A full year ----------
+   Fair rules (no fudging):
+   • Every month repeats the same pay, rent, child care, transport, basics, and SNAP (from the setup choices).
+   • Emergencies are rolled at random each month from the Federal Reserve's real yearly odds (CONFIG.events).
+     The rolls come from a seed, never from how the player is doing, so the game can't "pick on" anyone.
+     The same seed always gives the same year (replay code).
+   • When an emergency hits, the player pays from savings (if they have enough) or puts it on the credit card.
+   • Each month: pay bills and the card's minimum payment; then emergencies; then food (SNAP first, then cash).
+     If cash runs out, food is what gets cut (meals skipped). Bills that can't be paid pile up as "behind".
+   • Tax refund arrives once, in March, computed from 2025 tax rules (taxRefund()).
+   • Unused SNAP stays on the EBT card. Tax refunds don't count against SNAP. */
+
+// Small seeded random number generator (mulberry32)
+function rng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-function simulateMonths(cityKey, c, mc, wageOverride, upTo) {
+// Roll a whole year of emergencies from a seed. Same seed → same year. hasCar removes car repairs for bus riders.
+function rollYear(seed, hasCar) {
+  const r = rng(seed), year = [];
+  for (let m = 0; m < CONFIG.year.months; m++) {
+    const list = [];
+    for (const e of CONFIG.events) {
+      const p = 1 - Math.pow(1 - e.annualChance, 1 / 12);   // monthly chance that matches the yearly odds
+      const hit = r(), amt = r();                            // always draw both so sequences stay aligned
+      if (e.carOnly && !hasCar) continue;
+      if (hit < p) list.push({ id: e.id, cost: Math.round((e.min + amt * (e.max - e.min)) / 10) * 10 });
+    }
+    year.push(list);
+  }
+  return year;
+}
+
+// Yearly tax refund (2025 tax year rules), for a full-time worker with one child, head of household.
+function taxRefund(cityKey, wage, careMonthly) {
+  const T = CONFIG.tax;
+  const earned = wage * CONFIG.hoursPerYear, agi = earned;
+  const eitc = Math.max(0, Math.min(T.eitc.rate * earned, T.eitc.max) - T.eitc.phaseoutRate * Math.max(0, agi - T.eitc.phaseoutStart));
+  const taxable = Math.max(0, agi - T.stdDeductionHoH);
+  const incomeTax = Math.min(taxable, T.bracket10Top) * 0.10 + Math.max(0, taxable - T.bracket10Top) * 0.12;
+  const steps = Math.max(0, Math.ceil((agi - T.cdctc.startAGI) / T.cdctc.step));
+  const cdRate = Math.max(T.cdctc.minRate, T.cdctc.maxRate - 0.01 * steps);
+  const careCredit = Math.min(incomeTax, cdRate * Math.min(T.cdctc.expenseLimit, careMonthly * 12));   // nonrefundable
+  const tax2 = incomeTax - careCredit;
+  const ctcUsed = Math.min(T.ctc.perChild, tax2);                                                    // nonrefundable part
+  const actc = Math.min(T.ctc.perChild - ctcUsed, T.ctc.refundableMax, T.ctc.earnedRate * Math.max(0, earned - T.ctc.earnedFloor));
+  const federal = eitc + actc - (tax2 - ctcUsed);
+  let mnCredits = 0, mnTax = 0;
+  if (cityKey === "minneapolis") {
+    const M = T.mn;
+    mnTax = Math.max(0, agi - M.stdDeductionHoH) * M.rate1;
+    mnCredits = Math.max(0, M.ctcPerChild + M.wfcRate * Math.min(earned, M.wfcEarnedCap) - M.phaseoutRate * Math.max(0, Math.max(earned, agi) - M.phaseoutStart));
+  }
+  const total = federal + mnCredits - mnTax;
+  return { eitc, actc, careCredit, incomeTax, ctcUsed, federal, mnCredits, mnTax, total: Math.round(total) };
+}
+
+function cardMinPayment(balance) {
+  const C = CONFIG.card;
+  if (balance <= 0.005) return { interest: 0, pay: 0 };
+  const interest = balance * C.apr / 12;
+  const pay = Math.min(balance + interest, Math.max(C.minPaymentFloor, interest + C.minPaymentPct * balance));
+  return { interest, pay };
+}
+
+// Default way to handle an emergency (used for the 1,000-year summary, and never for the player's own choices):
+// use savings if that still leaves this month's food money, otherwise the card.
+function defaultPolicy(ev, st) { return st.cash - ev.cost >= st.foodCashNeeded ? "savings" : "card"; }
+
+/* Simulate the year.
+   choices: { "m-i": "savings" | "card" } for the player's decisions (month m, i-th emergency that month).
+   opts: { policy, noSnap, wage }. If a decision is missing and there is no policy, stops and returns { pending }. */
+function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
+  opts = opts || {};
   const city = CONFIG.cities[cityKey];
-  const wage = wageOverride != null ? wageOverride : city.wage;
-  const base = pathAtWage(city, c, wage);
-  const sched = cardSchedule();
-  const last = Math.min(upTo || CONFIG.maxMonths, CONFIG.maxMonths);
+  const wage = opts.wage != null ? opts.wage : city.wage;
+  const base = pathAtWage(city, Object.assign({}, c, { surprise: undefined }), wage);
+  const snap = opts.noSnap ? 0 : base.snap;
   const fixed = base.housing + base.care + base.transport + base.basics;
+  const refund = taxRefund(cityKey, wage, base.care);
+  const events = rollYear(seed, c.transport === "car");
   const days = CONFIG.daysInMonth;
-  const months = [], cards = [];
-  let carryCash = 0, carrySnap = 0, pending = false;
-  for (let m = 1; m <= last; m++) {
-    const event = m === 1 || pending;                       // is there a $400 bill this month?
-    const choice = m === 1 ? c.surprise : (pending ? (mc || {})[m] : null);
-    if (choice === "card") cards.push(m);
-    const cardPay = cards.reduce((a, start) => a + (sched[m - start] || 0), 0);
-    const billPaid = choice === "pay" ? CONFIG.surprise.amount : 0;
-    const cash = base.net - fixed - billPaid - cardPay + carryCash;   // cash after bills
-    const snapAvail = base.snap + carrySnap;
+  let cash = startSavings, card = 0, behind = 0, snapCarry = 0, interestPaid = 0;
+  const months = [];
+  for (let m = 0; m < CONFIG.year.months; m++) {
+    const rec = { m, startCash: cash, startCard: card, events: [], refund: 0 };
+    // 1) Paycheck (and tax refund in March)
+    cash += base.net;
+    if (m === CONFIG.year.refundMonth) { rec.refund = refund.total; cash += refund.total; }
+    // 2) Bills, then the card's minimum payment
+    cash -= fixed;
+    const cp = cardMinPayment(card);
+    card += cp.interest; interestPaid += cp.interest;
+    rec.cardInterest = cp.interest; rec.cardPay = cp.pay;
+    cash -= cp.pay; card -= cp.pay;
+    rec.behindAdded = 0;
+    if (cash < 0) { rec.behindAdded = -cash; behind += -cash; cash = 0; }
+    // 3) Emergencies
+    const snapAvail = snap + snapCarry;
     const need = base.need;
+    const foodCashNeeded = Math.max(0, need - snapAvail);
+    for (let i = 0; i < events[m].length; i++) {
+      const ev = events[m][i];
+      let how = choices && choices[m + "-" + i];
+      if (how === "savings" && cash < ev.cost) how = "card";
+      if (!how) {
+        if (opts.policy) how = cash >= ev.cost ? opts.policy(ev, { cash, foodCashNeeded }) : "card";
+        else { months.push(Object.assign(rec, { partial: true })); return { months, pending: { m, i, ev, cash }, refund, base, card, cash, behind, interestPaid, events }; }
+      }
+      if (how === "savings") cash -= ev.cost; else card += ev.cost;
+      rec.events.push(Object.assign({}, ev, { how }));
+    }
+    // 4) Food: SNAP first, then cash. Whatever's missing is skipped meals.
     const snapUsed = Math.min(snapAvail, need);
-    const cashForFood = Math.min(Math.max(0, cash), need - snapUsed);
-    const foodMoney = snapAvail + Math.max(0, cash);
-    const foodGap = Math.max(0, need - snapUsed - cashForFood);
-    const billsBehind = Math.max(0, -cash);
-    const red = foodGap > 0.005 || billsBehind > 0.005;
-    const rec = Object.assign({}, base, {
-      month: m, event, choice, cardPay, billPaid, surprise: billPaid + cardPay,
-      carryInCash: carryCash, carryInSnap: carrySnap,
-      leftover: cash, snap: snapAvail, foodMoney, foodGap, billsBehind, red,
-      gap: red ? foodGap + billsBehind : need - foodMoney,
-      daysFed: Math.min(days, Math.floor(foodMoney / need * days)),
-      mealsSkipped: Math.min(base.totalMeals, Math.round(foodGap / base.perMeal))
-    });
+    snapCarry = snapAvail - snapUsed;
+    const cashFood = Math.min(cash, need - snapUsed);
+    cash -= cashFood;
+    rec.snapUsed = snapUsed; rec.cashFood = cashFood;
+    rec.foodGap = Math.max(0, need - snapUsed - cashFood);
+    rec.mealsSkipped = Math.min(base.totalMeals, Math.round(rec.foodGap / base.perMeal));
+    rec.daysFed = Math.min(days, Math.floor((snapUsed + cashFood) / need * days));
+    // 5) Catch up on bills you were behind on, if money is left
+    if (cash > 0 && behind > 0) { const p = Math.min(cash, behind); cash -= p; behind -= p; rec.behindPaid = p; }
+    rec.endCash = cash; rec.endCard = card; rec.endBehind = behind;
     months.push(rec);
-    if (red) break;
-    if (event && choice == null) break;                      // waiting on the player's choice
-    carrySnap = snapAvail - snapUsed;
-    carryCash = Math.max(0, cash) - cashForFood;
-    pending = event && choice === "skip";
   }
-  return months;
+  return { months, pending: null, refund, base, card, cash, behind, interestPaid, events,
+    netWorth: cash - card - behind,
+    mealsSkipped: months.reduce((a, r) => a + r.mealsSkipped, 0),
+    shortMonths: months.filter((r) => r.foodGap > 0.005).length };
 }
 
-// What's still owed after the last simulated month (for the results screen)
-function leftovers(months) {
-  const sched = cardSchedule(), last = months[months.length - 1].month;
-  let cardOwed = 0, skips = 0;
-  for (const r of months) {
-    if (r.choice === "card") cardOwed += sched.slice(last - r.month + 1).reduce((a, b) => a + b, 0);
-    if (r.choice === "skip") skips++;
+function startSavingsAmount(opt, cityKey, c, wage) {
+  if (opt !== "3mo") return Number(opt) || 0;
+  const city = CONFIG.cities[cityKey];
+  const b = pathAtWage(city, Object.assign({}, c, { surprise: undefined }), wage != null ? wage : city.wage);
+  return Math.round((b.housing + b.care + b.transport + b.basics + b.need) * 3 / 10) * 10;   // 3 months of expenses
+}
+
+// Replay the same household many times with new random years (default policy for emergencies)
+function manyYears(cityKey, c, startSavings, opts) {
+  opts = opts || {};
+  const n = opts.runs || CONFIG.year.runs, out = [];
+  for (let k = 0; k < n; k++) {
+    const y = simulateYear(cityKey, c, startSavings, 1000003 + k * 7919, null, { policy: defaultPolicy, wage: opts.wage, noSnap: opts.noSnap });
+    out.push({ debt: y.card + y.behind, cash: y.cash, net: y.netWorth, meals: y.mealsSkipped, shortMonths: y.shortMonths, events: y.events.reduce((a, l) => a + l.length, 0) });
   }
-  const lastRec = months[months.length - 1];
-  return { cardOwed, skips, stillSkipped: lastRec.choice === "skip" };
+  const pct = (f) => Math.round(out.filter(f).length / n * 100);
+  const median = (arr) => { const s = arr.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+  return {
+    runs: n, results: out,
+    pctDebt: pct((x) => x.debt > 1), pctHungry: pct((x) => x.meals > 0), pctNoEvent: pct((x) => x.events === 0),
+    medianDebt: median(out.map((x) => x.debt)), medianNet: median(out.map((x) => x.net)), medianMeals: median(out.map((x) => x.meals))
+  };
 }
 // </calc>
 
@@ -902,27 +1158,29 @@ const IC = {
   skip: '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
   plate: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/>',
   dollar: '<path d="M12 2v20M17 6.5c-1-1.5-2.8-2-5-2-3 0-4.5 1.5-4.5 3.5 0 4.5 10 2.5 10 7.5 0 2-1.8 3.5-5 3.5-2.4 0-4.2-.8-5-2.5"/>',
-  check: '<path d="M5 12l5 5L20 7"/>'
+  check: '<path d="M5 12l5 5L20 7"/>',
+  med: '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/>'
 };
 const icon = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 
-const S = { screen: "intro", city: null, wageOverride: null, c: {}, month: 1, mc: {} };
-const FLOW = ["housing", "care", "transport", "basics", "snap", "surprise", "cut", "food"];
-const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, cut: 20, food: 30, results: 30, month: 1 };
+const S = { screen: "intro", city: null, wageOverride: null, c: {}, y: null };
+const FLOW = ["housing", "care", "transport", "basics", "snap", "savings", "year"];
+const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, savings: 12 };
 
 function city() { return CONFIG.cities[S.city]; }
 function path() { return computePath(S.city, S.c, S.wageOverride); }
-// Months played so far, and the current month's numbers
-function months() { return simulateMonths(S.city, S.c, S.mc, S.wageOverride, S.month); }
-function cur() { const ms = months(); return ms[ms.length - 1]; }
-const mk = (s) => (S.month > 1 ? t("month.prefix", { n: S.month }, true) + s : s);
 
 /* ---------- Meter ---------- */
 let meterShown = 0, meterRaf = null, deltaTimer = null;
 function meterMax() { return S.city ? takeHomeFor(S.wageOverride ?? city().wage).net : 1; }
 function cashBalance() {
   if (!S.city) return null;
-  if (S.month > 1) return cur().leftover;
+  if ((S.screen === "year" || S.screen === "results") && S.y) {
+    const sim = yearSim();
+    if (S.y.panel && S.y.panel.type === "event") return sim.pending ? sim.pending.cash : sim.cash;
+    if (S.y.shown < 0) return yearStart();
+    return sim.months[S.y.shown] ? sim.months[S.y.shown].endCash : sim.cash;
+  }
   const c = S.c, ct = city();
   let bal = meterMax();
   if (c.housing) bal -= ct.rent[c.housing];
@@ -936,11 +1194,26 @@ function updateMeter() {
   const m = $("meter"), amt = $("meterAmt"), fill = $("meterFill"), d = $("meterDelta"), ebt = $("ebt");
   $("meterLabel").textContent = TEXT["meter.label"];
   const target = cashBalance();
-  const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results" || S.screen === "month");
+  const inYear = (S.screen === "year" || S.screen === "results") && S.y;
+  $("meterLabel").textContent = inYear ? TEXT["meter.labelYear"] : TEXT["meter.label"];
+  const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results");
   m.classList.toggle("idle", !inGame);
   if (!inGame) return;
-  $("day").textContent = (S.month > 1 ? `M${S.month} · ` : "") + `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
-  if (S.c.snap) { const s = S.month > 1 ? cur().snap : path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
+  const cp = $("cardPill");
+  if (inYear) {
+    const sim = yearSim(), sh = S.y.shown;
+    const p = S.y.panel && S.y.panel.type === "event";
+    const mIdx = p ? S.y.panel.p.m : Math.max(0, sh);
+    $("day").textContent = S.screen === "results" ? "YEAR DONE" : MONTHS[mIdx].slice(0, 3).toUpperCase() + " · " + (mIdx + 1) + " / 12";
+    const bal = p ? sim.card : (sh >= 0 && sim.months[sh] ? sim.months[sh].endCard : 0);
+    const behind = sh >= 0 && sim.months[sh] ? sim.months[sh].endBehind : 0;
+    cp.hidden = bal < 1 && behind < 1;
+    cp.innerHTML = (bal >= 1 ? `CARD <b>${fmt(bal)}</b> <span>· ${fmt(cardMinPayment(bal).pay)}/mo</span>` : "") + (behind >= 1 ? ` <em>BEHIND ${fmt(behind)}</em>` : "");
+  } else {
+    cp.hidden = true;
+    $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
+  }
+  if (S.c.snap) { const s = path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
   else ebt.hidden = true;
   const pctLeft = target / meterMax() * 100;
   fill.style.width = Math.max(0, Math.min(100, pctLeft)) + "%";
@@ -966,7 +1239,7 @@ function updateMeter() {
 
 /* ---------- Building blocks ---------- */
 const dots = () => {
-  if (S.month > 1) return "";
+  if (S.screen === "year") return "";
   const i = FLOW.indexOf(S.screen);
   return `<div class="dots" aria-label="Step ${i + 1} of ${FLOW.length}">${FLOW.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join("")}</div>`;
 };
@@ -1139,13 +1412,14 @@ const screens = {
   basics() {
     return `${dots()}<p class="kicker">${t("basics.kicker")}</p>
       <h2>${t("basics.title")}</h2>
+      <p class="muted">${t("basics.sub")}</p>
       <ul class="auto">
-        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}</li>
+        <li><span class="ico">${icon("shirt")}</span>${t("basics.phone")}</li>
         <li><span class="ico">${icon("bag")}</span>${t("basics.supplies")}</li>
-        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}</li>
+        <li><span class="ico">${icon("home")}</span>${t("basics.clothes")}</li>
         <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(CONFIG.basicsMonthly)}</span></li>
       </ul>
-      <p class="cite">(estimate)</p>
+      <p class="cite">(${CONFIG.basicsCite})</p>
       <div class="actions">${next("snap", "Continue")}</div>`;
   },
 
@@ -1159,256 +1433,175 @@ const screens = {
       : `<h2>${t("snap.deniedTitle")}</h2>
          <p class="lead">${t("snap.deniedLead", { wage: fmtWage(r.wage) })}${cite(CONFIG.snap.cite)}</p>`;
     return `${dots()}<p class="kicker">${t("snap.kicker")}</p>${body}
-      <div class="actions">${next("surprise", "Continue")}</div>`;
+      <div class="actions">${next("savings", "Continue")}</div>`;
   },
 
-  surprise() {
-    const car = S.c.transport === "car";
-    const p = cardPayoff(), A = CONFIG.surprise.amount;
-    const title = car ? t("surprise.carTitle") : t("surprise.dentalTitle");
-    if (S.c.surprise) {
-      const line = {
-        pay: t("surprise.after.pay", { amount: fmt(A) }),
-        card: t("surprise.after.card", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months }),
-        skip: car ? t("surprise.after.skipCar") : t("surprise.after.skipDental")
-      }[S.c.surprise];
-      const to = path().gap > 0 ? "cut" : "food";
-      return `${dots()}<p class="kicker">${t("surprise.kicker")}</p>
-        <h2>${title}</h2>
-        <div class="note ${S.c.surprise === "pay" ? "" : "bad"}">${line}</div>
-        <div class="actions">${next(to, t("surprise.next"), "go")}</div>`;
-    }
-    const n = car
-      ? notif("wrench", "red", t("surprise.carApp"), t("surprise.carNotifTitle"), t("surprise.carNotif", { amount: fmt(A) }))
-      : notif("tooth", "red", t("surprise.dentalApp"), t("surprise.dentalNotifTitle"), t("surprise.dentalNotif", { amount: fmt(A) }));
-    const cov = CONFIG.stats.cover400WithCash;
-    return `${dots()}<p class="kicker">${t("surprise.kicker")}</p>
-      ${n}
-      <h2>${title}</h2>
-      <div class="figure">${picto(PERSON, "0 0 12 16", Math.round(cov), "on")}<p class="cap">${t("surprise.stat", { pct: cov })}${cite("Federal Reserve, 2025")}</p></div>
+  savings() {
+    const c = S.c, threeMo = startSavingsAmount("3mo", S.city, c, S.wageOverride);
+    return `${dots()}<p class="kicker">${t("savings.kicker")}</p>
+      <h2>${t("savings.title")}</h2>
+      <p class="muted">${t("savings.sub")}</p>
       <div class="opts">
-      ${opt({ act: "surprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), tag: t("tag.noDebt") })}
-      ${opt({ act: "surprise", val: "card", ico: "card", title: t("surprise.card"), price: fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
-        sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate") })}
-      ${opt({ act: "surprise", val: "skip", ico: "skip", title: t("surprise.skip"), price: "$0", sub: car ? t("surprise.skip.subCar") : t("surprise.skip.subDental") })}
-      </div>`;
-  },
-
-  month() {
-    const r = cur();
-    const car = S.c.transport === "car";
-    const A = CONFIG.surprise.amount, p = cardPayoff();
-    const li = (ico, label, amt) => `<li><span class="ico">${icon(ico)}</span>${label}<span class="amt">−${fmt(amt)}</span></li>`;
-    const carry = r.carryInCash > 0.5 || r.carryInSnap > 0.5
-      ? `<div class="note">${t("month.carry", { cash: fmt(r.carryInCash) })}${r.carryInSnap > 0.5 ? t("month.carrySnap", { snap: fmt(r.carryInSnap) }) : ""}.</div>` : "";
-    let bill = "";
-    if (r.event && !r.choice) {
-      bill = (car ? notif("wrench", "red", t("surprise.carApp"), t("month.returnCarTitle"), t("month.returnCar", { amount: fmt(A) }))
-                  : notif("tooth", "red", t("surprise.dentalApp"), t("month.returnDentalTitle"), t("month.returnDental", { amount: fmt(A) })))
-        + `<p class="small muted">${t("month.returnNote")}</p>
-        <div class="opts">
-        ${opt({ act: "msurprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), tag: t("tag.noDebt") })}
-        ${opt({ act: "msurprise", val: "card", ico: "card", title: t("surprise.card"), price: fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
-          sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate") })}
-        ${opt({ act: "msurprise", val: "skip", ico: "skip", title: t("surprise.skip"), price: "$0", sub: car ? t("surprise.skip.subCar") : t("surprise.skip.subDental") })}
-        </div>`;
-    } else if (r.event) {
-      const line = { pay: t("surprise.after.pay", { amount: fmt(A) }),
-        card: t("surprise.after.card", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months }),
-        skip: car ? t("surprise.after.skipCar") : t("surprise.after.skipDental") }[r.choice];
-      bill = `<div class="note ${r.choice === "pay" ? "" : "bad"}">${line}</div>`;
-    } else {
-      bill = `<div class="note plain">${t("month.quiet")}</div>`;
-    }
-    const ready = !r.event || r.choice;
-    return `<p class="kicker">${t("month.kicker", { n: S.month })}</p>
-      <h2>${t("month.title", { n: S.month })}</h2>
-      <p class="muted">${t("month.same")}</p>
-      ${carry}
-      <ul class="auto">
-        ${li("home", t("label.rent"), r.housing)}
-        ${li("kid", t("label.care"), r.care)}
-        ${li(car ? "car" : "bus", car ? t("label.car") : t("label.bus"), r.transport)}
-        ${li("bag", t("label.basics"), r.basics)}
-        ${r.cardPay > 0 ? li("card", t("label.surpriseCard"), r.cardPay) : ""}
-        <li class="tot"><span class="ico">${icon("cart")}</span>${t("month.snap", { amount: fmt(r.snap - r.carryInSnap) })}<span class="amt" style="color:var(--accent)">+${fmt(r.snap - r.carryInSnap)}</span></li>
-      </ul>
-      ${bill}
-      ${ready ? `<div class="actions">${next(r.red ? "cut" : "food", t("month.next"), "go")}</div>` : ""}`;
-  },
-
-  cut() {
-    const r = cur();
-    if (S.c.cut === "food") {
-      return `${dots()}<p class="kicker">${mk(t("cut.kicker"))}</p>
-        <h2>${t("cut.title")}</h2>
-        <div class="note bad" style="font-size:17px">${t("cut.yes")}</div>
-        <div class="actions">${next("food", t("cut.next"), "go")}</div>`;
-    }
-    const car = S.c.transport === "car";
-    return `${dots()}<p class="kicker">${mk(t("cut.kicker"))}</p>
-      <h2>${t("cut.title")}</h2>
-      <p class="lead">${t("cut.lead", { gap: `<span class="red">${fmt(r.gap)}</span>` })}</p>
-      <div class="opts" id="cutOpts">
-      ${opt({ act: "cut", val: "rent", ico: "home", title: t("cut.rent"), price: fmt(r.housing) })}
-      ${opt({ act: "cut", val: "care", ico: "kid", title: t("cut.care"), price: fmt(r.care) })}
-      ${opt({ act: "cut", val: "transport", ico: car ? "car" : "bus", title: t("cut.transport"), price: fmt(r.transport) })}
-      ${opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "" })}
-      ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
-      </div>`;
-  },
-
-  food() {
-    const r = cur();
-    const bus = S.c.transport === "bus";
-    const D = CONFIG.daysInMonth;
-    const cells = Array.from({ length: D }, (_, i) => `<div>${i + 1}</div>`).join("");
-    const frac = r.foodMoney / r.need;
-    setTimeout(() => animateCalendar(r), 900);
-    const more = !r.red && S.month < CONFIG.maxMonths;
-    const nextBtns = more
-      ? `<button class="btn go" data-act="nextMonth">${t("food.nextMonth", { n: S.month + 1 })} <span class="arr">→</span></button>${next("results", t("food.stopHere"), "secondary")}`
-      : next("results", t("food.next"), "go");
-    return `${dots()}<p class="kicker">${mk(t("food.kicker"))}</p>
-      <h2>${t("food.title")}</h2>
-      <div class="plate">
-        <svg viewBox="0 0 100 80" aria-hidden="true" style="width:96px"><g fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round">
-          <path d="M10 10v18a5 5 0 0 0 10 0V10M15 10v60"/><path d="M88 70V10c-6 4-8 14-8 26h8"/></g>
-          <circle cx="50" cy="40" r="27" fill="#fff" stroke="var(--line)" stroke-width="2.5"/><circle cx="50" cy="40" r="18" fill="var(--bg)" stroke="var(--line)" stroke-width="1.5"/></svg>
-        <div><div class="amt">$${r.perMeal.toFixed(2)}</div><div class="per">${t("food.perMeal")}</div></div>
+      ${opt({ act: "savings", val: "0", ico: "dollar", title: t("savings.zero"), price: "$0", sub: t("savings.zero.sub") })}
+      ${opt({ act: "savings", val: "500", ico: "dollar", title: t("savings.some"), price: "$500", sub: t("savings.some.sub") })}
+      ${opt({ act: "savings", val: "3mo", ico: "dollar", title: t("savings.three"), price: fmt(threeMo), sub: t("savings.three.sub") })}
       </div>
-      <p class="small muted">${t("food.perMealNote")}${bus ? " " + t("food.perMealBus") : ""}${cite(CONFIG.food.cite + (bus ? "; +25% estimate" : ""))}</p>
-      ${r.billsBehind > 0 ? `<div class="note bad">${t("food.behind", { amount: fmt(r.billsBehind) })}</div>` : ""}
-      <div class="figure bagwrap">
-        ${groceryBag(frac, t("food.missing", { amount: fmt(r.foodGap) }))}
-        <div class="bagtxt" style="flex:1">
-          <div class="pc ${frac < 1 ? "red" : "accent"}">${Math.min(100, Math.floor(frac * 100))}%</div>
-          <div class="lb">${frac >= 1 ? t("food.bagFull") : t("food.bagPct")}</div>
-          ${frac < 1 ? `<div class="ln red" style="border-top:0;font-weight:700;font-family:var(--mono);font-size:12px">${t("food.missing", { amount: fmt(r.foodGap) })}</div>` : ""}
-          <div class="ln"><span>${t("food.budget")}</span><b>${fmt(r.foodMoney)}</b></div>
-          <div class="ln small muted"><span>${t("food.budgetDetail", { cash: fmt(Math.max(0, r.leftover)), snap: fmt(r.snap) })}</span></div>
-          <div class="ln"><span>${t("food.need")}</span><b>${fmt(r.need)}</b></div>
-        </div>
-      </div>
-      <div class="cal" id="cal">${cells}</div>
-      <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("food.keyOn")}</span><span><i style="background:var(--red-soft)"></i>${t("food.keyOff")}</span></div>
-      <div class="verdict" id="verdict"></div>
-      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${nextBtns}</div>`;
+      <div class="figure">${picto(PERSON, "0 0 12 16", CONFIG.savings.threeMonthShare25to50k, "on")}
+        <p class="cap">${t("savings.context", { pct: CONFIG.savings.threeMonthShare25to50k })}${cite("Federal Reserve, 2026")}</p></div>`;
+  },
+
+  year() {
+    const y = S.y, sim = yearSim();
+    const ms = sim.months.filter((r) => !r.partial);
+    const p = y.panel;
+    const curM = p && p.type === "event" ? p.p.m : Math.max(0, y.shown);
+    const track = MONTHS.map((nm, i) => {
+      const r = ms[i], done = i <= y.shown && r;
+      const cls = !done ? "" : (r.foodGap > 0.005 || r.behindAdded > 0.5 ? "bad" : "ok");
+      const now = (p && p.type === "event" && p.p.m === i) || (!p && i === 0 && y.shown < 0) ? "now" : "";
+      return `<div class="ym ${cls} ${now}" title="${nm}"><span>${nm.slice(0, 1)}</span>${done && r.events.length ? '<i class="ev">!</i>' : ""}${done && r.refund ? '<i class="rf">$</i>' : ""}</div>`;
+    }).join("");
+    let body = "", actions = "";
+    if (y.shown < 0 && !p) {
+      body = `<div class="note plain">${t("year.intro")}</div>
+        <p class="small muted">${t("year.fair")}</p>`;
+      actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
+    } else if (p.type === "event") body = eventPanel(p.p);
+    else {
+      const r = ms[y.shown];
+      if (p.type === "refund") {
+        const rf = sim.refund;
+        body = notif("dollar", "green", t("refund.app"), t("refund.title"), t("refund.text", { amount: fmt(rf.total) }))
+          + `<ul class="auto">
+            <li><span class="ico">${icon("kid")}</span>${t("refund.eitc")}<span class="amt">+${fmt(rf.eitc)}</span></li>
+            <li><span class="ico">${icon("kid")}</span>${t("refund.ctc")}<span class="amt">+${fmt(rf.actc + rf.ctcUsed + rf.careCredit)}</span></li>
+            <li><span class="ico">${icon("card")}</span>${t("refund.fedtax")}<span class="amt">−${fmt(rf.incomeTax)}</span></li>
+            ${rf.mnCredits ? `<li><span class="ico">${icon("kid")}</span>${t("refund.mn")}<span class="amt">+${fmt(rf.mnCredits)}</span></li>
+            <li><span class="ico">${icon("card")}</span>${t("refund.mntax")}<span class="amt">−${fmt(rf.mnTax)}</span></li>` : ""}
+            <li class="tot"><span class="ico">${icon("check")}</span>${t("refund.total")}<span class="amt" style="color:var(--accent)">+${fmt(rf.total)}</span></li></ul>
+          <p class="cite">${t("refund.cite")}</p>
+          ${r.behindPaid ? `<div class="note">${t("refund.catchup", { amount: fmt(r.behindPaid) })}</div>` : ""}
+          ${monthCard(r)}`;
+      } else if (p.type === "cut") {
+        if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t("cut.yes")}</div>${monthCard(r)}`;
+        else {
+          const car = S.c.transport === "car", b = sim.base;
+          body = `<h3 class="red" style="margin:0 0 6px">${t("cut.title")}</h3>
+            <p class="lead">${t("year.cutLead", { month: MONTHS[r.m], gap: `<span class="red">${fmt(r.foodGap)}</span>` })}</p>
+            <div class="opts">
+            ${opt({ act: "cut", val: "rent", ico: "home", title: t("cut.rent"), price: fmt(b.housing) })}
+            ${opt({ act: "cut", val: "care", ico: "kid", title: t("cut.care"), price: fmt(b.care) })}
+            ${opt({ act: "cut", val: "transport", ico: car ? "car" : "bus", title: t("cut.transport"), price: fmt(b.transport) })}
+            ${opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "" })}
+            ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
+            </div>`;
+        }
+      } else if (p.type === "behind") {
+        body = `<div class="note bad">${t("year.behind", { month: MONTHS[r.m], amount: fmt(r.behindAdded) })}</div>${monthCard(r)}`;
+      } else body = monthCard(r);
+      const last = y.shown >= CONFIG.year.months - 1;
+      const needsTap = p.type !== "month" || !y.auto;
+      if (!(p.type === "cut" && !y.cutPicked)) {
+        actions = needsTap
+          ? `<button class="btn go" data-act="ycont">${last ? t("year.seeResults") : t("year.continue")} <span class="arr">→</span></button>`
+          : `<button class="btn secondary" data-act="ypause">${t("year.pause")}</button>`;
+        if (needsTap && p.type === "month" && !last) actions += `<button class="btn link" data-act="yplay">${t("year.autoplay")}</button>`;
+      }
+    }
+    return `<p class="kicker">${t("year.kicker", { city: CONFIG.cities[S.city].name })}</p>
+      <h2>${MONTHS[curM]}</h2>
+      <div class="ytrack">${track}</div>
+      ${body}
+      <div class="actions">${actions}</div>`;
   },
 
   results() {
-    if (S.month > 1) return multiResults();
-    const r = path();
-    const c = city();
-    const short = r.gap > 0;
-    const p = cardPayoff();
-    const dayTxt = `<span class="red">day ${r.daysFed + 1}</span>`;
+    const sim = yearSim(), ms = sim.months, b = sim.base, c = city();
+    const sum = (f) => ms.reduce((a, r) => a + f(r), 0);
+    const shortMonths = ms.filter((r) => r.foodGap > 0.005);
+    const redMonths = ms.filter((r) => r.foodGap > 0.005 || r.behindAdded > 0.5);
+    const totalShort = sum((r) => r.foodGap);
+    const meals = sum((r) => r.mealsSkipped);
+    const debt = sim.card, behind = sim.behind;
+    const first = computePath(S.city, { housing: S.c.housing, care: S.c.care, transport: S.c.transport });
+    const conscious = (S.c.housing === "oneBR") + (S.c.care === "home") + (S.c.transport === "bus");
 
-    // Headline + meals graphic
-    const meals = Array.from({ length: r.totalMeals }, (_, i) => `<i class="${i >= r.totalMeals - r.mealsSkipped ? "x" : ""}"></i>`).join("");
-    const mealsFig = `<div class="figure"><div class="meals">${meals}</div><div class="meals-key"><span>Day 1</span><span>${t("results.mealsKey")}</span><span>Day ${CONFIG.daysInMonth}</span></div></div>`;
+    // Headline
     let head;
-    if (r.foodGap > 0) {
-      head = `<p class="headline">${t(r.conscious === 4 ? "results.leadShort" : "results.leadShortSome", { day: dayTxt })}</p>
-        <div class="big red">${r.mealsSkipped}</div>
-        <p class="lead" style="margin-bottom:8px"><b>${t("results.mealsSkipped")}</b></p>
-        ${mealsFig}
-        <p>${t("results.mealsNote", { gap: fmt(r.foodGap) })}${r.billsBehind > 0 ? " " + t("results.billsToo", { amount: `<span class="red">${fmt(r.billsBehind)}</span>` }) : ""}</p>`;
-    } else if (r.billsBehind > 0) {
-      head = `<p class="headline">${t("results.leadBills")}</p>
-        <div class="big red">${fmt(r.billsBehind)}</div>
-        <p class="lead"><b>${t("results.billsBehind")}</b></p>
-        ${mealsFig}`;
-    } else {
-      head = `<p class="headline">${r.gap > -1 ? t("results.leadZero") : t("results.leadOk", { amount: `<span class="accent">${fmt(-r.gap)}</span>` })}</p>
-        ${mealsFig}<p class="small muted">${t("results.mealsAll", { total: r.totalMeals })}</p>`;
-    }
+    if (debt + behind > 1) head = t("yres.leadDebt", { amount: `<span class="red">${fmt(debt + behind)}</span>` });
+    else if (meals > 0) head = t("yres.leadHungry");
+    else head = t("yres.leadOk");
 
-    // With vs. without SNAP: number line with break-even at zero
-    const vNo = -r.gapNoSnap, vYes = -r.gap;           // negative = short
-    const lo = Math.min(vNo, vYes, 0), hi = Math.max(vNo, vYes, 0);
-    const pad = Math.max(40, (hi - lo) * 0.12);
-    const pos = (v) => ((v - (lo - pad)) / ((hi + pad) - (lo - pad)) * 100);
-    const lbl = (g) => g > 0 ? `${fmt(g)} ${t("results.short")}` : `${fmt(-g)} ${t("results.spare")}`;
-    const edge = (p) => (p < 18 ? "edgeL" : p > 82 ? "edgeR" : "");
-    const pNo = pos(vNo), pYes = pos(vYes);
-    const snapFig = `<p class="section">${t("results.snapTitle")}</p><div class="figure">
-      <div class="nline">
-        <div class="nl-track"></div>
-        <div class="nl-zero" style="left:${pos(0)}%"><span>${t("results.breakEven")}</span></div>
-        <div class="nl-arrow" style="left:${Math.min(pNo, pYes)}%;width:0" data-w="${Math.abs(pYes - pNo)}"></div>
-        <div class="nl-dot red ${edge(pNo)}" style="left:${pNo}%"><span>${t("results.withoutSnap")}<br><b>${lbl(r.gapNoSnap)}</b></span></div>
-        <div class="nl-dot acc ${edge(pYes)}" style="left:${pYes}%"><span>${t("results.withSnap")}<br><b>${lbl(r.gap)}</b></span></div>
-      </div>
-      <p class="cap">${t("results.snapCap", { amount: "+" + fmt(r.gapNoSnap - r.gap) })}${cite(CONFIG.snap.cite)}</p>
+    // Tiles
+    const tile = (big, label, cls) => `<div class="tile"><b class="${cls || ""}">${big}</b><span>${label}</span></div>`;
+    const tiles = `<div class="tiles">
+      ${tile(`${redMonths.length}<small>/12</small>`, t("yres.redMonths"), redMonths.length ? "red" : "accent")}
+      ${tile(meals.toLocaleString("en-US"), t("yres.meals"), meals ? "red" : "accent")}
+      ${tile(fmt(totalShort), t("yres.short"), totalShort > 0.5 ? "red" : "accent")}
+      ${tile(fmt(debt), t("yres.card", { interest: fmt(sim.interestPaid) }), debt > 1 ? "red" : "accent")}
+      ${tile(fmt(behind), t("yres.behind"), behind > 1 ? "red" : "accent")}
+      ${tile(fmt(sim.cash), t("yres.cash"), "")}
     </div>`;
 
-    // Who your shifts paid for (shift blocks)
-    // items: [text key, amount, color]
-    const surpriseKey = { pay: "label.surprisePay", card: "label.surpriseCard", skip: "label.surpriseSkip" }[S.c.surprise];
-    const items = [
-      ["label.rent", r.housing, "var(--s1)"],
-      ["label.care", r.care, "var(--s2)"],
-      [S.c.transport === "car" ? "label.car" : "label.bus", r.transport, "var(--s3)"],
-      ["label.basics", r.basics, "var(--s4)"],
-      [surpriseKey, r.surprise, "var(--s5)"]
-    ].filter((x) => x[1] > 0);
-    const spent = items.reduce((a, x) => a + x[1], 0);
-    const foodCash = Math.max(0, r.leftover);
-    const over = Math.max(0, spent - r.net);
-    const spm = shiftsPerMonth();
-    const sh = (amt) => amt / r.net * spm;
-    // Bills fill the shifts first; anything past the paycheck spills into red "extra" shifts
-    const segsS = items.map((x) => ({ v: sh(x[1]), color: x[2] }));
-    if (foodCash > 0) segsS.push({ v: sh(foodCash), color: "var(--accent)" });
-    if (over > 0) { // recolor the part beyond the paycheck red
-      let acc = 0; const out = [];
-      for (const s of segsS) {
-        const inside = Math.max(0, Math.min(s.v, spm - acc));
-        if (inside > 0) out.push({ v: inside, color: s.color });
-        acc += s.v;
-      }
-      out.push({ v: sh(over), color: "var(--red)" });
-      segsS.length = 0; segsS.push(...out);
-    }
-    const legend = items.map((x) => `<li><span class="sw" style="background:${x[2]}"></span>${t(x[0])}<span class="v">${fmt(x[1])}</span><span class="p">${sh(x[1]).toFixed(1)} ${t("results.shiftsUnit")}</span></li>`).join("")
-      + (foodCash > 0 ? `<li><span class="sw" style="background:var(--accent)"></span>${t("label.food")}<span class="v">${fmt(foodCash)}</span><span class="p">${sh(foodCash).toFixed(1)} ${t("results.shiftsUnit")}</span></li>` : "")
-      + (over > 0 ? `<li class="red"><span class="sw" style="background:var(--red)"></span>${t("results.over")}<span class="v">${fmt(over)}</span><span class="p">${sh(over).toFixed(1)} ${t("results.shiftsUnit")}</span></li>` : "");
-    const whereFig = `<p class="section">${t("results.whereTitle")}</p><div class="figure">
-      ${shiftBlocks(segsS, spm)}
-      <p class="shift-cap">${t("results.shiftsKey", { n: Math.round(spm) })}${over > 0 ? " " + t("results.shiftsOver") : ""}</p>
-      <ul class="legend">${legend}</ul></div>`;
+    // Year chart: cash above the line, debt below
+    const mx = Math.max(1, ...ms.map((r) => Math.max(r.endCash, r.endCard + r.endBehind)));
+    const chart = `<div class="ychart">${ms.map((r) => {
+      const up = r.endCash / mx * 70, dn = (r.endCard + r.endBehind) / mx * 70;
+      return `<div class="yc"><div class="yup"><i style="height:${up}px"></i></div><div class="ydn"><i style="height:${dn}px"></i></div><span>${MONTHS[r.m].slice(0, 1)}</span></div>`;
+    }).join("")}</div>
+    <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("yres.chartCash")}</span><span><i style="background:var(--red)"></i>${t("yres.chartDebt")}</span></div>`;
 
-    const owed = S.c.surprise === "card"
-      ? t("results.owedCard", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months - 1, total: fmt(p.total) })
-      : S.c.surprise === "skip" ? (S.c.transport === "car" ? t("results.owedSkipCar") : t("results.owedSkipDental")) : "";
-    const raiseLine = S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : "";
+    // Meals for the whole year: one row per month, one square per day
+    const grid = `<div class="ygrid">${ms.map((r) => `<div class="yrow"><span>${MONTHS[r.m].slice(0, 3)}</span>${Array.from({ length: CONFIG.daysInMonth }, (_, d) => `<i class="${d < r.daysFed ? "" : "x"}"></i>`).join("")}</div>`).join("")}</div>
+      <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("food.keyOn")}</span><span><i style="background:var(--red)"></i>${t("food.keyOff")}</span></div>`;
+
+    // Refund
+    const rm = CONFIG.year.refundMonth;
+    let runOut = null;
+    for (let m = rm; m < ms.length; m++) if (ms[m].foodGap > 0.005 || ms[m].behindAdded > 0.5) { runOut = m; break; }
+    const refundLine = t(runOut != null ? "yres.refundRanOut" : "yres.refundLasted", { amount: fmt(sim.refund.total), month: runOut != null ? MONTHS[runOut] : "" });
+
+    // Emergencies
+    const evs = ms.flatMap((r) => r.events.map((e) => ({ m: r.m, ...e })));
+    const evList = evs.length
+      ? `<ul class="auto">${evs.map((e) => `<li><span class="ico">${icon(EV_ICON[e.id])}</span>${MONTHS[e.m]}: ${t("ev." + e.id + ".short", null, true)} <small class="muted">&nbsp;(${e.how === "card" ? t("yres.onCard", null, true) : t("yres.fromSavings", null, true)})</small><span class="amt">${fmt(e.cost)}</span></li>`).join("")}</ul>`
+      : `<p class="muted">${t("yres.noEvents")}</p>`;
+
+    // Without SNAP, same year and choices
+    const no = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, { wage: S.wageOverride, noSnap: true });
+    const noSnap = `<div class="note plain">${t("yres.noSnap", { meals: no.mealsSkipped.toLocaleString("en-US"), debt: fmt(no.card + no.behind), snap: fmt(b.snap) })}</div>`;
+
+    // 1,000 random years
+    const mc = manyYears(S.city, S.c, yearStart(), { wage: S.wageOverride });
+    const bar = (pct, label, cls) => `<div class="pbar"><div class="row"><span>${label}</span><b class="${cls}">${pct}%</b></div><div class="track"><i class="${cls}" data-w="${pct}"></i></div></div>`;
+    const odds = `<div class="figure">
+      ${bar(mc.pctDebt, t("yres.mcDebt"), mc.pctDebt > 0 ? "red" : "acc")}
+      ${bar(mc.pctHungry, t("yres.mcHungry"), mc.pctHungry > 0 ? "red" : "acc")}
+      <p class="cap small">${t("yres.mcMedian", { debt: fmt(mc.medianDebt), meals: mc.medianMeals })}</p>
+      <p class="cite">${t("yres.mcNote", { n: mc.runs.toLocaleString("en-US") })}</p></div>`;
+
     const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
-
-    const rl = (l, v, cls = "") => `<div class="rl ${cls}"><span>${l}</span><span class="d"></span><span>${v}</span></div>`;
-    const receipt = `<details class="rec"><summary>${t("results.receipt")}</summary><div class="receipt">
-        <h3>ONE MONTH</h3>
-        <div class="sub">${c.name.toUpperCase()} · ${fmtWage(r.wage)}/HR · 40 HRS/WK</div>
-        ${rl("TAKE-HOME PAY", fmt(r.net))}<hr>
-        ${items.map((x) => rl(t(x[0], null, true).toUpperCase(), "−" + fmt(x[1]))).join("")}<hr>
-        ${rl("CASH LEFT", fmt(r.leftover), "tot")}
-        ${rl("SNAP / EBT", "+" + fmt(r.snap))}
-        ${rl("FOOD NEEDED", "−" + fmt(r.need))}<hr>
-        <div class="due">${short ? `<span class="stamp">SHORT</span>` : `<span class="stamp ok">LEFT OVER</span>`}<span class="${short ? "red" : "accent"}">${fmt(Math.abs(r.gap))}</span></div>
-      </div></details>`;
-
+    const raise = first.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${first.wageToClose}">${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) })}</button>` : "";
     const other = S.city === "fargo" ? "minneapolis" : "fargo";
-    return `<p class="kicker">${t("results.choices", { n: r.conscious })}</p>
-      ${head}
-      ${owed ? `<div class="note bad">${owed}</div>` : ""}
-      ${raiseLine}
-      ${snapFig}
-      ${whereFig}
+    return `<p class="kicker">${t("results.choices3", { n: conscious })}</p>
+      <p class="headline">${head}</p>
+      ${tiles}
+      ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
+      <p class="section">${t("yres.whyTitle")}</p>
+      <div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(Math.max(0, -(b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need))) })}</div>
+      <p class="section">${t("yres.yearTitle")}</p><div class="figure">${chart}</div>
+      <div class="note">${refundLine}</div>
+      <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
+      <p class="section">${t("yres.eventsTitle")}</p>${evList}
+      <p class="section">${t("results.snapTitle")}</p>${noSnap}
+      <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
       ${ctx}
-      ${receipt}
+      <p class="small muted">${t("yres.seed", { seed: S.y.seed })}</p>
       <div class="actions">
         ${next("final", t("results.next"), "go")}
-        ${short && r.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${r.wageToClose}">${t("results.raiseBtn", { wage: fmtWage(r.wageToClose) })}</button>` : ""}
+        <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
+        <button class="btn secondary" data-act="yreplay">${t("yres.sameYear")}</button>
+        ${raise}
         <button class="btn secondary" data-act="otherCity">${t("results.otherCity", { city: CONFIG.cities[other].name.split(",")[0] })}</button>
         <button class="btn link" data-act="replay">${t("results.replay")}</button>
       </div>`;
@@ -1449,12 +1642,21 @@ const screens = {
         <li>North Dakota Department of Health and Human Services. <i>SNAP Policy Manual, Appendix B: Table of Standards</i> (effective Oct. 1, 2026). <a href="https://www.nd.gov/dhs/policymanuals/SNAP/" target="_blank" rel="noopener">nd.gov</a></li>
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
+        <li>Massachusetts Institute of Technology. <i>Living Wage Calculator</i>: Fargo, ND-MN and Minneapolis-St. Paul-Bloomington, MN-WI (data updated Feb. 15, 2026). <a href="https://livingwage.mit.edu/metros/22020" target="_blank" rel="noopener">livingwage.mit.edu</a></li>
+        <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i> (May 2026): unexpected expenses and savings. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
+        <li>Internal Revenue Service. <i>Tax inflation adjustments for tax year 2025</i> (EITC, standard deduction, brackets); Child Tax Credit and dependent care credit rules for 2025. <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025" target="_blank" rel="noopener">irs.gov</a></li>
+        <li>Minnesota Department of Revenue. <i>Minnesota Child Tax Credit 2025</i>; 2025 standard deduction and income tax brackets. <a href="https://www.revenue.state.mn.us/child-tax-credit" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
         <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
       </ol>
       <div class="panel small">
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), basics (${fmt(CONFIG.basicsMonthly)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), and credit card terms (${Math.round(CONFIG.surprise.cardAPR * 100)}% APR, ${fmt(CONFIG.surprise.cardMonthlyPayment)}/mo).</p>
+        <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is MIT's "other necessities" for one adult and one child (clothing, housekeeping supplies, personal care, household furnishings). MIT's health care and "civic" costs are left out: at this income the child would likely be covered by Medicaid or CHIP, and civic costs could be called optional.</p>
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
-        <p><b>More than one month:</b> if a month ends with money left, the game continues (up to ${CONFIG.maxMonths} months, a game design limit). Every month repeats the same pay, rent, child care, transport, basics, and SNAP. No new costs are invented. The only new costs come from earlier choices: a skipped bill comes back at the same ${fmt(CONFIG.surprise.amount)}, and credit card charges are paid off on their schedule. Money left after food (cash, and unused SNAP, which stays on the EBT card) carries into the next month.</p>
+        <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out because they would only make things harder: home or appliance repairs (22%; renters' landlords usually cover these), child care cost increases and "other" (no cost given). The rolls come from a replay code (seed), not from how the player is doing.</p>
+        <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
+        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax. North Dakota has no state family credits; no ND income tax is owed at this income [VERIFY]. The EITC uses the formula rather than the IRS table, so it can differ by a few dollars.</p>
+        <p><b>Credit card:</b> ${Math.round(CONFIG.card.apr * 100)}% APR; minimum payment is the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimates). No credit limit is modeled, which is generous to the player.</p>
+        <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
         <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
       </div>
@@ -1462,89 +1664,71 @@ const screens = {
   }
 };
 
-/* ---------- Results after more than one month ---------- */
-function multiResults() {
-  const ms = months(), r = ms[ms.length - 1], first = path(), c = city();
-  const car = S.c.transport === "car";
-  const lo = leftovers(ms);
-  const n = ms.length;
-  const plural = (k) => k + " " + t(k === 1 ? "results.monthWord" : "results.monthsWord", null, true);
-
-  // Headline
-  let head;
-  if (r.red) {
-    head = `<p class="headline">${t("results.multiLeadRed", { k: plural(n - 1), m: n })}</p>`
-      + (r.foodGap > 0
-        ? `<div class="big red">${r.mealsSkipped}</div><p class="lead"><b>${t("results.mealsSkippedIn", { m: n })}</b></p>`
-        : `<div class="big red">${fmt(r.billsBehind)}</div><p class="lead"><b>${t("results.billsBehind")}</b> ${t("results.inMonth", { m: n })}</p>`);
-  } else {
-    head = `<p class="headline">${t("results.multiLeadOk", { n })}</p>
-      <div class="big accent">${fmt(-r.gap)}</div><p class="lead">${t("results.multiSaved")}</p>`;
-  }
-
-  // Month-by-month balance chart
-  const vals = ms.map((x) => -x.gap);
-  const mx = Math.max(1, ...vals.map(Math.abs));
-  const anyNeg = vals.some((v) => v < 0);
-  const evLabel = (x) => !x.event ? t("results.evNone", null, true)
-    : x.choice === "pay" ? t("results.evPaid", null, true)
-    : x.choice === "card" ? t("results.evCard", null, true)
-    : t(car ? "results.evSkipCar" : "results.evSkipDental", null, true);
-  const strip = `<p class="section">${t("results.monthsTitle")}</p><div class="figure"><div class="mstrip">${ms.map((x, i) => {
-    const v = vals[i], h = Math.max(4, Math.abs(v) / mx * 60);
-    return `<div class="mcol"><div class="mval ${v < 0 ? "red" : "accent"}">${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}</div>
-      <div class="mup">${v >= 0 ? `<div class="mbar pos" style="height:${h}px"></div>` : ""}</div>
-      <div class="mdown" style="height:${anyNeg ? 64 : 0}px">${v < 0 ? `<div class="mbar neg" style="height:${h}px"></div>` : ""}</div>
-      <div class="mlab">${t("results.monthShort", { n: x.month }, true)}</div><div class="mev">${evLabel(x)}</div></div>`;
-  }).join("")}</div><p class="cap small muted">${t("results.stripCap")}</p></div>`;
-
-  // What's still hanging over them
-  const notes = [];
-  if (lo.stillSkipped) notes.push(t("results.stillSkipped", { what: t(car ? "results.whatCar" : "results.whatDental", null, true), k: lo.skips }));
-  if (lo.cardOwed > 0.5) notes.push(t("results.stillOwe", { amount: fmt(lo.cardOwed) }));
-  const notesHtml = notes.length ? `<div class="note bad">${notes.join(" ")}</div>` : "";
-
-  // Meals for the last month
-  const meals = Array.from({ length: r.totalMeals }, (_, i) => `<i class="${i >= r.totalMeals - r.mealsSkipped ? "x" : ""}"></i>`).join("");
-  const mealsFig = `<div class="figure"><div class="meals">${meals}</div><div class="meals-key"><span>Day 1</span><span>${t("results.mealsKey")} · ${t("results.monthShort", { n }, true)}</span><span>Day ${CONFIG.daysInMonth}</span></div></div>`;
-
-  const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
-  const other = S.city === "fargo" ? "minneapolis" : "fargo";
-  return `<p class="kicker">${t("results.choices", { n: first.conscious })}</p>
-    ${head}
-    ${notesHtml}
-    ${strip}
-    ${mealsFig}
-    <p class="small muted">${t("results.capNote", { n: CONFIG.maxMonths })}</p>
-    ${ctx}
-    <div class="actions">
-      ${next("final", t("results.next"), "go")}
-      <button class="btn secondary" data-act="otherCity">${t("results.otherCity", { city: CONFIG.cities[other].name.split(",")[0] })}</button>
-      <button class="btn link" data-act="replay">${t("results.replay")}</button>
+/* ---------- The year: helpers ---------- */
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const EV_ICON = { car: "wrench", medical: "med", phone: "phone", legal: "card" };
+function yearStart() { return startSavingsAmount(S.c.savings, S.city, S.c, S.wageOverride); }
+function yearSim() { return simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, { wage: S.wageOverride }); }
+function seedFromUrl() { const m = location.search.match(/[?&]seed=(\d{1,9})/); return m ? +m[1] : null; }
+function newYearState(seed) {
+  return { seed: seed != null ? seed : 100000 + Math.floor(Math.random() * 900000), choices: {}, shown: -1, panel: null,
+    auto: true, cutDone: false, cutPicked: false, seenBehind: false, seenRefund: false };
+}
+let yTimer = null;
+function yStop() { clearTimeout(yTimer); yTimer = null; }
+function yRender() {
+  const m = $("screen");
+  m.innerHTML = screens.year();
+  updateMeter(); animateGraphics();
+  if (EDITOR) EDITOR.after();
+}
+// Move the year forward one step: an emergency to decide, or the next month
+function yAdvance() {
+  yStop();
+  const y = S.y, nextM = y.shown + 1;
+  if (nextM >= CONFIG.year.months) return go("results");
+  const sim = yearSim();
+  if (sim.pending && sim.pending.m === nextM) { y.panel = { type: "event", p: sim.pending }; yRender(); buzz([60, 40, 60]); return; }
+  const r = sim.months[nextM];
+  y.shown = nextM;
+  if (r.refund && !y.seenRefund) { y.seenRefund = true; y.panel = { type: "refund" }; }
+  else if (r.foodGap > 0.005 && !y.cutDone) { y.cutDone = true; y.cutGap = r.foodGap; y.panel = { type: "cut" }; }
+  else if (r.behindAdded > 0.5 && !y.seenBehind) { y.seenBehind = true; y.panel = { type: "behind" }; }
+  else y.panel = { type: "month" };
+  yRender();
+  if (y.panel.type === "month" && y.auto && nextM < CONFIG.year.months - 1) yTimer = setTimeout(yAdvance, reduceMotion ? 700 : 2000);
+}
+// One month's money, line by line
+function monthCard(r) {
+  const b = yearSim().base;
+  const ln = (label, amt, cls) => `<div class="ml ${cls || ""}"><span>${label}</span><b>${amt}</b></div>`;
+  return `<div class="mcard">
+    ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
+    ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
+    ${ln(t("mc.bills", null, true), "−" + fmt(b.housing + b.care + b.transport + b.basics))}
+    ${r.cardPay > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(r.cardPay)) : ""}
+    ${r.events.map((e) => ln(t("ev." + e.id + ".short", null, true) + (e.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), (e.how === "card" ? "" : "−") + fmt(e.cost), e.how === "card" ? "muted" : "")).join("")}
+    ${r.behindPaid ? ln(t("mc.catchup", null, true), "−" + fmt(r.behindPaid)) : ""}
+    ${ln(t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true), r.foodGap > 0.005 ? `<span class="red">${t("mc.skipped", { n: r.mealsSkipped }, true)}</span>` : `<span class="accent">${t("mc.covered", null, true)}</span>`)}
+    ${r.behindAdded > 0.5 ? ln(`<span class="red">${t("mc.behind", null, true)}</span>`, `<span class="red">${fmt(r.behindAdded)}</span>`) : ""}
+    ${ln(t("mc.end", null, true), fmt(r.endCash), "tot")}
+  </div>`;
+}
+// An emergency arrives: pay from savings or put it on the card
+function eventPanel(p) {
+  const e = p.ev, ec = CONFIG.events.find((x) => x.id === e.id);
+  const canSave = p.cash >= e.cost;
+  const newBal = yearSim().card + e.cost;   // card balance right now, plus this bill
+  const mp = cardMinPayment(newBal).pay;
+  return `${notif(EV_ICON[e.id], "red", t("ev." + e.id + ".app"), t("ev." + e.id + ".title"), t("ev." + e.id + ".text", { cost: fmt(e.cost) }))}
+    <div class="figure"><p class="cap">${t("ev.stat", { pct: Math.round(ec.annualChance * 100), what: t("ev." + e.id + ".short", null, true).toLowerCase() })}${cite("Federal Reserve, 2026")}</p></div>
+    <div class="opts">
+      ${(() => { const s = opt({ act: "yev", val: "savings", ico: "dollar", title: t("ev.savings"), price: fmt(e.cost), sub: canSave ? t("ev.savings.sub", { cash: fmt(p.cash) }) : t("ev.savings.no", { cash: fmt(p.cash) }), tag: canSave ? t("tag.noDebt") : "" }); return canSave ? s : s.replace('<button class="opt"', '<button class="opt nope" disabled'); })()}
+      ${opt({ act: "yev", val: "card", ico: "card", title: t("ev.card"), price: fmt(e.cost), sub: t("ev.card.sub", { bal: fmt(newBal), pay: fmt(mp), apr: Math.round(CONFIG.card.apr * 100) + "%" }) + cite("estimate") })}
     </div>`;
 }
 
 /* ---------- Effects ---------- */
-async function animateCalendar(r) {
-  const cal = $("cal"); if (!cal) return;
-  const cells = [...cal.children];
-  const step = reduceMotion ? 0 : 45;
-  for (let i = 0; i < cells.length; i++) {
-    if (!document.body.contains(cal)) return;
-    cells[i].classList.add(i < r.daysFed ? "on" : "off");
-    if (i === r.daysFed && r.daysFed < cells.length) { cells[i].classList.add("last"); buzz(60); }
-    if (step) await wait(i < r.daysFed ? step : step * 0.6);
-  }
-  const v = $("verdict");
-  if (!v) return;
-  if (r.foodGap > 0) v.innerHTML = t("food.verdictShort", { day: `<span class="red">day ${r.daysFed + 1}</span>` });
-  else if (r.billsBehind > 0) v.innerHTML = t("food.verdictBills", { rent: `<span class="red">${t("food.verdictBillsRent")}</span>` });
-  else v.innerHTML = t("food.verdictOk") + (S.month < CONFIG.maxMonths
-    ? `<span class="lead" style="display:block;font-family:var(--sans);font-weight:400;margin-top:8px">${t("food.carry", { amount: `<b class="accent">${fmt(-r.gap)}</b>`, n: S.month + 1 })}</span>` : "");
-  v.classList.add("show");
-  $("foodNext").style.opacity = 1;
-}
-
 function countUp() {
   document.querySelectorAll("[data-count]").forEach((el) => {
     const to = parseFloat(el.dataset.count), dec = +el.dataset.dec, dur = reduceMotion ? 0 : 1300, t0 = performance.now();
@@ -1559,6 +1743,7 @@ function countUp() {
 
 /* ---------- Navigation ---------- */
 function go(name) {
+  yStop();
   S.screen = name;
   if (name === "basics") S.c.basics = true;
   if (name === "snap") S.c.snap = true;
@@ -1570,12 +1755,11 @@ function go(name) {
   if (!EDITOR) window.scrollTo(0, 0);
   updateMeter();
   animateGraphics();
-  if (name === "surprise" && !S.c.surprise) setTimeout(() => { m.className = "shake"; buzz([80, 60, 80]); }, 450);
   if (EDITOR) EDITOR.after();
 }
 
 function restart(cityKey, wageOverride) {
-  S.city = cityKey; S.wageOverride = wageOverride ?? null; S.c = {}; S.month = 1; S.mc = {};
+  S.city = cityKey; S.wageOverride = wageOverride ?? null; S.c = {}; S.y = null;
   meterShown = 0;
   go(cityKey ? "housing" : "intro");
 }
@@ -1583,7 +1767,7 @@ function restart(cityKey, wageOverride) {
 function cutNo(b, val) {
   const r = path();
   const msg = {
-    rent: t("cut.rent.no", { gap: fmt(r.gap) }),
+    rent: t("cut.rent.no", { gap: fmt(S.y && S.y.cutGap != null ? S.y.cutGap : r.gap) }),
     care: t("cut.care.no", { pay: fmt(r.net), cost: fmt(r.care) }),
     transport: t("cut.transport.no", { pay: fmt(r.net), cost: fmt(r.transport) }),
     phone: t("cut.phone.no")
@@ -1606,13 +1790,23 @@ document.addEventListener("click", async (e) => {
   if (act === "cut") {
     if (val !== "food") return cutNo(b, val);
     locked = true; b.classList.add("picked"); buzz(15); await wait(400); locked = false;
-    S.c.cut = "food"; return go("cut");
+    S.y.cutPicked = true; return yRender();
   }
-  if (act === "msurprise") {
+  if (act === "savings") {
     locked = true; b.classList.add("picked"); b.parentElement.classList.add("locked"); buzz(15); await wait(320); locked = false;
-    S.mc[S.month] = val; return go("month");
+    S.c.savings = val; S.y = newYearState(seedFromUrl()); meterShown = 0; return go("year");
   }
-  if (act === "nextMonth") { S.month++; S.c.cut = undefined; return go("month"); }
+  if (act === "yev") {
+    if (b.disabled) return;
+    locked = true; b.classList.add("picked"); b.parentElement.classList.add("locked"); buzz(15); await wait(320); locked = false;
+    const pp = S.y.panel.p; S.y.choices[pp.m + "-" + pp.i] = val; S.y.panel = null; return yAdvance();
+  }
+  if (act === "ystart" || act === "ycont") return yAdvance();
+  if (act === "ypause") { S.y.auto = false; yStop(); return yRender(); }
+  if (act === "yplay") { S.y.auto = true; return yAdvance(); }
+  if (act === "ynew" || act === "yreplay") {
+    S.y = newYearState(act === "yreplay" ? S.y.seed : null); meterShown = yearStart(); return go("year");
+  }
   if (act === "city" || AFTER[act]) {
     locked = true;
     b.classList.add("picked");
@@ -1628,7 +1822,7 @@ document.addEventListener("click", async (e) => {
     case "next": go(val); break;
     case "raise": restart(S.city, parseFloat(val)); break;
     case "otherCity": restart(S.city === "fargo" ? "minneapolis" : "fargo"); break;
-    case "replay": S.city = null; S.wageOverride = null; S.c = {}; S.month = 1; S.mc = {}; meterShown = 0; go("intro"); break;
+    case "replay": S.city = null; S.wageOverride = null; S.c = {}; S.y = null; meterShown = 0; go("intro"); break;
   }
 });
 
@@ -1639,7 +1833,7 @@ document.addEventListener("click", async (e) => {
    • "Send to Claude" copies your notes + text changes to paste into chat.
    ===================================================================== */
 let EDITOR = null;
-const LOCKED_TEXT = ["final.stat", "final.grid", "surprise.stat", "intro.stubTax"];   // statistics: never editable
+const LOCKED_TEXT = ["final.stat", "final.grid", "intro.stubTax", "savings.context", "ev.stat"];   // statistics: never editable
 
 function startEditor() {
   const KEY = "build-a-budget-edits-v2", NKEY = "build-a-budget-notes";
@@ -1663,7 +1857,7 @@ function startEditor() {
   document.body.classList.add("editing", "editmode");
 
   // ---------- UI shell ----------
-  const SCREENS = ["intro", "housing", "care", "transport", "basics", "snap", "surprise", "cut", "food", "results", "final", "sources"];
+  const SCREENS = ["intro", "housing", "care", "transport", "basics", "snap", "savings", "year", "year-emergency", "results", "final", "sources"];
   const bar = document.createElement("div");
   bar.id = "edbar";
   bar.innerHTML = `<div class="eb-in">
@@ -1883,21 +2077,33 @@ function startEditor() {
   $("ebJump").addEventListener("change", (e) => jumpTo(e.target.value));
 
   function jumpTo(name) {
-    const order = ["housing", "care", "transport", "basics", "snap", "surprise", "cut", "food", "results", "final", "sources"];
+    const order = ["housing", "care", "transport", "basics", "snap", "savings", "year", "year-emergency", "results", "final", "sources"];
     const idx = order.indexOf(name);
     closePop();
-    if (idx < 0) { S.city = null; S.c = {}; meterShown = 0; return go("intro"); }
+    if (idx < 0) { S.city = null; S.c = {}; S.y = null; meterShown = 0; return go("intro"); }
     if (!S.city) S.city = "fargo";
     const prev = S.c, c = {};
     const pick = (k, d) => (c[k] = prev[k] || d);
     if (idx > 0) pick("housing", "oneBR");
     if (idx > 1) pick("care", "home");
-    if (idx > 2) pick("transport", "bus");
+    if (idx > 2) pick("transport", "car");
     if (idx > 3) c.basics = true;
     if (idx > 4) c.snap = true;
-    if (idx > 5) pick("surprise", "pay");
-    if (idx > 6) c.cut = "food";
+    if (idx > 5) pick("savings", "0");
     S.c = c;
+    if (idx >= 6 && idx <= 8) {
+      S.y = newYearState(S.y ? S.y.seed : 123457);
+      if (name === "year") return go("year");
+      if (name === "year-emergency") {            // play forward to the first emergency
+        S.screen = "year"; S.y.auto = false;
+        for (let k = 0; k < 13; k++) { yAdvance(); if (S.y.panel && S.y.panel.type === "event") break; if (S.screen !== "year") break; }
+        return;
+      }
+      // results: let the default rule make every emergency choice
+      for (let k = 0; k < 40; k++) { const sim = yearSim(); if (!sim.pending) break; const pp = sim.pending; S.y.choices[pp.m + "-" + pp.i] = defaultPolicy(pp.ev, { cash: pp.cash, foodCashNeeded: 0 }); }
+      S.y.shown = CONFIG.year.months - 1;
+      return go("results");
+    }
     go(name);
     window.scrollTo(0, 0);
   }

@@ -57,4 +57,4 @@ This site lives on the `website` branch of `BrocCooley/build_a_budget`. Claude c
 
 ## Game test
 
-`node tools/test-paths.js` plays all 48 game paths and checks the math. `node tools/test-months.js` checks that month 1 is unchanged and plays every multi-month branch.
+`node tools/test-paths.js` plays all 48 game paths and checks the math. `node tools/test-year.js` checks the tax refunds, that emergencies happen at the survey odds, a sample year, and 1,000 simulated years for every household.

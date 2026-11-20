@@ -2,6 +2,22 @@
    *asterisks* = italics. "verify" = a detail Claude could not confirm automatically; check it before you submit.
    To add your own entries, use works_cited_extra in content.js (they're merged and sorted automatically). */
 window.WORKS_CITED = [
+
+  { text: "\"Economic Hardships.\" *Economic Well-Being of U.S. Households in 2025*, Board of Governors of the Federal Reserve System, May 2026, www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm.",
+    url: "https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm", usedIn: "Game (emergency odds and costs; savings)" },
+
+  { text: "\"IRS Releases Tax Inflation Adjustments for Tax Year 2025.\" Internal Revenue Service, www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025. Accessed 20 Nov. 2026.",
+    url: "https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025", usedIn: "Game (tax refund: EITC)",
+    verify: "The 2025 standard deduction ($23,625 head of household) and Child Tax Credit ($2,200; $1,700 refundable) come from the One Big Beautiful Bill Act, not this page. Add an IRS or Congress.gov source for those." },
+
+  { text: "\"Child Tax Credit.\" Minnesota Department of Revenue, www.revenue.state.mn.us/child-tax-credit. Accessed 20 Nov. 2026.",
+    url: "https://www.revenue.state.mn.us/child-tax-credit", usedIn: "Game (Minnesota tax refund)" },
+
+  { text: "\"Minnesota Income Tax Brackets, Standard Deduction and Dependent Exemption Amounts for 2025.\" Minnesota Department of Revenue, www.revenue.state.mn.us/mndor-pp/20636. Accessed 20 Nov. 2026.",
+    url: "https://www.revenue.state.mn.us/mndor-pp/20636", usedIn: "Game (Minnesota income tax)" },
+
+  { text: "Glasmeier, Amy K. *Living Wage Calculator*. Massachusetts Institute of Technology, data updated 15 Feb. 2026, livingwage.mit.edu/metros/22020.",
+    url: "https://livingwage.mit.edu/metros/22020", usedIn: "Game (basic necessities, Fargo and Minneapolis)" },
   { text: "\"Appendix B - Table of Standards.\" *SNAP Policy Manual*, North Dakota Department of Health and Human Services, effective 1 Oct. 2026, www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm.",
     url: "https://www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm", usedIn: "Game (SNAP income limit)" },
 
