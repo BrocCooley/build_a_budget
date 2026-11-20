@@ -298,6 +298,19 @@ details.rec[open] summary::after{content:"−"}
 .stamp.ok{border-color:var(--accent);color:var(--accent)}
 @keyframes stamp{from{opacity:0;transform:rotate(-8deg) scale(1.8)}to{opacity:.9;transform:rotate(-8deg) scale(1)}}
 
+/* ---------- Month-by-month chart ---------- */
+.mstrip{display:flex;gap:10px;align-items:stretch}
+.mcol{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.mval{font:800 15px/1.2 var(--mono);margin-bottom:6px}
+.mup,.mdown{width:100%;display:flex;justify-content:center}
+.mup{height:64px;align-items:flex-end;border-bottom:2px solid var(--ink)}
+.mdown{align-items:flex-start}
+.mbar{width:60%;max-width:56px}
+.mbar.pos{background:var(--accent);border-radius:6px 6px 0 0}
+.mbar.neg{background:var(--red);border-radius:0 0 6px 6px}
+.mlab{font:700 12px/1.2 var(--mono);margin-top:8px}
+.mev{font-size:12px;color:var(--muted);line-height:1.3;margin-top:2px}
+
 /* ---------- Final ---------- */
 .stat .big{font-size:76px}
 .stat p{font-size:17px}
@@ -459,6 +472,7 @@ const CONFIG = {
   },
 
   daysInMonth: 30,
+  maxMonths: 3,                  // GAME DESIGN LIMIT (not data): follow the household for up to this many months
 
   stats: {
     foodInsecure2024: 13.7,      // USDA ERS, Household Food Security in the United States in 2024 — final edition of the report
@@ -593,6 +607,24 @@ const TEXT = {
   "food.verdictBillsRent": "Rent doesn't get paid.",
   "food.verdictOk": "The food lasts the month.",
   "food.next": "See your month",
+  "food.nextMonth": "Play month {n}",
+  "food.stopHere": "Stop here and see results",
+  "food.carry": "You carry {amount} into month {n}.",
+
+  "month.prefix": "Month {n} · ",
+  "month.kicker": "Month {n} · Day 1",
+  "month.title": "Month {n}",
+  "month.same": "Same job, same pay, same rent and bills.",
+  "month.carry": "You start the month with **{cash}** saved",
+  "month.carrySnap": " and **{snap}** still on your EBT card",
+  "month.snap": "SNAP reloads",
+  "month.returnCarTitle": "The car still needs work",
+  "month.returnCar": "You skipped the repair last month. It's still there: **{amount}**.",
+  "month.returnDentalTitle": "The filling still needs doing",
+  "month.returnDental": "You skipped the dentist last month. Your kid still needs the filling: **{amount}**.",
+  "month.returnNote": "Same price as last month. Problems like this often cost more when they wait, but the game doesn't add costs it can't source.",
+  "month.quiet": "No surprise bills this month.",
+  "month.next": "Get through the month",
 
   "results.choices": "You made {n} of 4 budget-conscious choices",
   "results.leadShort": "You did everything you could. The food ran out on {day}.",
@@ -617,6 +649,26 @@ const TEXT = {
   "results.shiftsKey": "Each block is one 8-hour shift. You work about {n} a month.",
   "results.shiftsOver": "Dashed red blocks are shifts you'd need on top of full time to cover it all.",
   "results.over": "Over by",
+  "results.multiLeadRed": "You stayed out of the red for {k}. In month {m}, the money ran out.",
+  "results.multiLeadOk": "You made it through {n} months.",
+  "results.multiSaved": "saved. That's your whole cushion for the next surprise.",
+  "results.inMonth": "in month {m}",
+  "results.mealsSkippedIn": "meals skipped in month {m}",
+  "results.monthWord": "month",
+  "results.monthsWord": "months",
+  "results.monthShort": "Month {n}",
+  "results.monthsTitle": "Month by month",
+  "results.stripCap": "Money left at the end of each month after food (cash plus unused SNAP). Red means short.",
+  "results.evNone": "No surprise",
+  "results.evPaid": "Paid the bill",
+  "results.evCard": "Bill on the card",
+  "results.evSkipCar": "Skipped the repair",
+  "results.evSkipDental": "Skipped the dentist",
+  "results.stillSkipped": "The {what} still isn't done. You skipped it {k} times.",
+  "results.whatCar": "car repair",
+  "results.whatDental": "filling",
+  "results.stillOwe": "You still owe about **{amount}** on the credit card.",
+  "results.capNote": "The game follows you for up to {n} months. Every month uses the same real costs. The only new costs come from your own earlier choices.",
   "results.shiftsUnit": "shifts",
   "results.owedCard": "And the card bill didn't go away. You owe {payment} a month for {months} more months, {total} in all. Next month starts {payment} behind.",
   "results.owedSkipCar": "And the repair didn't go away. It's still waiting, and it usually costs more later.",
@@ -740,6 +792,76 @@ function computePath(cityKey, c, wageOverride) {
   }
   return r;
 }
+/* ---------- Multiple months ----------
+   Honest rules, no new invented costs:
+   • Every month repeats the same pay, rent, child care, transport, basics, and SNAP.
+   • The only new costs come from the player's own earlier choices:
+       – a skipped bill comes back the next month at the same price (CONFIG.surprise.amount);
+       – each credit-card charge is paid off on its real schedule (cardSchedule()).
+   • Money left after food carries into the next month: cash, and unused SNAP (it stays on the EBT card).
+   • Stop when a month ends in the red, or after CONFIG.maxMonths.
+   mc = { 2: "pay" | "card" | "skip", 3: ... } — the player's choice for a returning bill in that month. */
+function cardSchedule() {
+  const s = CONFIG.surprise, r = s.cardAPR / 12, pays = [];
+  let bal = s.amount;
+  while (bal > 0.005 && pays.length < 600) { bal += bal * r; const p = Math.min(s.cardMonthlyPayment, bal); bal -= p; pays.push(p); }
+  return pays;
+}
+
+function simulateMonths(cityKey, c, mc, wageOverride, upTo) {
+  const city = CONFIG.cities[cityKey];
+  const wage = wageOverride != null ? wageOverride : city.wage;
+  const base = pathAtWage(city, c, wage);
+  const sched = cardSchedule();
+  const last = Math.min(upTo || CONFIG.maxMonths, CONFIG.maxMonths);
+  const fixed = base.housing + base.care + base.transport + base.basics;
+  const days = CONFIG.daysInMonth;
+  const months = [], cards = [];
+  let carryCash = 0, carrySnap = 0, pending = false;
+  for (let m = 1; m <= last; m++) {
+    const event = m === 1 || pending;                       // is there a $400 bill this month?
+    const choice = m === 1 ? c.surprise : (pending ? (mc || {})[m] : null);
+    if (choice === "card") cards.push(m);
+    const cardPay = cards.reduce((a, start) => a + (sched[m - start] || 0), 0);
+    const billPaid = choice === "pay" ? CONFIG.surprise.amount : 0;
+    const cash = base.net - fixed - billPaid - cardPay + carryCash;   // cash after bills
+    const snapAvail = base.snap + carrySnap;
+    const need = base.need;
+    const snapUsed = Math.min(snapAvail, need);
+    const cashForFood = Math.min(Math.max(0, cash), need - snapUsed);
+    const foodMoney = snapAvail + Math.max(0, cash);
+    const foodGap = Math.max(0, need - snapUsed - cashForFood);
+    const billsBehind = Math.max(0, -cash);
+    const red = foodGap > 0.005 || billsBehind > 0.005;
+    const rec = Object.assign({}, base, {
+      month: m, event, choice, cardPay, billPaid, surprise: billPaid + cardPay,
+      carryInCash: carryCash, carryInSnap: carrySnap,
+      leftover: cash, snap: snapAvail, foodMoney, foodGap, billsBehind, red,
+      gap: red ? foodGap + billsBehind : need - foodMoney,
+      daysFed: Math.min(days, Math.floor(foodMoney / need * days)),
+      mealsSkipped: Math.min(base.totalMeals, Math.round(foodGap / base.perMeal))
+    });
+    months.push(rec);
+    if (red) break;
+    if (event && choice == null) break;                      // waiting on the player's choice
+    carrySnap = snapAvail - snapUsed;
+    carryCash = Math.max(0, cash) - cashForFood;
+    pending = event && choice === "skip";
+  }
+  return months;
+}
+
+// What's still owed after the last simulated month (for the results screen)
+function leftovers(months) {
+  const sched = cardSchedule(), last = months[months.length - 1].month;
+  let cardOwed = 0, skips = 0;
+  for (const r of months) {
+    if (r.choice === "card") cardOwed += sched.slice(last - r.month + 1).reduce((a, b) => a + b, 0);
+    if (r.choice === "skip") skips++;
+  }
+  const lastRec = months[months.length - 1];
+  return { cardOwed, skips, stillSkipped: lastRec.choice === "skip" };
+}
 // </calc>
 
 /* =====================================================================
@@ -784,18 +906,23 @@ const IC = {
 };
 const icon = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 
-const S = { screen: "intro", city: null, wageOverride: null, c: {} };
+const S = { screen: "intro", city: null, wageOverride: null, c: {}, month: 1, mc: {} };
 const FLOW = ["housing", "care", "transport", "basics", "snap", "surprise", "cut", "food"];
-const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, cut: 20, food: 30, results: 30 };
+const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, surprise: 17, cut: 20, food: 30, results: 30, month: 1 };
 
 function city() { return CONFIG.cities[S.city]; }
 function path() { return computePath(S.city, S.c, S.wageOverride); }
+// Months played so far, and the current month's numbers
+function months() { return simulateMonths(S.city, S.c, S.mc, S.wageOverride, S.month); }
+function cur() { const ms = months(); return ms[ms.length - 1]; }
+const mk = (s) => (S.month > 1 ? t("month.prefix", { n: S.month }, true) + s : s);
 
 /* ---------- Meter ---------- */
 let meterShown = 0, meterRaf = null, deltaTimer = null;
 function meterMax() { return S.city ? takeHomeFor(S.wageOverride ?? city().wage).net : 1; }
 function cashBalance() {
   if (!S.city) return null;
+  if (S.month > 1) return cur().leftover;
   const c = S.c, ct = city();
   let bal = meterMax();
   if (c.housing) bal -= ct.rent[c.housing];
@@ -809,11 +936,11 @@ function updateMeter() {
   const m = $("meter"), amt = $("meterAmt"), fill = $("meterFill"), d = $("meterDelta"), ebt = $("ebt");
   $("meterLabel").textContent = TEXT["meter.label"];
   const target = cashBalance();
-  const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results");
+  const inGame = target != null && (FLOW.includes(S.screen) || S.screen === "results" || S.screen === "month");
   m.classList.toggle("idle", !inGame);
   if (!inGame) return;
-  $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
-  if (S.c.snap) { const s = path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
+  $("day").textContent = (S.month > 1 ? `M${S.month} · ` : "") + `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
+  if (S.c.snap) { const s = S.month > 1 ? cur().snap : path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
   else ebt.hidden = true;
   const pctLeft = target / meterMax() * 100;
   fill.style.width = Math.max(0, Math.min(100, pctLeft)) + "%";
@@ -839,6 +966,7 @@ function updateMeter() {
 
 /* ---------- Building blocks ---------- */
 const dots = () => {
+  if (S.month > 1) return "";
   const i = FLOW.indexOf(S.screen);
   return `<div class="dots" aria-label="Step ${i + 1} of ${FLOW.length}">${FLOW.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join("")}</div>`;
 };
@@ -1066,16 +1194,59 @@ const screens = {
       </div>`;
   },
 
+  month() {
+    const r = cur();
+    const car = S.c.transport === "car";
+    const A = CONFIG.surprise.amount, p = cardPayoff();
+    const li = (ico, label, amt) => `<li><span class="ico">${icon(ico)}</span>${label}<span class="amt">−${fmt(amt)}</span></li>`;
+    const carry = r.carryInCash > 0.5 || r.carryInSnap > 0.5
+      ? `<div class="note">${t("month.carry", { cash: fmt(r.carryInCash) })}${r.carryInSnap > 0.5 ? t("month.carrySnap", { snap: fmt(r.carryInSnap) }) : ""}.</div>` : "";
+    let bill = "";
+    if (r.event && !r.choice) {
+      bill = (car ? notif("wrench", "red", t("surprise.carApp"), t("month.returnCarTitle"), t("month.returnCar", { amount: fmt(A) }))
+                  : notif("tooth", "red", t("surprise.dentalApp"), t("month.returnDentalTitle"), t("month.returnDental", { amount: fmt(A) })))
+        + `<p class="small muted">${t("month.returnNote")}</p>
+        <div class="opts">
+        ${opt({ act: "msurprise", val: "pay", ico: "dollar", title: t("surprise.pay"), price: fmt(A), sub: t("surprise.pay.sub"), tag: t("tag.noDebt") })}
+        ${opt({ act: "msurprise", val: "card", ico: "card", title: t("surprise.card"), price: fmt(CONFIG.surprise.cardMonthlyPayment) + " now",
+          sub: t("surprise.card.sub", { apr: Math.round(CONFIG.surprise.cardAPR * 100) + "%", amount: fmt(A), total: fmt(p.total), months: p.months }) + cite("estimate") })}
+        ${opt({ act: "msurprise", val: "skip", ico: "skip", title: t("surprise.skip"), price: "$0", sub: car ? t("surprise.skip.subCar") : t("surprise.skip.subDental") })}
+        </div>`;
+    } else if (r.event) {
+      const line = { pay: t("surprise.after.pay", { amount: fmt(A) }),
+        card: t("surprise.after.card", { payment: fmt(CONFIG.surprise.cardMonthlyPayment), months: p.months }),
+        skip: car ? t("surprise.after.skipCar") : t("surprise.after.skipDental") }[r.choice];
+      bill = `<div class="note ${r.choice === "pay" ? "" : "bad"}">${line}</div>`;
+    } else {
+      bill = `<div class="note plain">${t("month.quiet")}</div>`;
+    }
+    const ready = !r.event || r.choice;
+    return `<p class="kicker">${t("month.kicker", { n: S.month })}</p>
+      <h2>${t("month.title", { n: S.month })}</h2>
+      <p class="muted">${t("month.same")}</p>
+      ${carry}
+      <ul class="auto">
+        ${li("home", t("label.rent"), r.housing)}
+        ${li("kid", t("label.care"), r.care)}
+        ${li(car ? "car" : "bus", car ? t("label.car") : t("label.bus"), r.transport)}
+        ${li("bag", t("label.basics"), r.basics)}
+        ${r.cardPay > 0 ? li("card", t("label.surpriseCard"), r.cardPay) : ""}
+        <li class="tot"><span class="ico">${icon("cart")}</span>${t("month.snap", { amount: fmt(r.snap - r.carryInSnap) })}<span class="amt" style="color:var(--accent)">+${fmt(r.snap - r.carryInSnap)}</span></li>
+      </ul>
+      ${bill}
+      ${ready ? `<div class="actions">${next(r.red ? "cut" : "food", t("month.next"), "go")}</div>` : ""}`;
+  },
+
   cut() {
-    const r = path();
+    const r = cur();
     if (S.c.cut === "food") {
-      return `${dots()}<p class="kicker">${t("cut.kicker")}</p>
+      return `${dots()}<p class="kicker">${mk(t("cut.kicker"))}</p>
         <h2>${t("cut.title")}</h2>
         <div class="note bad" style="font-size:17px">${t("cut.yes")}</div>
         <div class="actions">${next("food", t("cut.next"), "go")}</div>`;
     }
     const car = S.c.transport === "car";
-    return `${dots()}<p class="kicker">${t("cut.kicker")}</p>
+    return `${dots()}<p class="kicker">${mk(t("cut.kicker"))}</p>
       <h2>${t("cut.title")}</h2>
       <p class="lead">${t("cut.lead", { gap: `<span class="red">${fmt(r.gap)}</span>` })}</p>
       <div class="opts" id="cutOpts">
@@ -1088,13 +1259,17 @@ const screens = {
   },
 
   food() {
-    const r = path();
+    const r = cur();
     const bus = S.c.transport === "bus";
     const D = CONFIG.daysInMonth;
     const cells = Array.from({ length: D }, (_, i) => `<div>${i + 1}</div>`).join("");
     const frac = r.foodMoney / r.need;
     setTimeout(() => animateCalendar(r), 900);
-    return `${dots()}<p class="kicker">${t("food.kicker")}</p>
+    const more = !r.red && S.month < CONFIG.maxMonths;
+    const nextBtns = more
+      ? `<button class="btn go" data-act="nextMonth">${t("food.nextMonth", { n: S.month + 1 })} <span class="arr">→</span></button>${next("results", t("food.stopHere"), "secondary")}`
+      : next("results", t("food.next"), "go");
+    return `${dots()}<p class="kicker">${mk(t("food.kicker"))}</p>
       <h2>${t("food.title")}</h2>
       <div class="plate">
         <svg viewBox="0 0 100 80" aria-hidden="true" style="width:96px"><g fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round">
@@ -1118,10 +1293,11 @@ const screens = {
       <div class="cal" id="cal">${cells}</div>
       <div class="cal-key"><span><i style="background:var(--accent)"></i>${t("food.keyOn")}</span><span><i style="background:var(--red-soft)"></i>${t("food.keyOff")}</span></div>
       <div class="verdict" id="verdict"></div>
-      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${next("results", t("food.next"), "go")}</div>`;
+      <div class="actions" id="foodNext" style="opacity:0;transition:opacity .4s">${nextBtns}</div>`;
   },
 
   results() {
+    if (S.month > 1) return multiResults();
     const r = path();
     const c = city();
     const short = r.gap > 0;
@@ -1278,12 +1454,75 @@ const screens = {
       <div class="panel small">
         <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), basics (${fmt(CONFIG.basicsMonthly)}/mo), Minneapolis home-based child care (${fmt(CONFIG.cities.minneapolis.childCare.home)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), and credit card terms (${Math.round(CONFIG.surprise.cardAPR * 100)}% APR, ${fmt(CONFIG.surprise.cardMonthlyPayment)}/mo).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
+        <p><b>More than one month:</b> if a month ends with money left, the game continues (up to ${CONFIG.maxMonths} months, a game design limit). Every month repeats the same pay, rent, child care, transport, basics, and SNAP. No new costs are invented. The only new costs come from earlier choices: a skipped bill comes back at the same ${fmt(CONFIG.surprise.amount)}, and credit card charges are paid off on their schedule. Money left after food (cash, and unused SNAP, which stays on the EBT card) carries into the next month.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
         <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
       </div>
       <div class="actions"><button class="btn secondary" data-act="next" data-val="final">Back</button></div>`;
   }
 };
+
+/* ---------- Results after more than one month ---------- */
+function multiResults() {
+  const ms = months(), r = ms[ms.length - 1], first = path(), c = city();
+  const car = S.c.transport === "car";
+  const lo = leftovers(ms);
+  const n = ms.length;
+  const plural = (k) => k + " " + t(k === 1 ? "results.monthWord" : "results.monthsWord", null, true);
+
+  // Headline
+  let head;
+  if (r.red) {
+    head = `<p class="headline">${t("results.multiLeadRed", { k: plural(n - 1), m: n })}</p>`
+      + (r.foodGap > 0
+        ? `<div class="big red">${r.mealsSkipped}</div><p class="lead"><b>${t("results.mealsSkippedIn", { m: n })}</b></p>`
+        : `<div class="big red">${fmt(r.billsBehind)}</div><p class="lead"><b>${t("results.billsBehind")}</b> ${t("results.inMonth", { m: n })}</p>`);
+  } else {
+    head = `<p class="headline">${t("results.multiLeadOk", { n })}</p>
+      <div class="big accent">${fmt(-r.gap)}</div><p class="lead">${t("results.multiSaved")}</p>`;
+  }
+
+  // Month-by-month balance chart
+  const vals = ms.map((x) => -x.gap);
+  const mx = Math.max(1, ...vals.map(Math.abs));
+  const anyNeg = vals.some((v) => v < 0);
+  const evLabel = (x) => !x.event ? t("results.evNone", null, true)
+    : x.choice === "pay" ? t("results.evPaid", null, true)
+    : x.choice === "card" ? t("results.evCard", null, true)
+    : t(car ? "results.evSkipCar" : "results.evSkipDental", null, true);
+  const strip = `<p class="section">${t("results.monthsTitle")}</p><div class="figure"><div class="mstrip">${ms.map((x, i) => {
+    const v = vals[i], h = Math.max(4, Math.abs(v) / mx * 60);
+    return `<div class="mcol"><div class="mval ${v < 0 ? "red" : "accent"}">${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}</div>
+      <div class="mup">${v >= 0 ? `<div class="mbar pos" style="height:${h}px"></div>` : ""}</div>
+      <div class="mdown" style="height:${anyNeg ? 64 : 0}px">${v < 0 ? `<div class="mbar neg" style="height:${h}px"></div>` : ""}</div>
+      <div class="mlab">${t("results.monthShort", { n: x.month }, true)}</div><div class="mev">${evLabel(x)}</div></div>`;
+  }).join("")}</div><p class="cap small muted">${t("results.stripCap")}</p></div>`;
+
+  // What's still hanging over them
+  const notes = [];
+  if (lo.stillSkipped) notes.push(t("results.stillSkipped", { what: t(car ? "results.whatCar" : "results.whatDental", null, true), k: lo.skips }));
+  if (lo.cardOwed > 0.5) notes.push(t("results.stillOwe", { amount: fmt(lo.cardOwed) }));
+  const notesHtml = notes.length ? `<div class="note bad">${notes.join(" ")}</div>` : "";
+
+  // Meals for the last month
+  const meals = Array.from({ length: r.totalMeals }, (_, i) => `<i class="${i >= r.totalMeals - r.mealsSkipped ? "x" : ""}"></i>`).join("");
+  const mealsFig = `<div class="figure"><div class="meals">${meals}</div><div class="meals-key"><span>Day 1</span><span>${t("results.mealsKey")} · ${t("results.monthShort", { n }, true)}</span><span>Day ${CONFIG.daysInMonth}</span></div></div>`;
+
+  const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
+  const other = S.city === "fargo" ? "minneapolis" : "fargo";
+  return `<p class="kicker">${t("results.choices", { n: first.conscious })}</p>
+    ${head}
+    ${notesHtml}
+    ${strip}
+    ${mealsFig}
+    <p class="small muted">${t("results.capNote", { n: CONFIG.maxMonths })}</p>
+    ${ctx}
+    <div class="actions">
+      ${next("final", t("results.next"), "go")}
+      <button class="btn secondary" data-act="otherCity">${t("results.otherCity", { city: CONFIG.cities[other].name.split(",")[0] })}</button>
+      <button class="btn link" data-act="replay">${t("results.replay")}</button>
+    </div>`;
+}
 
 /* ---------- Effects ---------- */
 async function animateCalendar(r) {
@@ -1300,7 +1539,8 @@ async function animateCalendar(r) {
   if (!v) return;
   if (r.foodGap > 0) v.innerHTML = t("food.verdictShort", { day: `<span class="red">day ${r.daysFed + 1}</span>` });
   else if (r.billsBehind > 0) v.innerHTML = t("food.verdictBills", { rent: `<span class="red">${t("food.verdictBillsRent")}</span>` });
-  else v.innerHTML = t("food.verdictOk");
+  else v.innerHTML = t("food.verdictOk") + (S.month < CONFIG.maxMonths
+    ? `<span class="lead" style="display:block;font-family:var(--sans);font-weight:400;margin-top:8px">${t("food.carry", { amount: `<b class="accent">${fmt(-r.gap)}</b>`, n: S.month + 1 })}</span>` : "");
   v.classList.add("show");
   $("foodNext").style.opacity = 1;
 }
@@ -1335,7 +1575,7 @@ function go(name) {
 }
 
 function restart(cityKey, wageOverride) {
-  S.city = cityKey; S.wageOverride = wageOverride ?? null; S.c = {};
+  S.city = cityKey; S.wageOverride = wageOverride ?? null; S.c = {}; S.month = 1; S.mc = {};
   meterShown = 0;
   go(cityKey ? "housing" : "intro");
 }
@@ -1368,6 +1608,11 @@ document.addEventListener("click", async (e) => {
     locked = true; b.classList.add("picked"); buzz(15); await wait(400); locked = false;
     S.c.cut = "food"; return go("cut");
   }
+  if (act === "msurprise") {
+    locked = true; b.classList.add("picked"); b.parentElement.classList.add("locked"); buzz(15); await wait(320); locked = false;
+    S.mc[S.month] = val; return go("month");
+  }
+  if (act === "nextMonth") { S.month++; S.c.cut = undefined; return go("month"); }
   if (act === "city" || AFTER[act]) {
     locked = true;
     b.classList.add("picked");
@@ -1383,7 +1628,7 @@ document.addEventListener("click", async (e) => {
     case "next": go(val); break;
     case "raise": restart(S.city, parseFloat(val)); break;
     case "otherCity": restart(S.city === "fargo" ? "minneapolis" : "fargo"); break;
-    case "replay": S.city = null; S.wageOverride = null; S.c = {}; meterShown = 0; go("intro"); break;
+    case "replay": S.city = null; S.wageOverride = null; S.c = {}; S.month = 1; S.mc = {}; meterShown = 0; go("intro"); break;
   }
 });
 
