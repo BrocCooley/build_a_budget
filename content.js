@@ -24,7 +24,7 @@ window.CONTENT = {
   site_title: "Food Insecurity in the U.S.",
 
   /* ---------- Home page ---------- */
-  home_claim: "TODO: Your argument as a short headline, 5–8 words, like a newspaper headline.",
+  home_claim: "No income, no food.",
 
   home_hook: "TODO: One or two short sentences to pull the reader in: a question, a quick scene, or a surprising fact.",
 
