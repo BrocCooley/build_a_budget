@@ -20,7 +20,7 @@ window.CONTENT = {
   /* ---------- Home page ---------- */
   home_hook: "TODO: How do you want to open? A question, a short scene, or a surprising fact to pull the reader in. (1–3 sentences)",
 
-  home_thesis: "TODO: What is your main claim? (1–2 sentences)",
+  home_thesis: "Many people believe others go hungry because they budget badly or squander their money on unnecessary items, but income is the biggest issue that affects food insecurity. On a typical low-income salary, it is not possible to buy enough healthy groceries, even when making the best budget choices, and government funding is one of the best ways to solve this problem.",
 
   /* ---------- Map page ---------- */
   map_takeaway: "TODO: What pattern do you want the reader to notice on the map, and why does it support your claim?",
