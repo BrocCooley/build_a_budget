@@ -44,14 +44,36 @@
 
   // ---------- YOUR WORDS ----------
   // <div data-content="home_thesis"></div> → your text, or a yellow placeholder if it still starts with "TODO:"
+  // Turns your text into short, scannable pieces:
+  //   paragraphs (blank line between), bullet lists ("- " lines), and cards ("- **Name:** sentence" lines)
+  function renderText(val) {
+    return val.split(/\n\s*\n/).map((block) => {
+      const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+      const isList = lines.length && lines.every((l) => /^[-•]\s+/.test(l));
+      if (isList) {
+        const items = lines.map((l) => l.replace(/^[-•]\s+/, ""));
+        const cardRe = /^\*\*(.+?)\*\*:?\s*(.*)$/;
+        if (items.every((i) => cardRe.test(i))) {
+          return `<div class="content-cards">${items.map((i) => {
+            const m = i.match(cardRe);
+            return `<div class="content-card"><h3>${inline(m[1].replace(/:$/, ""))}</h3>${m[2] ? `<p>${inline(m[2])}</p>` : ""}</div>`;
+          }).join("")}</div>`;
+        }
+        return `<ul class="content-list">${items.map((i) => `<li>${inline(i)}</li>`).join("")}</ul>`;
+      }
+      return `<p>${lines.map(inline).join("<br>")}</p>`;
+    }).join("");
+  }
+
   document.querySelectorAll("[data-content]").forEach((el) => {
     const key = el.dataset.content;
     const val = typeof C[key] === "string" ? C[key].trim() : "";
     if (!val || /^TODO:/i.test(val)) {
       const q = val.replace(/^TODO:\s*/i, "") || "Write this section.";
-      el.innerHTML = `<div class="yw" role="note"><span class="yw-label">YOUR WORDS</span><p>${inline(q)}</p><span class="yw-key">content.js → ${esc(key)}</span></div>`;
+      el.innerHTML = `<div class="yw" role="note"><span class="yw-label">YOUR WORDS</span><p>${q.split("\n").map(inline).join("<br>")}</p><span class="yw-key">content.js → ${esc(key)}</span></div>`;
+      el.classList.add("is-placeholder");
     } else {
-      el.innerHTML = `<div class="content-text">${val.split(/\n\s*\n/).map((p) => `<p>${inline(p.trim())}</p>`).join("")}</div>`;
+      el.innerHTML = `<div class="content-text">${renderText(val)}</div>`;
     }
   });
 

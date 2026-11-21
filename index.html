@@ -17,22 +17,38 @@
 
 <main id="main">
   <section class="hero wrap">
-    <div class="hero-grid">
-      <div>
-        <h1 data-site-title>Food Insecurity in the U.S.</h1>
-        <div data-content="home_hook"></div>
-        <div class="thesis" data-content="home_thesis"></div>
-      </div>
-      <aside class="bigstat" aria-label="Key statistic">
-        <div class="num">13.7%</div>
+    <p class="kicker" data-site-title>Food Insecurity in the U.S.</p>
+    <div class="claim" role="heading" aria-level="1" data-content="home_claim"></div>
+    <div class="hook" data-content="home_hook"></div>
+    <div class="thesis-box">
+      <span class="kicker">The argument</span>
+      <div class="thesis" data-content="home_thesis"></div>
+    </div>
+    <div class="btn-row"><a class="btn go" href="#play">Play the game ↓</a><a class="btn ghost" href="map/">See the map</a></div>
+  </section>
+
+  <section class="wrap" aria-label="Key statistics">
+    <div class="statrow">
+      <div class="stat-tile">
+        <b>13.7%</b>
         <p>of U.S. households were food insecure in 2024, the highest rate since 2014.</p>
         <span class="cite">(USDA ERS, 2025)</span>
-      </aside>
+      </div>
+      <div class="stat-tile">
+        <b>9.0%</b>
+        <p>in North Dakota, the lowest rate of any state (2022–2024 average).</p>
+        <span class="cite">(USDA ERS, 2025)</span>
+      </div>
+      <div class="stat-tile">
+        <b>63%</b>
+        <p>of U.S. adults could cover a surprise $400 expense with cash.</p>
+        <span class="cite">(Federal Reserve, 2026)</span>
+      </div>
     </div>
   </section>
 
   <section class="wrap section" aria-labelledby="play">
-    <h2 id="play" style="margin-top:20px">Play the game</h2>
+    <h2 id="play" style="margin-top:20px">Can you make the food last a year?</h2>
     <p class="muted prose">Play as a single parent working full time as a cashier: set up your budget, then live a year of it. Emergencies happen at real-world odds. About 4 minutes.</p>
     <div class="home-game">
       <iframe class="game-frame" src="game/play/" title="Build a Budget game"></iframe>
@@ -44,7 +60,7 @@
   </section>
 
   <section class="wrap section" aria-labelledby="explore">
-    <h2 id="explore" style="margin-top:20px">Explore</h2>
+    <h2 id="explore" style="margin-top:20px">Where do you want to go next?</h2>
     <div class="cards">
       <a class="card" href="map/">
         <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
@@ -64,6 +80,13 @@
         <p>What could change, plus food resources in Fargo-Moorhead, Minneapolis, and at NDSU.</p>
         <span class="go">See what's next →</span>
       </a>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="cta-band">
+      <p>One paycheck. Twelve months. Real emergencies.</p>
+      <a class="btn go" href="game/play/">Play the game →</a>
     </div>
   </section>
 </main>
