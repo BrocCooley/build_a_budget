@@ -3,17 +3,14 @@
    To add your own entries, use works_cited_extra in content.js (they're merged and sorted automatically). */
 window.WORKS_CITED = [
 
-  { text: "*2024 Affordability Analysis*. Child Care Aware of America, 2025, info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf.",
-    url: "https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf", usedIn: "Game (child care prices, 4-year-old, center and family child care, ND and MN)",
-    verify: "Confirm the publication year (2025) on the report's cover." },
+  { text: "*Child Care in America: 2024 Affordability Analysis*. Child Care Aware of America, 2025, info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf.",
+    url: "https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf", usedIn: "Game (child care prices, 4-year-old, center and family child care, ND and MN)" },
 
-  { text: "\"USDA Cancels Survey Tracking How Many Americans Struggle to Get Enough Food.\" *NPR*, 22 Sept. 2025, www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger.",
-    url: "https://www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger", usedIn: "Game (2024 was the last year USDA published the report)",
-    verify: "Add the reporter's name from the article byline." },
+  { text: "Smith, Jordan-Marie. \"USDA Cancels Survey Tracking How Many Americans Struggle to Get Enough Food.\" *NPR*, 22 Sept. 2025, www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger.",
+    url: "https://www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger", usedIn: "Game (2024 was the last year USDA published the report)" },
 
-  { text: "*An Act to Provide for Reconciliation Pursuant to Title II of H. Con. Res. 14* [One Big Beautiful Bill Act]. Public Law 119-21, 4 July 2025, www.congress.gov/bill/119th-congress/house-bill/1.",
-    url: "https://www.congress.gov/bill/119th-congress/house-bill/1", usedIn: "Game (2025 standard deduction and Child Tax Credit)",
-    verify: "Congress.gov blocked the automated check. Open the link to confirm, or cite an IRS page on the law instead." },
+  { text: "United States, Congress. *An Act to Provide for Reconciliation Pursuant to Title II of H. Con. Res. 14* [One Big Beautiful Bill Act]. Public Law 119-21, 4 July 2025. *GovInfo*, U.S. Government Publishing Office, www.govinfo.gov/app/details/PLAW-119publ21.",
+    url: "https://www.govinfo.gov/app/details/PLAW-119publ21", usedIn: "Game (2025 standard deduction and Child Tax Credit)" },
 
   { text: "\"Economic Hardships.\" *Economic Well-Being of U.S. Households in 2025*, Board of Governors of the Federal Reserve System, May 2026, www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm.",
     url: "https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm", usedIn: "Game (emergency odds and costs; savings)" },
