@@ -550,10 +550,11 @@ const CONFIG = {
   },
 
   savings: {
-    // Starting savings options. Context: 39% of adults with family income $25,000–$49,999 had 3 months of
-    // expenses saved (Federal Reserve, Economic Well-Being of U.S. Households in 2025, Table 27).
-    options: [0, 500, "3mo"],
-    threeMonthShare25to50k: 39
+    // Starting savings options (GAME DESIGN CHOICE: small amounts, realistic for this household).
+    // Context: "4 in 10 adults with [income under $50,000] said they could not cover even a $100 emergency
+    // expense with only their savings." Federal Reserve, Economic Well-Being of U.S. Households in 2025 (May 2026), Executive Summary.
+    options: [0, 500, 1000],
+    cantCover100Under50k: 40
   },
 
   // Tax refund, paid once a year (tax year 2025 rules). The game's monthly take-home already assumes
@@ -594,9 +595,9 @@ const TEXT = {
   "savings.zero.sub": "Paycheck to paycheck.",
   "savings.some": "A little cushion",
   "savings.some.sub": "Enough for a small emergency.",
-  "savings.three": "Three months of expenses",
-  "savings.three.sub": "A full emergency fund.",
-  "savings.context": "**{pct} in 100** adults with family income of $25,000–$49,999 had three months of expenses saved.",
+  "savings.three": "A bigger cushion",
+  "savings.three.sub": "About as much as one typical emergency costs.",
+  "savings.context": "**{pct} in 100** adults earning under $50,000 couldn't cover even a **$100** emergency from their savings.",
 
   "year.kicker": "Your year · {city}",
   "year.intro": "Same job, same rent, same bills every month. Pay comes in, bills go out, and life happens. Quiet months play by themselves. The game stops when something needs you.",
@@ -1441,17 +1442,17 @@ const screens = {
   },
 
   savings() {
-    const c = S.c, threeMo = startSavingsAmount("3mo", S.city, c, S.wageOverride);
+    const c = S.c;
     return `${dots()}<p class="kicker">${t("savings.kicker")}</p>
       <h2>${t("savings.title")}</h2>
       <p class="muted">${t("savings.sub")}</p>
       <div class="opts">
       ${opt({ act: "savings", val: "0", ico: "dollar", title: t("savings.zero"), price: "$0", sub: t("savings.zero.sub") })}
       ${opt({ act: "savings", val: "500", ico: "dollar", title: t("savings.some"), price: "$500", sub: t("savings.some.sub") })}
-      ${opt({ act: "savings", val: "3mo", ico: "dollar", title: t("savings.three"), price: fmt(threeMo), sub: t("savings.three.sub") })}
+      ${opt({ act: "savings", val: "1000", ico: "dollar", title: t("savings.three"), price: "$1,000", sub: t("savings.three.sub") })}
       </div>
-      <div class="figure">${picto(PERSON, "0 0 12 16", CONFIG.savings.threeMonthShare25to50k, "on")}
-        <p class="cap">${t("savings.context", { pct: CONFIG.savings.threeMonthShare25to50k })}${cite("Federal Reserve, 2026")}</p></div>`;
+      <div class="figure">${picto(PERSON, "0 0 12 16", CONFIG.savings.cantCover100Under50k, "red")}
+        <p class="cap">${t("savings.context", { pct: CONFIG.savings.cantCover100Under50k })}${cite("Federal Reserve, 2026")}</p></div>`;
   },
 
   year() {
@@ -1504,7 +1505,7 @@ const screens = {
         body = `<div class="note bad">${t("year.behind", { month: MONTHS[r.m], amount: fmt(r.behindAdded) })}</div>${monthCard(r)}`;
       } else body = monthCard(r);
       const last = y.shown >= CONFIG.year.months - 1;
-      const needsTap = p.type !== "month" || !y.auto;
+      const needsTap = p.type !== "month" || !y.auto || last;   // December always waits for "See your year"
       if (!(p.type === "cut" && !y.cutPicked)) {
         actions = needsTap
           ? `<button class="btn go" data-act="ycont">${last ? t("year.seeResults") : t("year.continue")} <span class="arr">→</span></button>`

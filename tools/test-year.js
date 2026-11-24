@@ -41,7 +41,7 @@ console.log("\n1,000 SIMULATED YEARS PER HOUSEHOLD (emergencies: savings if food
 console.log("  household                       start   %end in debt  median debt  %any hunger  median meals skipped  median net worth");
 for (const city of ["fargo", "minneapolis"]) for (const housing of ["oneBR", "twoBR"]) for (const care of ["center", "home"]) for (const transport of ["car", "bus"]) {
   const c = { housing, care, transport };
-  for (const opt of [0, "3mo"]) {
+  for (const opt of [0, 1000]) {
     const start = startSavingsAmount(opt, city, c);
     const s = manyYears(city, c, start);
     console.log(`  ${(city.slice(0, 5) + " " + housing + "/" + care + "/" + transport).padEnd(30)} ${$(start).padStart(7)}   ${String(s.pctDebt).padStart(3)}%        ${$(s.medianDebt).padStart(8)}     ${String(s.pctHungry).padStart(3)}%        ${String(s.medianMeals).padStart(4)}                ${$(s.medianNet).padStart(8)}`);
