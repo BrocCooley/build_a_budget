@@ -30,7 +30,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .meter-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .meter-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
 .day{font:700 11px/1 var(--mono);letter-spacing:.06em;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 9px;white-space:nowrap}
-.meter-main{display:flex;align-items:baseline;gap:10px;margin-top:3px;min-height:38px}
+.meter-main{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 8px;margin-top:3px;min-height:38px}
 .meter-amt{font:700 32px/1.1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;transition:color .3s}
 .meter-amt.neg{color:var(--red)}
 .meter-amt.bump{animation:bump .45s var(--ease)}
@@ -314,6 +314,21 @@ details.rec[open] summary::after{content:"−"}
 /* ---------- The year ---------- */
 .cardpill{font:700 11.5px/1.2 var(--mono);color:#fff;background:var(--red);border-radius:6px;padding:5px 7px;align-self:center;white-space:nowrap}
 .cardpill span{opacity:.85;font-weight:600}
+.cardpill.ok{background:var(--accent)}
+.foodpill{font:700 11.5px/1.2 var(--mono);color:#fff;background:var(--accent);border-radius:6px;padding:5px 7px;align-self:center;white-space:nowrap}
+.foodpill.short{background:var(--red)}
+.mresult{display:flex;justify-content:space-between;align-items:baseline;border-radius:14px;padding:12px 16px;margin:0 0 10px;color:#fff;animation:rise .35s var(--ease) both}
+.mresult.neg{background:var(--red)}
+.mresult.pos{background:var(--accent)}
+.mresult span{font:700 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.mresult b{font:800 30px/1 var(--mono);letter-spacing:-.02em}
+.mfood{display:flex;gap:12px;align-items:center;border:2px solid var(--accent);background:var(--accent-soft);border-radius:14px;padding:12px 14px;margin:0 0 10px}
+.mfood.short{border-color:var(--red);background:var(--red-soft)}
+.mfood svg.i{width:30px;height:30px;flex:none}
+.mfood.short svg.i{color:var(--red)}
+.mfood b{display:block;font-size:16.5px}
+.mfood.short b{color:var(--red)}
+.mfood span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 .cardpill em{font-style:normal;margin-left:4px;padding-left:6px;border-left:1px solid rgba(255,255,255,.5)}
 .ytrack{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:4px 0 18px}
 .ym{position:relative;height:38px;border-radius:8px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;font:700 12px/1 var(--mono);color:var(--faint);transition:background .3s,border-color .3s}
@@ -427,6 +442,7 @@ body.editmode .tk.tk-locked:hover{background:rgba(0,0,0,.05);box-shadow:0 0 0 2p
       <span class="meter-amt" id="meterAmt">$0</span>
       <span class="ebt" id="ebt" hidden></span>
       <span class="cardpill" id="cardPill" hidden></span>
+      <span class="foodpill" id="foodPill" hidden></span>
       <span class="meter-delta" id="meterDelta"></span>
     </div>
     <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
@@ -448,7 +464,7 @@ const CONFIG = {
     fargo: {
       name: "Fargo, ND",
       wage: 16.07,               // BLS OEWS May 2025, median hourly wage, Cashiers (41-2011), Fargo ND-MN metro (BLS series OEUM002202000000041201108 = 16.07, checked Nov 2026)
-      wageLabel: "Median cashier pay",
+      wageLabel: "Median cashier pay: half of Fargo cashiers earn less",
       wageCite: "BLS, 2025",
       rent: {
         oneBR: 917,              // HUD FY2026 Fair Market Rent, 1BR, Fargo ND-MN MSA
@@ -586,7 +602,7 @@ const CONFIG = {
 const TEXT = {
   "meter.label": "Money left this month",
 
-  "meter.labelYear": "Cash on hand",
+  "meter.labelYear": "Where you stand (cash minus debts)",
 
   "savings.kicker": "Day 12 · Before the year starts",
   "savings.title": "How much do you have saved?",
@@ -620,6 +636,9 @@ const TEXT = {
   "mc.covered": "Covered",
   "mc.behind": "Bills you couldn't pay",
   "mc.end": "Cash at month's end",
+  "mc.result": "This month",
+  "mc.foodShort": "Food ran out on day {days}: {n} meals skipped",
+  "mc.foodOk": "Food lasted all month",
 
   "refund.app": "IRS",
   "refund.title": "Your tax refund arrived",
@@ -723,9 +742,9 @@ const TEXT = {
   "care.title": "Who watches your kid?",
   "care.sub": "Full-time care for a 4-year-old, every month.",
   "care.center": "Licensed center",
-  "care.center.sub": "Set hours, trained staff.",
+  "care.center.sub": "Set hours, trained staff. State average for a 4-year-old, full time.",
   "care.home": "Home-based daycare",
-  "care.home.sub": "A smaller group in a neighbor's home.",
+  "care.home.sub": "A smaller group in a neighbor's home. State average for a 4-year-old, full time.",
   "care.shifts": "**{n} of your {total} shifts** each month go to paying for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
@@ -1053,7 +1072,7 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
   let cash = startSavings, card = 0, behind = 0, snapCarry = 0, interestPaid = 0;
   const months = [];
   for (let m = 0; m < CONFIG.year.months; m++) {
-    const rec = { m, startCash: cash, startCard: card, events: [], refund: 0 };
+    const rec = { m, startCash: cash, startCard: card, startBehind: behind, events: [], refund: 0 };
     // 1) Paycheck (and tax refund in March)
     cash += base.net;
     if (m === CONFIG.year.refundMonth) { rec.refund = refund.total; cash += refund.total; }
@@ -1182,9 +1201,11 @@ function cashBalance() {
   if (!S.city) return null;
   if ((S.screen === "year" || S.screen === "results") && S.y) {
     const sim = yearSim();
-    if (S.y.panel && S.y.panel.type === "event") return sim.pending ? sim.pending.cash : sim.cash;
+    // Where you stand = cash minus credit card debt minus bills you're behind on
+    if (S.y.panel && S.y.panel.type === "event") return sim.pending ? sim.pending.cash - sim.card - sim.behind : sim.netWorth;
     if (S.y.shown < 0) return yearStart();
-    return sim.months[S.y.shown] ? sim.months[S.y.shown].endCash : sim.cash;
+    const r = sim.months[S.y.shown];
+    return r ? r.endCash - r.endCard - r.endBehind : sim.netWorth;
   }
   const c = S.c, ct = city();
   let bal = meterMax();
@@ -1210,12 +1231,18 @@ function updateMeter() {
     const p = S.y.panel && S.y.panel.type === "event";
     const mIdx = p ? S.y.panel.p.m : Math.max(0, sh);
     $("day").textContent = S.screen === "results" ? "YEAR DONE" : MONTHS[mIdx].slice(0, 3).toUpperCase() + " · " + (mIdx + 1) + " / 12";
-    const bal = p ? sim.card : (sh >= 0 && sim.months[sh] ? sim.months[sh].endCard : 0);
-    const behind = sh >= 0 && sim.months[sh] ? sim.months[sh].endBehind : 0;
-    cp.hidden = bal < 1 && behind < 1;
-    cp.innerHTML = (bal >= 1 ? `CARD <b>${fmt(bal)}</b> <span>· ${fmt(cardMinPayment(bal).pay)}/mo</span>` : "") + (behind >= 1 ? ` <em>BEHIND ${fmt(behind)}</em>` : "");
+    const r = sh >= 0 ? sim.months[sh] : null;
+    const cash = p ? sim.pending.cash : (r ? r.endCash : yearStart());
+    const bal = p ? sim.card : (r ? r.endCard : 0);
+    const behind = p ? sim.behind : (r ? r.endBehind : 0);
+    cp.hidden = false;
+    cp.className = "cardpill" + (bal >= 1 || behind >= 1 ? "" : " ok");
+    cp.innerHTML = `CASH <b>${fmt(cash)}</b>` + (bal >= 1 ? ` <em>CARD ${fmt(bal)} · ${fmt(cardMinPayment(bal).pay)}/mo</em>` : "") + (behind >= 1 ? ` <em>BEHIND ${fmt(behind)}</em>` : "");
+    const fp = $("foodPill");
+    if (r && !p) { fp.hidden = false; fp.className = "foodpill" + (r.daysFed < CONFIG.daysInMonth ? " short" : ""); fp.innerHTML = `FOOD <b>${r.daysFed}/${CONFIG.daysInMonth}</b> DAYS`; }
+    else fp.hidden = true;
   } else {
-    cp.hidden = true;
+    cp.hidden = true; $("foodPill").hidden = true;
     $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
   }
   if (S.c.snap) { const s = path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? `+ ${fmt(s)} EBT` : "EBT $0"; }
@@ -1706,14 +1733,17 @@ function yAdvance() {
 function monthCard(r) {
   const b = yearSim().base;
   const ln = (label, amt, cls) => `<div class="ml ${cls || ""}"><span>${label}</span><b>${amt}</b></div>`;
-  return `<div class="mcard">
+  const change = (r.endCash - r.endCard - r.endBehind) - (r.startCash - r.startCard - (r.startBehind || 0));
+  const short = r.foodGap > 0.005;
+  return `<div class="mresult ${change < -0.5 ? "neg" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true)}</span></div></div>
+  <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
     ${ln(t("mc.bills", null, true), "−" + fmt(b.housing + b.care + b.transport + b.basics))}
     ${r.cardPay > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(r.cardPay)) : ""}
     ${r.events.map((e) => ln(t("ev." + e.id + ".short", null, true) + (e.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), (e.how === "card" ? "" : "−") + fmt(e.cost), e.how === "card" ? "muted" : "")).join("")}
     ${r.behindPaid ? ln(t("mc.catchup", null, true), "−" + fmt(r.behindPaid)) : ""}
-    ${ln(t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true), r.foodGap > 0.005 ? `<span class="red">${t("mc.skipped", { n: r.mealsSkipped }, true)}</span>` : `<span class="accent">${t("mc.covered", null, true)}</span>`)}
     ${r.behindAdded > 0.5 ? ln(`<span class="red">${t("mc.behind", null, true)}</span>`, `<span class="red">${fmt(r.behindAdded)}</span>`) : ""}
     ${ln(t("mc.end", null, true), fmt(r.endCash), "tot")}
   </div>`;
