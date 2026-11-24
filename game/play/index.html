@@ -329,6 +329,7 @@ details.rec[open] summary::after{content:"−"}
 .mfood b{display:block;font-size:16.5px}
 .mfood.short b{color:var(--red)}
 .mfood span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.mfood span.why{color:var(--red);font-weight:600;margin-top:4px}
 .cardpill em{font-style:normal;margin-left:4px;padding-left:6px;border-left:1px solid rgba(255,255,255,.5)}
 .ytrack{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:4px 0 18px}
 .ym{position:relative;height:38px;border-radius:8px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;font:700 12px/1 var(--mono);color:var(--faint);transition:background .3s,border-color .3s}
@@ -639,6 +640,7 @@ const TEXT = {
   "mc.result": "This month",
   "mc.foodShort": "Food ran out on day {days}: {n} meals skipped",
   "mc.foodOk": "Food lasted all month",
+  "mc.foodWhy": "Rent, child care, and getting to work were paid first. Food got whatever was left.",
 
   "refund.app": "IRS",
   "refund.title": "Your tax refund arrived",
@@ -1736,7 +1738,7 @@ function monthCard(r) {
   const change = (r.endCash - r.endCard - r.endBehind) - (r.startCash - r.startCard - (r.startBehind || 0));
   const short = r.foodGap > 0.005;
   return `<div class="mresult ${change < -0.5 ? "neg" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true)}</span></div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
