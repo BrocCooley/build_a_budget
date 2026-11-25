@@ -3,7 +3,7 @@
   const ROOT = (window.SITE && SITE.ROOT) || "";
   const esc = (window.SITE && SITE.esc) || ((s) => s);
   const $ = (id) => document.getElementById(id);
-  const HIGHLIGHT = ["ND", "MN"];
+  const HIGHLIGHT = ["MN"];
 
   // Single-hue sequential scale (green, matching the game's accent)
   const BINS = [
@@ -59,7 +59,7 @@
 
   // ---------- Legend ----------
   $("legend").innerHTML = BINS.map((b) => `<span><i class="sw" style="background:${b.color}"></i>${b.label}</span>`).join("")
-    + `<span><i class="hlk"></i>North Dakota &amp; Minnesota</span>`
+    + `<span><i class="hlk"></i>Minnesota</span>`
     + `<span class="muted">U.S. average: ${US.food_insecure_pct.toFixed(1)}%</span>`;
 
   // ---------- Info panel ----------
@@ -116,7 +116,7 @@
   $("stateSelect").innerHTML = sorted.map((s) => `<option value="${s.abbr}">${esc(s.name)}</option>`).join("");
   $("stateSelect").addEventListener("change", (e) => select(e.target.value, true));
 
-  // ---------- North Dakota & Minnesota callouts ----------
+  // ---------- Minnesota callout ----------
   $("callouts").innerHTML = HIGHLIGHT.map((a) => {
     const s = byAbbr[a];
     return `<div class="callout"><button type="button" data-pick="${a}" aria-label="Show ${esc(s.name)} details">
@@ -138,5 +138,5 @@
       <td>${s.food_insecure_sig_diff_from_us ? "Yes" : "No"}</td></tr>`).join("")}
     </tbody></table></div>`;
 
-  select("ND");
+  select("MN");
 })();

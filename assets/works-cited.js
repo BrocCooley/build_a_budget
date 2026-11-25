@@ -23,9 +23,8 @@ window.WORKS_CITED = [
 
   { text: "\"Minnesota Income Tax Brackets, Standard Deduction and Dependent Exemption Amounts for 2025.\" Minnesota Department of Revenue, www.revenue.state.mn.us/mndor-pp/20636. Accessed 20 Nov. 2026.",
     url: "https://www.revenue.state.mn.us/mndor-pp/20636", usedIn: "Game (Minnesota income tax)" },
-
-  { text: "\"Appendix B - Table of Standards.\" *SNAP Policy Manual*, North Dakota Department of Health and Human Services, effective 1 Oct. 2026, www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm.",
-    url: "https://www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm", usedIn: "Game (SNAP income limit: 200% of poverty for a family of 2, the same limit Minnesota uses)" },
+  { text: "Minnesota Statutes, section 142F.101. *Minnesota Office of the Revisor of Statutes*, 2025, www.revisor.mn.gov/statutes/cite/142F.101.",
+    url: "https://www.revisor.mn.gov/statutes/cite/142F.101", usedIn: "Game (SNAP income limit: 200% of the poverty line)" },
 
   { text: "Bostock, Mike. *us-atlas*. Version 3.0.1, GitHub, github.com/topojson/us-atlas.",
     url: "https://github.com/topojson/us-atlas", usedIn: "Map (state shapes)" },

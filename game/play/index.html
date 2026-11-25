@@ -561,7 +561,7 @@ const CONFIG = {
     standardDeduction: 217,      // USDA FNS FY2027 COLA memo — standard deduction, households of 1–3
     excessShelterCap: 769,       // USDA FNS FY2027 COLA memo — max excess shelter deduction (no elderly/disabled member)
     benefitReduction: 0.30,      // Benefit = max allotment − 30% of net income
-    grossLimit2Person: 3608,     // 200% of poverty, 2-person household (ND DHS SNAP Manual, Appendix B, eff. 10/1/2026). MN also uses 200% (Minn. Stat. 142F.101; USDA BBCE chart)
+    grossLimit2Person: 3607,     // 200% of the 2026 poverty guideline for 2 ($21,640 × 2 ÷ 12, rounded up). Minn. Stat. 142F.101: gross income at or below 200% of the federal poverty guidelines
     // Child care is fully deductible (dependent care deduction).
     // Shelter cost = HUD Fair Market Rent, which already includes tenant-paid utilities, so no separate utility allowance is added.
     cite: "USDA, 2026"
@@ -621,7 +621,7 @@ const CONFIG = {
     eitc: { rate: 0.34, max: 4328, phaseoutStart: 23350, phaseoutRate: 0.1598 },  // 2025 EITC, 1 child (IRS Rev. Proc. 2024-40). Formula, not the IRS table: within a few dollars
     ctc: { perChild: 2200, refundableMax: 1700, earnedRate: 0.15, earnedFloor: 2500 }, // 2025 Child Tax Credit
     cdctc: { expenseLimit: 3000, maxRate: 0.35, minRate: 0.20, startAGI: 15000, step: 2000 }, // 2025 Child and Dependent Care Credit, 1 child
-    mn: {                        // Minnesota (Minneapolis only). North Dakota: no state family credits; no ND income tax at this income (0% bracket) — VERIFY
+    mn: {                        // Minnesota state tax credits and income tax (Minneapolis)
       stdDeductionHoH: 22500, rate1: 0.0535,              // 2025 MN head of household standard deduction; 5.35% bracket (to $40,100)
       ctcPerChild: 1750, wfcRate: 0.04, wfcEarnedCap: 9480, // 2025 MN Child Tax Credit + Working Family Credit (refundable)
       phaseoutStart: 31950, phaseoutRate: 0.12            // reduced by 12% of income over $31,950 (non-joint filers)
@@ -1805,7 +1805,7 @@ const screens = {
         <li>Child Care Aware of America. <i>2024 Affordability Analysis</i>, Tables I and II (full-time price, 4-year-old, center and family child care, by state). Statewide averages. <a href="https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf" target="_blank" rel="noopener">childcareaware.org</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>USDA Food Plans: Cost of Food Report (Thrifty Food Plan), January 2026.</i> <a href="https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports" target="_blank" rel="noopener">fns.usda.gov</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>SNAP Fiscal Year 2027 Cost-of-Living Adjustments.</i> <a href="https://www.fns.usda.gov/snap/allotment/cola" target="_blank" rel="noopener">fns.usda.gov</a></li>
-        <li>North Dakota Department of Health and Human Services. <i>SNAP Policy Manual, Appendix B: Table of Standards</i> (effective Oct. 1, 2026). <a href="https://www.nd.gov/dhs/policymanuals/SNAP/" target="_blank" rel="noopener">nd.gov</a></li>
+        <li>Minnesota Statutes, section 142F.101 (SNAP: gross income at or below 200% of the federal poverty guidelines). <a href="https://www.revisor.mn.gov/statutes/cite/142F.101" target="_blank" rel="noopener">revisor.mn.gov</a></li>
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. Rev. Proc. 2025-25 (2026 applicable percentage table). <a href="https://www.irs.gov/pub/irs-drop/rp-25-25.pdf" target="_blank" rel="noopener">irs.gov</a>; HHS ASPE, Poverty Guidelines. <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" rel="noopener">aspe.hhs.gov</a></li>
