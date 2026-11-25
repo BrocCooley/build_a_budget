@@ -503,7 +503,8 @@ const CONFIG = {
       },
       childCareCiteCenter: "Child Care Aware, 2024",
       childCareCiteHome: "Child Care Aware, 2024",
-      busPass: 76,               // ESTIMATE — Metro Transit monthly pass
+      busPass: 43,               // Metro Transit TAP: $1 per ride for SNAP/EBT households (2½-hour transfer). 2 rides × 5 days × 52 weeks ÷ 12 = $43
+      busCite: "Metro Transit TAP, 2026",
       stateMinWage: null,
       stateMinWageNote: "",
       health: "mncare",          // MinnesotaCare (to 200% FPL). Children under 21 pay $0 (MN DHS, DHS-4139A, 2026)
@@ -547,8 +548,9 @@ const CONFIG = {
   },
 
   food: {
-    usdaMonthly: 500,            // USDA Thrifty Food Plan, parent + 4-year-old (~$500/mo). Adult female 20–50 = $248.50/mo (Jan 2026). VERIFY against current USDA Cost of Food report
-    adultFemale20to50: 248.50,   // USDA Thrifty Food Plan, Jan 2026
+    usdaMonthly: 487,            // USDA Thrifty Food Plan, Oct 2026: female 20–50 $254.20 + child 4–5 $188.50 = $442.70, +10% for a 2-person household = $486.97
+    adultFemale20to50: 254.20,   // USDA Thrifty Food Plan, Oct 2026
+    child4to5: 188.50,           // USDA Thrifty Food Plan, Oct 2026
     convenienceMarkup: 0.25,     // ESTIMATE — no car, so you shop at the nearby convenience store: food costs +25%
     people: 2,                   // Parent + 4-year-old
     mealsPerDay: 3,
@@ -588,10 +590,13 @@ const CONFIG = {
   ],
 
   card: {
-    apr: 0.22,                   // ESTIMATE — typical credit card interest rate
+    apr: 0.2236,                 // Fed G.19: interest rate on credit card accounts assessed interest, Aug 2026 (FRED TERMCBCCINTNS = 22.36%)
     minPaymentFloor: 40,         // ESTIMATE — minimum payment is the larger of $40 or (interest + 1% of the balance)
     minPaymentPct: 0.01,         // ESTIMATE
-    creditLimit: null            // No limit modeled (no sourced figure found). Generous to the player.
+    creditLimit: 5450,           // Median current credit limit, all large-bank card accounts, Q2 2026 (Philadelphia Fed FR Y-14M via FRED RCCCBLIMPCT50).
+                                 // Generous: new cards for credit scores under 660 have a median limit of $600 (FRED RCCCOLIMMEDSCORELT660, Q2 2026).
+    hasCardPct: 71,              // Fed SHED 2025, Table 40: adults with family income $25,000–$49,999 who have a credit card
+    carryPct: 57                 // same table: card holders in that income group who carried a balance in the past year
   },
 
   savings: {
@@ -650,7 +655,7 @@ const TEXT = {
   "year.kicker": "Your year · {city}",
   "year.legendOk": "Money to spare",
   "year.legendDip": "Got by on savings",
-  "year.legendBad": "Short",
+  "year.legendBad": "Short or borrowed",
   "year.intro": "Same job, same rent, same bills every month. Pay comes in, bills go out, and life happens. Quiet months play by themselves. The game stops when something needs you.",
   "year.fair": "Emergencies are rolled at random from real yearly odds. They don't know how much money you have.",
   "year.start": "Start January",
@@ -666,7 +671,10 @@ const TEXT = {
   "mc.bills": "Rent, child care, transport, basics",
   "mc.cardPay": "Credit card minimum payment",
   "mc.catchup": "Catching up on late bills",
+  "mc.cardFood": "Groceries on the credit card",
+  "mc.cardExtra": "Extra payment on the card",
   "mc.food": "Food ({snap} SNAP + {cash} cash)",
+  "mc.foodCard": "Food ({snap} SNAP + {cash} cash + {card} on the card)",
   "mc.skipped": "{n} meals skipped",
   "mc.covered": "Covered",
   "mc.behind": "Bills you couldn't pay",
@@ -695,6 +703,7 @@ const TEXT = {
   "ev.savings.sub": "You have {cash} in cash.",
   "ev.savings.no": "You only have {cash}. Not enough.",
   "ev.card": "Put it on the credit card",
+  "ev.card.limit": "Only {room} left before your limit. The other {rest} becomes an unpaid bill.",
   "ev.card.sub": "Card balance becomes {bal}. Minimum payment about {pay}/mo at {apr} interest.",
   "ev.car.app": "Auto shop",
   "ev.car.title": "The car won't start",
@@ -724,38 +733,54 @@ const TEXT = {
   "yres.leadOkSpare": "You made it through the year, with {spare} a month to spare.",
   "yres.leadOkRefund": "You made it through the year, but only because of your {refund} tax refund.",
   "yres.closeTitle": "How close was it?",
-  "close.noRefund": "Without your **{refund}** tax refund in March, you'd have ended the year with only **{net}**.",
-  "close.noRefundNeg": "Without your **{refund}** tax refund in March, you'd have ended the year **{net} short**.",
-  "close.oneBill": "A typical emergency costs about **{bill}**. That's **{months} months** of the money you had to spare.",
-  "close.odds": "This year you had **{n}** {em}. Of {runs} random years for this same household, **{pct}%** end in debt or with skipped meals.",
-  "yres.redMonths": "months in the red",
+  "close.spare": "A normal month: **{spare}** to spare.",
+  "best.titleBestLucky": "Best case, and lucky",
+  "best.titleBest": "Best case",
+  "best.title": "A lucky year",
+  "best.titlePlain": "A good year",
+  "best.cheapest": "You picked the cheapest option every time.",
+  "best.luck": "You had {n} {em}. Only **{pct}%** of random years have that few.",
+  "best.noLuck": "You had {n} {em}, like **{pct}%** of random years.",
+  "best.head": "Same job, typical year",
+  "best.yours": "Your choices",
+  "best.car": "With a car",
+  "best.twoBR": "With a 2-bedroom",
+  "best.center": "With a licensed center",
+  "best.debtPct": "Years in debt",
+  "best.note": "Typical (median) of {n} random years each. One change at a time.",
+  "close.noRefund": "Without the **{refund}** March tax refund: only **{net}** left all year.",
+  "close.noRefundNeg": "Without the **{refund}** March tax refund: **{net} short** for the year.",
+  "close.oneBill": "One typical emergency (**{bill}**) = **{months} months** of that spare money.",
+  "close.odds": "You had **{n}** {em}. {pct}% of random years for this household end in debt or with skipped meals.",
+  "yres.redMonths": "months short or borrowing",
+  "yres.debtTile": "debt in December (card {card} + unpaid bills {bills})",
   "yres.meals": "meals skipped",
   "yres.short": "short on food, all year",
   "yres.card": "credit card debt ({interest} in interest)",
   "yres.behind": "behind on rent and bills",
   "yres.cash": "cash left in December",
   "yres.whyTitle": "Why food had to give",
-  "yres.why": "Every month, rent, child care, getting to work and basics came first. Skip any of them and you lose your home or your job. Food is the one bill nobody comes to collect. Even with SNAP, a normal month here comes up **{gap}** short.",
+  "yres.why": "Rent, child care, the bus and basics get paid first, or you lose your home or job. Even with SNAP, a normal month comes up **{gap}** short.",
   "yres.whyThin": "Every month, rent, child care, getting to work and basics came first. In a month with no surprises, this budget covers food with only **{spare}** to spare. One emergency and food is what gives, because it's the one bill nobody comes to collect.",
   "yres.yearTitle": "Your year, month by month",
   "yres.chartCash": "Cash",
   "yres.chartDebt": "Debt (card + late bills)",
   "yres.refundRanOut": "Your tax refund (**{amount}** in March) helped, but by {month} you were short again.",
   "yres.refundLasted": "Your tax refund (**{amount}** in March) carried you through December.",
-  "yres.mealsTitle": "Every day of the year",
+  "yres.mealsTitle": "Every day of your year",
   "yres.eventsTitle": "What happened",
   "yres.noEvents": "No emergencies this year.",
   "yres.onCard": "on the card",
   "yres.fromSavings": "from savings",
-  "yres.noSnap": "The same year without SNAP ({snap}/mo): **{meals}** meals skipped and **{debt}** in debt.",
+  "yres.noSnap": "Without SNAP ({snap}/mo), this same year: **{meals}** meals skipped, **{debt}** in debt.",
   "yres.mcTitle": "{n} more years like yours",
   "yres.mcDebt": "Years that ended in debt",
   "yres.mcHungry": "Years with skipped meals",
   "yres.mcMedian": "In a typical year: {debt} in debt, {meals} meals skipped.",
-  "yres.mcNote": "Same household, {n} new random years with the same real odds. Emergencies paid from savings when possible, otherwise the card.",
+  "yres.mcNote": "Same household, {n} random years at real odds.",
   "yres.seed": "Replay code: {seed}. Anyone can replay this exact year by adding ?seed={seed} to the game's link.",
   "yres.cmpTitle": "Same year, different help",
-  "yres.cmpSub": "Your exact year again, with the same emergencies. In every row, emergencies are paid from savings when there's enough, otherwise the card. Only the help changes.",
+  "yres.cmpSub": "Your exact year again, same emergencies. Only the help changes.",
   "yres.cmpNone": "No extra help",
   "yres.cmpMore": "Why more skipped meals in the {rows} row? The extra money went first to rent and bills you had fallen behind on, so food didn't get it. Your debt went down instead.",
   "yres.cmpMoreRaise": "Why more skipped meals in the {rows} row? The extra money went first to rent and bills you had fallen behind on, and SNAP gets smaller when pay goes up or child care costs go down, so less was left for food. Your debt went down instead.",
@@ -885,6 +910,11 @@ const TEXT = {
   "cut.food.sub": "Smaller meals. Skip some. Hope it's enough.",
   "cut.notOption": "Not really an option",
   "cut.yes": "Food is the one bill nobody comes to collect. So food is what gives.",
+  "cut.yesCard": "From now on, when food runs short, groceries go on the card, until it hits its {limit} limit. Then food is what gives.",
+  "cut.card": "Put groceries on the credit card",
+  "cut.card.sub": "Eat now, pay later at {apr} interest. The minimum payment comes out of every paycheck after this.",
+  "cut.cardStat": "{has} in 100 adults at this income have a credit card. {carry} in 100 of them carry a balance.",
+  "year.maxed": "In {month}, the card hit its {limit} limit. No more groceries on credit. Now food is what gives.",
   "cut.next": "See how far the food goes",
 
   "food.kicker": "Day 1–30 · Groceries",
@@ -1158,6 +1188,8 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
   const events = rollYear(seed, c.transport === "car");
   const days = CONFIG.daysInMonth;
   let cash = startSavings, card = 0, behind = 0, snapCarry = 0, interestPaid = 0;
+  const limit = CONFIG.card.creditLimit || Infinity, room = () => Math.max(0, limit - card);
+  const foodOnCard = (choices && choices.food === "card") || !!opts.foodOnCard;   // player chose to buy groceries on the card when short
   const months = [];
   for (let m = 0; m < CONFIG.year.months; m++) {
     const rec = { m, startCash: cash, startCard: card, startBehind: behind, events: [], refund: 0 };
@@ -1189,8 +1221,11 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
         if (opts.policy) how = cash >= ev.cost ? opts.policy(ev, { cash, foodCashNeeded }) : "card";
         else { months.push(Object.assign(rec, { partial: true })); return { months, pending: { m, i, ev, cash }, refund, base, card, cash, behind, interestPaid, events }; }
       }
-      if (how === "savings") cash -= ev.cost; else card += ev.cost;
-      rec.events.push(Object.assign({}, ev, { how }));
+      let unpaid = 0;
+      if (how === "savings") cash -= ev.cost;
+      else { const put = Math.min(ev.cost, room()); card += put; unpaid = ev.cost - put; }   // over the limit: the rest becomes an unpaid bill
+      if (unpaid > 0.005) { behind += unpaid; rec.behindAdded += unpaid; }
+      rec.events.push(Object.assign({}, ev, { how, unpaid }));
     }
     // 4) Food: SNAP first, then cash. Whatever's missing is skipped meals.
     const snapUsed = Math.min(snapAvail, need);
@@ -1198,19 +1233,31 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     const cashFood = Math.min(cash, need - snapUsed);
     cash -= cashFood;
     rec.snapUsed = snapUsed; rec.cashFood = cashFood;
-    rec.foodGap = Math.max(0, need - snapUsed - cashFood);
+    let gap = Math.max(0, need - snapUsed - cashFood);
+    rec.cardFood = 0;
+    if (foodOnCard && gap > 0.005) {             // groceries on the card, up to the credit limit
+      rec.cardFood = Math.min(gap, room()); card += rec.cardFood; gap -= rec.cardFood;
+      if (gap > 0.005) rec.cardMaxed = true;
+    }
+    rec.foodGap = gap;
     rec.mealsSkipped = Math.min(base.totalMeals, Math.round(rec.foodGap / base.perMeal));
-    rec.daysFed = Math.min(days, Math.floor((snapUsed + cashFood) / need * days));
+    rec.daysFed = Math.min(days, Math.floor((snapUsed + cashFood + rec.cardFood) / need * days));
     // 5) Catch up on bills you were behind on, if money is left
     if (cash > 0 && behind > 0) { const p = Math.min(cash, behind); cash -= p; behind -= p; rec.behindPaid = p; }
+    // 6) Pay down the card with cash beyond one month of groceries (a 22% card costs more than cash earns)
+    if (card > 0.005 && cash > need) { const p = Math.min(card, cash - need); cash -= p; card -= p; rec.cardExtra = p; }
     rec.endCash = cash; rec.endCard = card; rec.endBehind = behind;
     months.push(rec);
   }
   return { months, pending: null, refund, base, card, cash, behind, interestPaid, events,
     netWorth: cash - card - behind,
     mealsSkipped: months.reduce((a, r) => a + r.mealsSkipped, 0),
-    shortMonths: months.filter((r) => r.foodGap > 0.005).length };
+    shortMonths: months.filter((r) => r.foodGap > 0.005).length,
+    redMonths: months.filter(isRedMonth).length };
 }
+
+// A month is "red" when food ran short, a bill went unpaid, or groceries went on the credit card
+function isRedMonth(r) { return r.foodGap > 0.005 || r.behindAdded > 0.5 || (r.cardFood || 0) > 0.5; }
 
 function startSavingsAmount(opt, cityKey, c, wage) {
   if (opt !== "3mo") return Number(opt) || 0;
@@ -1224,15 +1271,15 @@ function manyYears(cityKey, c, startSavings, opts) {
   opts = opts || {};
   const n = opts.runs || CONFIG.year.runs, out = [];
   for (let k = 0; k < n; k++) {
-    const y = simulateYear(cityKey, c, startSavings, 1000003 + k * 7919, null, { policy: defaultPolicy, wage: opts.wage, noSnap: opts.noSnap });
-    out.push({ debt: y.card + y.behind, cash: y.cash, net: y.netWorth, meals: y.mealsSkipped, shortMonths: y.shortMonths, events: y.events.reduce((a, l) => a + l.length, 0) });
+    const y = simulateYear(cityKey, c, startSavings, 1000003 + k * 7919, null, { policy: defaultPolicy, wage: opts.wage, noSnap: opts.noSnap, foodOnCard: opts.foodOnCard });
+    out.push({ debt: y.card + y.behind, cash: y.cash, net: y.netWorth, meals: y.mealsSkipped, shortMonths: y.shortMonths, red: y.redMonths, events: y.events.reduce((a, l) => a + l.length, 0) });
   }
   const pct = (f) => Math.round(out.filter(f).length / n * 100);
   const median = (arr) => { const s = arr.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
   return {
     runs: n, results: out,
     pctDebt: pct((x) => x.debt > 1), pctHungry: pct((x) => x.meals > 0), pctNoEvent: pct((x) => x.events === 0),
-    medianDebt: median(out.map((x) => x.debt)), medianNet: median(out.map((x) => x.net)), medianMeals: median(out.map((x) => x.meals))
+    medianDebt: median(out.map((x) => x.debt)), medianNet: median(out.map((x) => x.net)), medianMeals: median(out.map((x) => x.meals)), medianRed: median(out.map((x) => x.red))
   };
 }
 // </calc>
@@ -1531,7 +1578,7 @@ const screens = {
       <h2>${t("transport.title")}</h2>
       <div class="opts">
       ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate") })}
-      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper"),
+      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite(city().busCite || "estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper"),
         extra: `<div class="ptags"><span class="ptag">${t("transport.grocery")} <b>${fmt(CONFIG.food.usdaMonthly)}</b></span><span class="ar">→</span><span class="ptag red">${t("transport.corner")} <b>${fmt(CONFIG.food.usdaMonthly * (1 + CONFIG.food.convenienceMarkup))}</b></span></div>` })}
       </div>`;
   },
@@ -1601,7 +1648,7 @@ const screens = {
           ${p.type === "refund" && r.behindPaid ? `<div class="note">${t("refund.catchup", { amount: fmt(r.behindPaid) })}</div>` : ""}
           ${p.type === "refund" ? monthCard(r) : `<div class="note plain small">${t("refund.first")}</div>`}`;
       } else if (p.type === "cut") {
-        if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t("cut.yes")}</div>${monthCard(r)}`;
+        if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t(S.y.choices.food === "card" ? "cut.yesCard" : "cut.yes", { limit: fmt(CONFIG.card.creditLimit) })}</div>${monthCard(r)}`;
         else {
           const car = S.c.transport === "car", b = sim.base;
           body = `<h3 class="red" style="margin:0 0 6px">${t("cut.title")}</h3>
@@ -1611,9 +1658,13 @@ const screens = {
             ${opt({ act: "cut", val: "care", ico: "kid", title: t("cut.care"), price: fmt(b.care) })}
             ${opt({ act: "cut", val: "transport", ico: car ? "car" : "bus", title: t("cut.transport"), price: fmt(b.transport) })}
             ${opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "" })}
+            ${opt({ act: "cut", val: "card", ico: "card", title: t("cut.card"), price: "", sub: t("cut.card.sub", { apr: (CONFIG.card.apr * 100).toFixed(1) + "%" }) })}
             ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
-            </div>`;
+            </div>
+            <p class="small muted">${t("cut.cardStat", { has: CONFIG.card.hasCardPct, carry: CONFIG.card.carryPct })}${cite("Federal Reserve, 2026")}</p>`;
         }
+      } else if (p.type === "maxed") {
+        body = `<div class="note bad" style="font-size:17px">${t("year.maxed", { month: MONTHS[r.m], limit: fmt(CONFIG.card.creditLimit) })}</div>${monthCard(r)}`;
       } else if (p.type === "behind") {
         body = `<div class="note bad">${t("year.behind", { month: MONTHS[r.m], amount: fmt(r.behindAdded) })}</div>${monthCard(r)}`;
       } else body = monthCard(r);
@@ -1641,7 +1692,7 @@ const screens = {
     const sim = yearSim(), ms = sim.months, b = sim.base, c = city();
     const sum = (f) => ms.reduce((a, r) => a + f(r), 0);
     const shortMonths = ms.filter((r) => r.foodGap > 0.005);
-    const redMonths = ms.filter((r) => r.foodGap > 0.005 || r.behindAdded > 0.5);
+    const redMonths = ms.filter(isRedMonth);
     const totalShort = sum((r) => r.foodGap);
     const meals = sum((r) => r.mealsSkipped);
     const debt = sim.card, behind = sim.behind;
@@ -1665,9 +1716,7 @@ const screens = {
     const tiles = `<div class="tiles">
       ${tile(`${redMonths.length}<small>/12</small>`, t("yres.redMonths"), redMonths.length ? "red" : "accent")}
       ${tile(meals.toLocaleString("en-US"), t("yres.meals"), meals ? "red" : "accent")}
-      ${tile(fmt(totalShort), t("yres.short"), totalShort > 0.5 ? "red" : "accent")}
-      ${tile(fmt(debt), t("yres.card", { interest: fmt(sim.interestPaid) }), debt > 1 ? "red" : "accent")}
-      ${tile(fmt(behind), t("yres.behind"), behind > 1 ? "red" : "accent")}
+      ${tile(fmt(debt + behind), t("yres.debtTile", { card: fmt(debt), bills: fmt(behind) }), debt + behind > 1 ? "red" : "accent")}
       ${tile(fmt(sim.cash), t("yres.cash"), "")}
     </div>`;
 
@@ -1708,12 +1757,33 @@ const screens = {
       <p class="cap small">${t("yres.mcMedian", { debt: fmt(mc.medianDebt), meals: mc.medianMeals })}</p>
       <p class="cite">${t("yres.mcNote", { n: mc.runs.toLocaleString("en-US") })}</p></div>`;
 
+    // Mostly-green year: say how lucky it was, and how the same job goes with other choices
+    let bestCase = "";
+    if (redMonths.length <= 4) {
+      const nEv = ms.reduce((a, r) => a + r.events.length, 0);
+      const fewer = Math.round(mc.results.filter((x) => x.events <= nEv).length / mc.runs * 100);
+      const alts = [
+        S.c.transport !== "car" && [t("best.car"), { transport: "car" }],
+        S.c.housing !== "twoBR" && [t("best.twoBR"), { housing: "twoBR" }],
+        S.c.care !== "center" && [t("best.center"), { care: "center" }]
+      ].filter(Boolean);
+      const row = (label, m, cls) => `<tr class="${cls || ""}"><th>${label}</th><td class="n ${m.medianRed ? "red" : "accent"}">${m.medianRed}/12</td><td class="n ${m.medianMeals ? "red" : "accent"}">${m.medianMeals}</td><td class="n ${m.pctDebt ? "red" : "accent"}">${m.pctDebt}%</td></tr>`;
+      const lucky = fewer <= 33;   // a third of years or fewer have this few emergencies
+      bestCase = `<p class="section">${t(conscious === 3 ? (lucky ? "best.titleBestLucky" : "best.titleBest") : (lucky ? "best.title" : "best.titlePlain"))}</p>
+        <div class="note" style="font-size:16px">${conscious === 3 ? t("best.cheapest") + " " : ""}${t(lucky ? "best.luck" : "best.noLuck", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer })}</div>
+        ${alts.length ? `<div class="figure"><table class="cmp"><thead><tr><th>${t("best.head")}</th><th class="n">${t("yres.cmpRed")}</th><th class="n">${t("yres.cmpMeals")}</th><th class="n">${t("best.debtPct")}</th></tr></thead><tbody>
+          ${row(t("best.yours"), mc, "you")}
+          ${alts.map(([label, ch]) => row(label, manyYears(S.city, Object.assign({}, S.c, ch), yearStart(), { wage: S.wageOverride }))).join("")}
+        </tbody></table><p class="cap small muted">${t("best.note", { n: mc.runs.toLocaleString("en-US") })}</p></div>` : ""}`;
+    }
+
     // How close was it? (only shown when food never ran short in a normal month)
     const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;
     const noRefund = sim.netWorth - sim.refund.total;
     const typicalBill = CONFIG.help.typicalEmergency;
     const badPct = Math.round(mc.results.filter((x) => x.debt > 1 || x.meals > 0).length / mc.runs * 100);
     const closeList = `<ul class="close">
+      <li>${t("close.spare", { spare: fmt(Math.max(0, spareMo)) })}</li>
       <li>${t(noRefund < 0 ? "close.noRefundNeg" : "close.noRefund", { refund: fmt(sim.refund.total), net: fmt(Math.abs(noRefund)) })}</li>
       ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), months: (typicalBill / spareMo).toFixed(1) })}${cite("Federal Reserve, 2026")}</li>` : ""}
       <li>${t("close.odds", { n: evs.length === 0 ? "no" : evs.length, em: evs.length === 1 ? "emergency" : "emergencies", pct: badPct, runs: mc.runs.toLocaleString("en-US") })}</li>
@@ -1723,8 +1793,8 @@ const screens = {
     const H = CONFIG.help, w0 = S.wageOverride ?? c.wage, w1 = w0 * (1 + H.trainingRaise);
     const copayAt = (w) => Math.round(takeHomeFor(w).gross * H.childCareCopayPct);
     // Every row uses the same rule for emergencies (savings if there's enough, otherwise the card), so rows compare fairly
-    const run = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, null, Object.assign({ wage: w0, policy: defaultPolicy }, o));
-    const stat = (y) => ({ red: y.months.filter((x) => x.foodGap > 0.005 || x.behindAdded > 0.5).length, meals: y.mealsSkipped, debt: y.card + y.behind });
+    const run = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, null, Object.assign({ wage: w0, policy: defaultPolicy, foodOnCard: S.y.choices.food === "card" }, o));
+    const stat = (y) => ({ red: y.redMonths, meals: y.mealsSkipped, debt: y.card + y.behind });
     const cmp = [
       [t("yres.cmpNone"), stat(run({})), "you"],
       [t("yres.cmpTrainingShort"), stat(run({ wage: w1 })), "", true],
@@ -1754,14 +1824,12 @@ const screens = {
       ${tiles}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
       ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need);
-        if (g > 0.5) return `<p class="section">${t("yres.whyTitle")}</p><div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(g) })}</div>`;
-        return `<p class="section">${t("yres.closeTitle")}</p>
-          <div class="note" style="font-size:16px">${t("yres.whyThin", { spare: fmt(-g) })}</div>${closeList}`; })()}
-      <p class="section">${t("yres.yearTitle")}</p><div class="figure">${chart}</div>
-      <div class="note">${refundLine}</div>
+        if (g > 0.5) return `<div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(g) })}</div>`;
+        return `<p class="section">${t("yres.closeTitle")}</p>${closeList}`; })()}
+      ${bestCase}
       <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
       <p class="section">${t("yres.eventsTitle")}</p>${evList}
-      <p class="section">${t("results.snapTitle")}</p>${noSnap}
+      ${noSnap}
       <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
       <p class="section">${t("yres.cmpTitle")}</p>${cmpTable}${helpCards}
       ${ctx}
@@ -1803,8 +1871,12 @@ const screens = {
         <li>City of Minneapolis. <i>Minimum Wage, rate effective January 1, 2026.</i> <a href="https://www.minneapolismn.gov/" target="_blank" rel="noopener">minneapolismn.gov</a></li>
         <li>U.S. Department of Housing and Urban Development. <i>FY2026 Fair Market Rents</i> (Minneapolis-St. Paul-Bloomington, MN-WI MSA). <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank" rel="noopener">huduser.gov</a></li>
         <li>Child Care Aware of America. <i>2024 Affordability Analysis</i>, Tables I and II (full-time price, 4-year-old, center and family child care, by state). Statewide averages. <a href="https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf" target="_blank" rel="noopener">childcareaware.org</a></li>
-        <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>USDA Food Plans: Cost of Food Report (Thrifty Food Plan), January 2026.</i> <a href="https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports" target="_blank" rel="noopener">fns.usda.gov</a></li>
+        <li>U.S. Department of Agriculture, Food and Nutrition Administration. <i>Official USDA Thrifty Food Plan: U.S. Average, October 2026.</i> <a href="https://www.fna.usda.gov/sites/default/files/resource-files/CostofFoodOct2026Thrifty.pdf" target="_blank" rel="noopener">fns.usda.gov</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>SNAP Fiscal Year 2027 Cost-of-Living Adjustments.</i> <a href="https://www.fns.usda.gov/snap/allotment/cola" target="_blank" rel="noopener">fns.usda.gov</a></li>
+        <li>Federal Reserve Bank of Philadelphia. Large Bank Consumer Credit Card data (FR Y-14M): median credit limit, all accounts (RCCCBLIMPCT50) and new accounts with credit scores under 660 (RCCCOLIMMEDSCORELT660), via FRED. <a href="https://fred.stlouisfed.org/series/RCCCBLIMPCT50" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
+        <li>Board of Governors of the Federal Reserve System. G.19 Consumer Credit: interest rate on credit card plans, accounts assessed interest (TERMCBCCINTNS), via FRED. <a href="https://fred.stlouisfed.org/series/TERMCBCCINTNS" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
+        <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i>, "Credit," Table 40. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
+        <li>Metro Transit. "Transit Assistance Program (TAP)." <a href="https://www.metrotransit.org/fares-passes/tap/tap-riders/" target="_blank" rel="noopener">metrotransit.org</a></li>
         <li>Minnesota Statutes, section 142F.101 (SNAP: gross income at or below 200% of the federal poverty guidelines). <a href="https://www.revisor.mn.gov/statutes/cite/142F.101" target="_blank" rel="noopener">revisor.mn.gov</a></li>
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
@@ -1825,12 +1897,14 @@ const screens = {
         <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is what the lowest-income fifth of U.S. households actually spent in 2025 on cell phone service (${fmt(CONFIG.basicsItems.phone)}/yr), clothes and shoes (${fmt(CONFIG.basicsItems.clothes)}), personal care (${fmt(CONFIG.basicsItems.personal)}) and housekeeping supplies (${fmt(CONFIG.basicsItems.supplies)}). Those households average 1.5 people, so this is on the low side for a parent and child. Furniture, appliances, health care and entertainment are left out; utilities are already in the rent figures.</p>
         <p><b>Health insurance (parent):</b> MinnesotaCare, using the 2026 state premium table (the child is covered at $0: MinnesotaCare charges nothing for anyone under 21). Above MinnesotaCare's income limit, the parent would buy a marketplace plan with the premium tax credit (2026 IRS table). Deductibles and copays are not modeled; big medical bills show up as emergencies.</p>
         <p><b>Child care from a neighbor or relative:</b> the median paid "unlisted" home provider charged $3.60/hr for a 4-year-old in 2012 (NSECE), raised to today's dollars with the BLS day care price index. Free family care is not modeled.</p>
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), the bus pass (${fmt(CONFIG.cities.minneapolis.busPass)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
+        <p><b>Food:</b> USDA Thrifty Food Plan for October 2026: a woman 20–50 ($254.20) plus a child 4–5 ($188.50), plus 10% for a 2-person household, as USDA suggests = $487/mo.</p>
+        <p><b>Bus:</b> with a SNAP EBT card, Metro Transit's Transit Assistance Program (TAP) charges $1 a ride with a 2½-hour transfer. Two rides each workday = about $43/mo.</p>
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), the corner-store markup when you don't have a car (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), the credit card's minimum payment rule, and refund timing (March).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
         <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
         <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax.</p>
-        <p><b>Credit card:</b> ${Math.round(CONFIG.card.apr * 100)}% APR; minimum payment is the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimates). No credit limit is modeled, which is generous to the player.</p>
+        <p><b>Credit card:</b> ${(CONFIG.card.apr * 100).toFixed(2)}% interest (Federal Reserve average for accounts charged interest, Aug. 2026). Credit limit ${fmt(CONFIG.card.creditLimit)}, the median for all U.S. card accounts (Philadelphia Fed, 2026). That's generous: new cards for people with credit scores under 660 start at a median of $600. Charges past the limit become unpaid bills. Minimum payment: the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimate). Cash beyond one month of groceries goes to paying the card down. ${CONFIG.card.hasCardPct}% of adults earning $25,000–$49,999 have a credit card (Federal Reserve SHED 2025); the game assumes you do.</p>
         <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
         <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
@@ -1873,6 +1947,7 @@ function yAdvance() {
   y.shown = nextM;
   if (r.refund && !y.seenRefund) { y.seenRefund = true; y.panel = { type: "refund" }; }
   else if (r.foodGap > 0.005 && !y.cutDone) { y.cutDone = true; y.cutGap = r.foodGap; y.panel = { type: "cut" }; }
+  else if (r.cardMaxed && !y.seenMaxed) { y.seenMaxed = true; y.panel = { type: "maxed" }; }
   else if (r.behindAdded > 0.5 && !y.seenBehind) { y.seenBehind = true; y.panel = { type: "behind" }; }
   else y.panel = { type: "month" };
   yRender();
@@ -1880,7 +1955,7 @@ function yAdvance() {
 }
 // red: food or bills fell short. amber: everything was paid, but only by spending money left from earlier months. green: money to spare
 function monthChange(r) { return (r.endCash - r.endCard - r.endBehind) - (r.startCash - r.startCard - (r.startBehind || 0)); }
-function monthState(r) { return r.foodGap > 0.005 || r.behindAdded > 0.5 ? "bad" : monthChange(r) < -0.5 ? "dip" : "ok"; }
+function monthState(r) { return isRedMonth(r) ? "bad" : monthChange(r) < -0.5 ? "dip" : "ok"; }
 // One month's money, line by line
 function monthCard(r) {
   const b = yearSim().base;
@@ -1889,14 +1964,16 @@ function monthCard(r) {
   const short = r.foodGap > 0.005;
   return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
   ${st === "dip" ? `<p class="small muted" style="margin:-4px 0 10px">${t("mc.dip", { cash: fmt(r.startCash) })}</p>` : ""}
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
     ${ln(t("mc.bills", null, true), "−" + fmt(b.housing + b.care + b.transport + b.basics))}
     ${r.cardPay > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(r.cardPay)) : ""}
     ${r.events.map((e) => ln(t("ev." + e.id + ".short", null, true) + (e.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), (e.how === "card" ? "" : "−") + fmt(e.cost), e.how === "card" ? "muted" : "")).join("")}
+    ${r.cardFood > 0.5 ? ln(`<span class="red">${t("mc.cardFood", null, true)}</span>`, `<span class="red">${fmt(r.cardFood)}</span>`) : ""}
     ${r.behindPaid ? ln(t("mc.catchup", null, true), "−" + fmt(r.behindPaid)) : ""}
+    ${r.cardExtra > 0.5 ? ln(t("mc.cardExtra", null, true), "−" + fmt(r.cardExtra)) : ""}
     ${r.behindAdded > 0.5 ? ln(`<span class="red">${t("mc.behind", null, true)}</span>`, `<span class="red">${fmt(r.behindAdded)}</span>`) : ""}
     ${ln(t("mc.end", null, true), fmt(r.endCash), "tot")}
   </div>`;
@@ -1905,13 +1982,14 @@ function monthCard(r) {
 function eventPanel(p) {
   const e = p.ev, ec = CONFIG.events.find((x) => x.id === e.id);
   const canSave = p.cash >= e.cost;
-  const newBal = yearSim().card + e.cost;   // card balance right now, plus this bill
+  const curBal = yearSim().card, roomLeft = Math.max(0, CONFIG.card.creditLimit - curBal);
+  const newBal = curBal + Math.min(e.cost, roomLeft);   // card balance right now, plus this bill (up to the limit)
   const mp = cardMinPayment(newBal).pay;
   return `${notif(EV_ICON[e.id], "red", t("ev." + e.id + ".app"), t("ev." + e.id + ".title"), t("ev." + e.id + ".text", { cost: fmt(e.cost) }))}
     <div class="figure"><p class="cap">${t("ev.stat", { pct: Math.round(ec.annualChance * 100), what: t("ev." + e.id + ".short", null, true).toLowerCase() })}${cite("Federal Reserve, 2026")}</p></div>
     <div class="opts">
       ${(() => { const s = opt({ act: "yev", val: "savings", ico: "dollar", title: t("ev.savings"), price: fmt(e.cost), sub: canSave ? t("ev.savings.sub", { cash: fmt(p.cash) }) : t("ev.savings.no", { cash: fmt(p.cash) }), tag: canSave ? t("tag.noDebt") : "" }); return canSave ? s : s.replace('<button class="opt"', '<button class="opt nope" disabled'); })()}
-      ${opt({ act: "yev", val: "card", ico: "card", title: t("ev.card"), price: fmt(e.cost), sub: t("ev.card.sub", { bal: fmt(newBal), pay: fmt(mp), apr: Math.round(CONFIG.card.apr * 100) + "%" }) + cite("estimate") })}
+      ${opt({ act: "yev", val: "card", ico: "card", title: t("ev.card"), price: fmt(e.cost), sub: (roomLeft < e.cost ? t("ev.card.limit", { room: fmt(roomLeft), rest: fmt(e.cost - roomLeft) }) : t("ev.card.sub", { bal: fmt(newBal), pay: fmt(mp), apr: (CONFIG.card.apr * 100).toFixed(1) + "%" })) + cite("Federal Reserve, 2026") })}
     </div>`;
 }
 
@@ -1975,8 +2053,9 @@ document.addEventListener("click", async (e) => {
   if (!b || locked || b.closest("#edbar,#ebPop,#ebSheet")) return;
   const { act, val } = b.dataset;
   if (act === "cut") {
-    if (val !== "food") return cutNo(b, val);
+    if (val !== "food" && val !== "card") return cutNo(b, val);
     locked = true; b.classList.add("picked"); buzz(15); await wait(400); locked = false;
+    S.y.choices.food = val === "card" ? "card" : "skip";
     S.y.cutPicked = true; return yRender();
   }
   if (act === "savings") {

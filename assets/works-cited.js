@@ -53,9 +53,8 @@ window.WORKS_CITED = [
 
   { text: "\"SNAP Cost-of-Living Adjustment (COLA) Information.\" Food and Nutrition Administration, U.S. Department of Agriculture, www.fna.usda.gov/snap/allotment/cola. Accessed 20 Nov. 2026.",
     url: "https://www.fna.usda.gov/snap/allotment/cola", usedIn: "Game (SNAP FY2027 amounts)" },
-
-  { text: "\"USDA Food Plans: Monthly Cost of Food Reports.\" Food and Nutrition Administration, U.S. Department of Agriculture, www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports. Accessed 20 Nov. 2026.",
-    url: "https://www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports", usedIn: "Game (Thrifty Food Plan)" },
+  { text: "U.S. Department of Agriculture, Food and Nutrition Administration. *Official USDA Thrifty Food Plan: U.S. Average, October 2026*. Nov. 2026, www.fna.usda.gov/sites/default/files/resource-files/CostofFoodOct2026Thrifty.pdf.",
+    url: "https://www.fna.usda.gov/sites/default/files/resource-files/CostofFoodOct2026Thrifty.pdf", usedIn: "Game (food budget: $487/mo for a parent and a 4-year-old)" },
 
   { "text":"Katz, Lawrence F., et al. \"Why Do Sectoral Employment Programs Work? Lessons from WorkAdvance.\" NBER Working Paper no. 28248, National Bureau of Economic Research, Dec. 2020, www.nber.org/papers/w28248.","url":"https://www.nber.org/papers/w28248","usedIn":"Game results (what extra help would change): job training raised earnings 11–40%" },
 
@@ -89,5 +88,15 @@ window.WORKS_CITED = [
 
   { "text":"Ullrich, Rebecca, and Aaron Sojourner. *Child Care Is Key to Our Economic Recovery: Technical Appendix*. Center for Law and Social Policy, Apr. 2020, www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf.","url":"https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf","usedIn":"Game (what paid neighbors and relatives charge for child care, from the National Survey of Early Care and Education)" },
 
-  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" }
+  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" },
+
+  { "text":"Federal Reserve Bank of Philadelphia. \"Large Bank Consumer Credit Card Balances: Current Credit Limit: 50th Percentile (RCCCBLIMPCT50).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/RCCCBLIMPCT50. Accessed 24 Nov. 2026.","url":"https://fred.stlouisfed.org/series/RCCCBLIMPCT50","usedIn":"Game (credit limit: $5,450 median)" },
+
+  { "text":"Federal Reserve Bank of Philadelphia. \"Large Bank Consumer Credit Card Originations: Median Original Credit Limit by Credit Score Group: <660 Credit Score (RCCCOLIMMEDSCORELT660).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/RCCCOLIMMEDSCORELT660. Accessed 24 Nov. 2026.","url":"https://fred.stlouisfed.org/series/RCCCOLIMMEDSCORELT660","usedIn":"Game (new cards for lower credit scores: $600 median limit)" },
+
+  { "text":"Board of Governors of the Federal Reserve System. \"Commercial Bank Interest Rate on Credit Card Plans, Accounts Assessed Interest (TERMCBCCINTNS).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/TERMCBCCINTNS. Accessed 24 Nov. 2026.","url":"https://fred.stlouisfed.org/series/TERMCBCCINTNS","usedIn":"Game (credit card interest: 22.36%)" },
+
+  { "text":"\"Credit.\" *Economic Well-Being of U.S. Households in 2025*, Board of Governors of the Federal Reserve System, May 2026, www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm.","url":"https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm","usedIn":"Game (71% at this income have a credit card; 57% of them carry a balance)" },
+
+  { "text":"\"Transit Assistance Program (TAP).\" *Metro Transit*, Metropolitan Council, www.metrotransit.org/fares-passes/tap/tap-riders/. Accessed 24 Nov. 2026.","url":"https://www.metrotransit.org/fares-passes/tap/tap-riders/","usedIn":"Game (bus: $1 rides with a SNAP EBT card)" }
 ];
