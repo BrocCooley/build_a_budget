@@ -682,6 +682,7 @@ const TEXT = {
   "ev.legal.short": "Fine or legal bill",
 
   "yres.leadDebt": "You ended the year {amount} in debt.",
+  "yres.leadDebtCash": "You ended the year {amount} in debt, with only {cash} in cash.",
   "yres.leadHungry": "You stayed out of debt, but the food didn't last.",
   "yres.leadOk": "You made it through the year.",
   "yres.redMonths": "months in the red",
@@ -885,7 +886,7 @@ const TEXT = {
   "final.kicker": "The bigger picture",
   "final.stat": "of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.",
   "final.grid": "About **{n} in every 100** households.",
-  "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and one surprise bill.",
+  "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and emergencies at real-world odds.",
   "final.sources": "Sources",
   "final.again": "Play again",
   "final.credit": "Build a Budget · Created by Ryan Cooley"
@@ -1562,7 +1563,9 @@ const screens = {
 
     // Headline
     let head;
-    if (debt + behind > 1) head = t("yres.leadDebt", { amount: `<span class="red">${fmt(debt + behind)}</span>` });
+    if (debt + behind > 1) head = sim.cash > 1
+      ? t("yres.leadDebtCash", { amount: `<span class="red">${fmt(debt + behind)}</span>`, cash: fmt(sim.cash) })
+      : t("yres.leadDebt", { amount: `<span class="red">${fmt(debt + behind)}</span>` });
     else if (meals > 0) head = t("yres.leadHungry");
     else head = t("yres.leadOk");
 
