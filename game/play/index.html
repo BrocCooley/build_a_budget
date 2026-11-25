@@ -486,31 +486,7 @@ const CONFIG = {
   payrollTaxRate: 0.0765,        // Social Security 6.2% + Medicare 1.45% (FICA). Take-home = gross × (1 − 0.0765) = gross × 0.9235
 
   cities: {
-    fargo: {
-      name: "Fargo, ND",
-      wage: 16.07,               // BLS OEWS May 2025, median hourly wage, Cashiers (41-2011), Fargo ND-MN metro (BLS series OEUM002202000000041201108 = 16.07, checked Nov 2026)
-      wageLabel: "Median cashier pay: half of Fargo cashiers earn less",
-      wageCite: "BLS, 2025",
-      rent: {
-        oneBR: 917,              // HUD FY2026 Fair Market Rent, 1BR, Fargo ND-MN MSA
-        twoBR: 1112              // HUD FY2026 Fair Market Rent, 2BR, Fargo ND-MN MSA
-      },
-      rentCite: "HUD, 2026",
-      childCare: {
-        center: 906,             // Child Care Aware of America, 2024 Affordability Analysis, Table I: ND center, 4-year-old, $10,869/yr ÷ 12
-        home: 789                // Child Care Aware of America, 2024 Affordability Analysis, Table II: ND family child care, 4-year-old, $9,473/yr ÷ 12
-      },
-      childCareCiteCenter: "Child Care Aware, 2024",
-      childCareCiteHome: "Child Care Aware, 2024",
-      busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
-      busNote: "MATBUS runs 6:15 a.m. to 10:15 p.m. on weekdays, from 7:15 a.m. on Saturday, and not at all on Sunday. Early and weekend shifts are hard to reach.",
-      busNoteCite: "MATBUS, 2026",   // matbus.com/riding-matbus/matbus-hours-of-service, checked Nov 24 2026
-      stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
-      stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009.",
-      health: "aca",             // Parent earns too much for ND Medicaid (adults: $2,489/mo for 2, eff. Apr 1 2026, ND HHS) -> marketplace plan with the premium tax credit. Kid: ND CHIP
-      kidHealth: "CHIP",
-      healthCite: "IRS, 2025; HHS, 2025"
-    },
+    // Minneapolis only (the game used to include Fargo, ND)
     minneapolis: {
       name: "Minneapolis, MN",
       wage: 16.37,               // City of Minneapolis minimum wage, effective Jan 1, 2026
@@ -815,7 +791,7 @@ const TEXT = {
   "intro.tag2": "Kid, age 4",
   "intro.tag3": "Cashier, 40 hrs/week",
   "intro.lead": "Set up your budget. Then live a year of it and see if the food lasts.",
-  "intro.pick": "Choose your city",
+  "intro.pick": "Your city",
   "intro.stubPay": "{wage}/hr × {hours} hrs",
   "intro.stubTax": "Payroll tax (7.65%)",
   "intro.stubNet": "Take-home / month",
@@ -965,7 +941,6 @@ const TEXT = {
   "results.receipt": "See the full receipt",
   "results.next": "What this means",
   "results.raiseBtn": "Replay earning {wage}/hr",
-  "results.otherCity": "Try {city}",
   "results.replay": "Replay from the start",
 
   "label.rent": "Rent",
@@ -1517,7 +1492,7 @@ const screens = {
       <h1><span>${t("intro.title1")}</span><span>${t("intro.title2")}</span><span>${t("intro.title3")}</span></h1>
       <div class="who"><span>${icon("parent")}${t("intro.tag1")}</span><span>${icon("kid")}${t("intro.tag2")}</span><span>${icon("cart")}${t("intro.tag3")}</span></div>
       <p class="lead">${t("intro.lead")}</p>
-      <div class="opts"><p class="kicker" style="margin-top:20px">${t("intro.pick")}</p>${cityBtn("minneapolis")}${cityBtn("fargo")}</div>
+      <div class="opts"><p class="kicker" style="margin-top:20px">${t("intro.pick")}</p>${cityBtn("minneapolis")}</div>
     </div>`;
   },
 
@@ -1774,7 +1749,6 @@ const screens = {
     </div>`;
     const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
     const raise = first.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${first.wageToClose}">${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) })}</button>` : "";
-    const other = S.city === "fargo" ? "minneapolis" : "fargo";
     return `<p class="kicker">${t("results.choices3", { n: conscious })}</p>
       <p class="headline">${head}</p>
       ${tiles}
@@ -1797,7 +1771,6 @@ const screens = {
         <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
         <button class="btn secondary" data-act="yreplay">${t("yres.sameYear")}</button>
         ${raise}
-        <button class="btn secondary" data-act="otherCity">${t("results.otherCity", { city: CONFIG.cities[other].name.split(",")[0] })}</button>
         <button class="btn link" data-act="replay">${t("results.replay")}</button>
       </div>`;
   },
@@ -1827,9 +1800,8 @@ const screens = {
     return `
       <h2>Sources</h2>
       <ol class="sources">
-        <li>U.S. Bureau of Labor Statistics. <i>Occupational Employment and Wage Statistics, May 2025: Cashiers (41-2011), Fargo, ND-MN.</i> <a href="https://www.bls.gov/oes/" target="_blank" rel="noopener">bls.gov/oes</a></li>
         <li>City of Minneapolis. <i>Minimum Wage, rate effective January 1, 2026.</i> <a href="https://www.minneapolismn.gov/" target="_blank" rel="noopener">minneapolismn.gov</a></li>
-        <li>U.S. Department of Housing and Urban Development. <i>FY2026 Fair Market Rents</i> (Fargo, ND-MN MSA; Minneapolis-St. Paul-Bloomington, MN-WI MSA). <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank" rel="noopener">huduser.gov</a></li>
+        <li>U.S. Department of Housing and Urban Development. <i>FY2026 Fair Market Rents</i> (Minneapolis-St. Paul-Bloomington, MN-WI MSA). <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank" rel="noopener">huduser.gov</a></li>
         <li>Child Care Aware of America. <i>2024 Affordability Analysis</i>, Tables I and II (full-time price, 4-year-old, center and family child care, by state). Statewide averages. <a href="https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf" target="_blank" rel="noopener">childcareaware.org</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>USDA Food Plans: Cost of Food Report (Thrifty Food Plan), January 2026.</i> <a href="https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports" target="_blank" rel="noopener">fns.usda.gov</a></li>
         <li>U.S. Department of Agriculture, Food and Nutrition Service. <i>SNAP Fiscal Year 2027 Cost-of-Living Adjustments.</i> <a href="https://www.fns.usda.gov/snap/allotment/cola" target="_blank" rel="noopener">fns.usda.gov</a></li>
@@ -1837,9 +1809,8 @@ const screens = {
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. Rev. Proc. 2025-25 (2026 applicable percentage table). <a href="https://www.irs.gov/pub/irs-drop/rp-25-25.pdf" target="_blank" rel="noopener">irs.gov</a>; HHS ASPE, Poverty Guidelines. <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" rel="noopener">aspe.hhs.gov</a></li>
-        <li>Minnesota Department of Human Services. <i>MinnesotaCare Premium Estimator Table, 2026</i> (DHS-4139A). <a href="https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG" target="_blank" rel="noopener">edocs.dhs.state.mn.us</a>; North Dakota HHS, Medicaid eligibility. <a href="https://www.hhs.nd.gov/healthcare/medicaid/eligibility" target="_blank" rel="noopener">hhs.nd.gov</a></li>
+        <li>Minnesota Department of Human Services. <i>MinnesotaCare Premium Estimator Table, 2026</i> (DHS-4139A). <a href="https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG" target="_blank" rel="noopener">edocs.dhs.state.mn.us</a></li>
         <li>Ullrich, Rebecca, and Aaron Sojourner. <i>Child Care Is Key to Our Economic Recovery: Technical Appendix</i>. CLASP, 2020 (NSECE prices by provider type). <a href="https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf" target="_blank" rel="noopener">clasp.org</a>; BLS CPI, Day care and preschool (CUUR0000SEEB03).</li>
-        <li>MATBUS. "Hours of Service." <a href="https://www.matbus.com/riding-matbus/matbus-hours-of-service" target="_blank" rel="noopener">matbus.com</a> (checked Nov. 2026)</li>
         <li>U.S. Bureau of Labor Statistics. <i>Consumer Expenditure Surveys, 2025</i>, Table 1101: Quintiles of income before taxes. <a href="https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx" target="_blank" rel="noopener">bls.gov/cex</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i> (May 2026): unexpected expenses and savings. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. <i>Tax inflation adjustments for tax year 2025</i> (EITC, standard deduction, brackets); Child Tax Credit and dependent care credit rules for 2025. <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025" target="_blank" rel="noopener">irs.gov</a></li>
@@ -1849,17 +1820,16 @@ const screens = {
         <li>Internal Revenue Service. "2021 Child Tax Credit and Advance Child Tax Credit Payments — Topic A: General Information." <a href="https://www.irs.gov/credits-deductions/2021-child-tax-credit-and-advance-child-tax-credit-payments-topic-a-general-information" target="_blank" rel="noopener">irs.gov</a></li>
         <li>Shafer, Paul R., et al. "Association of the Implementation of Child Tax Credit Advance Payments With Food Insufficiency." <i>JAMA Network Open</i>, 2022. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8759005" target="_blank" rel="noopener">pmc.ncbi.nlm.nih.gov</a>; Bouchelle, Zoe, et al. "Food Insufficiency Following Discontinuation of Monthly Child Tax Credit Payments." <i>JAMA Health Forum</i>, 2022. <a href="https://chibe.upenn.edu/publications/food-insufficiency-following-discontinuation-of-monthly-child-tax-credit-payments-among-lower-income-us-households" target="_blank" rel="noopener">chibe.upenn.edu</a></li>
         <li>HHS ASPE. <i>Child Care Subsidy Eligibility and Receipt</i>, 2019 (Sept. 2022). <a href="https://aspe.hhs.gov/sites/default/files/documents/1d276a590ac166214a5415bee430d5e9/cy2019-child-care-subsidy-eligibility.pdf" target="_blank" rel="noopener">aspe.hhs.gov</a>; ACF, <i>2024 CCDF Final Rule Fact Sheet</i>. <a href="https://acf.gov/sites/default/files/documents/occ/2024_CCDF_Final_Rule_Fact_Sheet.pdf" target="_blank" rel="noopener">acf.gov</a>; "Restoring Flexibility in the Child Care and Development Fund." <i>Federal Register</i>, 12 May 2026. <a href="https://www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf" target="_blank" rel="noopener">federalregister.gov</a></li>
-        <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
       </ol>
       <div class="panel small">
         <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is what the lowest-income fifth of U.S. households actually spent in 2025 on cell phone service (${fmt(CONFIG.basicsItems.phone)}/yr), clothes and shoes (${fmt(CONFIG.basicsItems.clothes)}), personal care (${fmt(CONFIG.basicsItems.personal)}) and housekeeping supplies (${fmt(CONFIG.basicsItems.supplies)}). Those households average 1.5 people, so this is on the low side for a parent and child. Furniture, appliances, health care and entertainment are left out; utilities are already in the rent figures.</p>
-        <p><b>Health insurance (parent):</b> the child is covered at $0 (North Dakota CHIP; MinnesotaCare charges nothing for anyone under 21). Fargo: the parent earns too much for North Dakota Medicaid, so they buy a marketplace plan; with the premium tax credit they pay a set share of income for the benchmark silver plan (2026 IRS table; the larger pandemic-era credits ended after 2025). Minneapolis: MinnesotaCare, using the 2026 state premium table. Deductibles and copays are not modeled; big medical bills show up as emergencies.</p>
+        <p><b>Health insurance (parent):</b> MinnesotaCare, using the 2026 state premium table (the child is covered at $0: MinnesotaCare charges nothing for anyone under 21). Above MinnesotaCare's income limit, the parent would buy a marketplace plan with the premium tax credit (2026 IRS table). Deductibles and copays are not modeled; big medical bills show up as emergencies.</p>
         <p><b>Child care from a neighbor or relative:</b> the median paid "unlisted" home provider charged $3.60/hr for a 4-year-old in 2012 (NSECE), raised to today's dollars with the BLS day care price index. Free family care is not modeled.</p>
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
+        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), the bus pass (${fmt(CONFIG.cities.minneapolis.busPass)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
         <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
-        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax. North Dakota has no state family credits; no ND income tax is owed at this income (North Dakota's 0% bracket covers head-of-household taxable income up to about $65,000). The EITC uses the formula rather than the IRS table, so it can differ by a few dollars.</p>
+        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit and Working Family Credit, minus Minnesota income tax.</p>
         <p><b>Credit card:</b> ${Math.round(CONFIG.card.apr * 100)}% APR; minimum payment is the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimates). No credit limit is modeled, which is generous to the player.</p>
         <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
@@ -2038,7 +2008,6 @@ document.addEventListener("click", async (e) => {
   switch (act) {
     case "next": go(val); break;
     case "raise": restart(S.city, parseFloat(val)); break;
-    case "otherCity": restart(S.city === "fargo" ? "minneapolis" : "fargo"); break;
     case "replay": S.city = null; S.wageOverride = null; S.c = {}; S.y = null; meterShown = 0; go("intro"); break;
   }
 });
@@ -2298,7 +2267,7 @@ function startEditor() {
     const idx = order.indexOf(name);
     closePop();
     if (idx < 0) { S.city = null; S.c = {}; S.y = null; meterShown = 0; return go("intro"); }
-    if (!S.city) S.city = "fargo";
+    if (!S.city) S.city = "minneapolis";
     const prev = S.c, c = {};
     const pick = (k, d) => (c[k] = prev[k] || d);
     if (idx > 0) pick("housing", "oneBR");

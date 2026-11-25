@@ -4,7 +4,7 @@
 window.WORKS_CITED = [
 
   { text: "*Child Care in America: 2024 Affordability Analysis*. Child Care Aware of America, 2025, info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf.",
-    url: "https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf", usedIn: "Game (child care prices, 4-year-old, center and family child care, ND and MN)" },
+    url: "https://info.childcareaware.org/hubfs/Affordability_Analysis_Updated_2024.pdf", usedIn: "Game (child care prices, 4-year-old, center and family child care, Minnesota)" },
 
   { text: "Smith, Jordan-Marie. \"USDA Cancels Survey Tracking How Many Americans Struggle to Get Enough Food.\" *NPR*, 22 Sept. 2025, www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger.",
     url: "https://www.npr.org/2025/09/22/nx-s1-5549115/usda-food-insecurity-survey-hunger", usedIn: "Game (2024 was the last year USDA published the report)" },
@@ -25,7 +25,7 @@ window.WORKS_CITED = [
     url: "https://www.revenue.state.mn.us/mndor-pp/20636", usedIn: "Game (Minnesota income tax)" },
 
   { text: "\"Appendix B - Table of Standards.\" *SNAP Policy Manual*, North Dakota Department of Health and Human Services, effective 1 Oct. 2026, www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm.",
-    url: "https://www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm", usedIn: "Game (SNAP income limit)" },
+    url: "https://www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm", usedIn: "Game (SNAP income limit: 200% of poverty for a family of 2, the same limit Minnesota uses)" },
 
   { text: "Bostock, Mike. *us-atlas*. Version 3.0.1, GitHub, github.com/topojson/us-atlas.",
     url: "https://github.com/topojson/us-atlas", usedIn: "Map (state shapes)" },
@@ -45,9 +45,6 @@ window.WORKS_CITED = [
   { text: "\"HUD Fair Market Rents (FMRs) by State, County, and Metropolitan Areas.\" *HUD User*, U.S. Department of Housing and Urban Development, FY 2026, www.huduser.gov/portal/datasets/fmr.html.",
     url: "https://www.huduser.gov/portal/datasets/fmr.html", usedIn: "Game (rent)" },
 
-  { text: "\"Occupational Employment and Wage Statistics: Fargo, ND-MN, Cashiers (41-2011), May 2025.\" U.S. Bureau of Labor Statistics, data.bls.gov/oes/#/area/0022020. Accessed 20 Nov. 2026.",
-    url: "https://data.bls.gov/oes/#/area/0022020", usedIn: "Game (Fargo cashier wage: median $16.07/hr, BLS series OEUM002202000000041201108)" },
-
   { text: "\"Minneapolis Minimum Wage Increases to $16.37 for All Employers.\" City of Minneapolis, Dec. 2025, www.minneapolismn.gov/news/2025/december/minimum-wage/.",
     url: "https://www.minneapolismn.gov/news/2025/december/minimum-wage/", usedIn: "Game (Minneapolis wage)" },
 
@@ -57,9 +54,6 @@ window.WORKS_CITED = [
 
   { text: "\"SNAP Cost-of-Living Adjustment (COLA) Information.\" Food and Nutrition Administration, U.S. Department of Agriculture, www.fna.usda.gov/snap/allotment/cola. Accessed 20 Nov. 2026.",
     url: "https://www.fna.usda.gov/snap/allotment/cola", usedIn: "Game (SNAP FY2027 amounts)" },
-
-  { text: "\"State Minimum Wage Laws.\" Wage and Hour Division, U.S. Department of Labor, www.dol.gov/agencies/whd/minimum-wage/state. Accessed 20 Nov. 2026.",
-    url: "https://www.dol.gov/agencies/whd/minimum-wage/state", usedIn: "Game (North Dakota minimum wage)" },
 
   { text: "\"USDA Food Plans: Monthly Cost of Food Reports.\" Food and Nutrition Administration, U.S. Department of Agriculture, www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports. Accessed 20 Nov. 2026.",
     url: "https://www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports", usedIn: "Game (Thrifty Food Plan)" },
@@ -88,17 +82,13 @@ window.WORKS_CITED = [
 
   { "text":"U.S. Bureau of Labor Statistics. \"Table 1101. Quintiles of Income before Taxes: Annual Expenditure Means, Shares, Standard Errors, and Relative Standard Errors.\" *Consumer Expenditure Surveys, 2025*, 2026, www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx.","url":"https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx","usedIn":"Game (basic necessities: what the lowest-income fifth of households spends)" },
 
-  { "text":"Internal Revenue Service. *Rev. Proc. 2025-25*. 17 July 2025, www.irs.gov/pub/irs-drop/rp-25-25.pdf.","url":"https://www.irs.gov/pub/irs-drop/rp-25-25.pdf","usedIn":"Game (parent's health insurance in Fargo: 2026 premium tax credit table)" },
+  { "text":"Internal Revenue Service. *Rev. Proc. 2025-25*. 17 July 2025, www.irs.gov/pub/irs-drop/rp-25-25.pdf.","url":"https://www.irs.gov/pub/irs-drop/rp-25-25.pdf","usedIn":"Game (health insurance above MinnesotaCare's income limit: 2026 premium tax credit table)" },
 
   { "text":"\"Poverty Guidelines.\" Office of the Assistant Secretary for Planning and Evaluation, U.S. Department of Health and Human Services, aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines. Accessed 24 Nov. 2026.","url":"https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines","usedIn":"Game (health insurance income limits)" },
 
   { "text":"Minnesota Department of Human Services. *MinnesotaCare Premium Estimator Table: Effective January 1, 2026 – December 31, 2026*. DHS-4139A-ENG, Sept. 2025, edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG.","url":"https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG","usedIn":"Game (parent's health insurance in Minneapolis)" },
 
-  { "text":"\"Medicaid Eligibility.\" North Dakota Health and Human Services, www.hhs.nd.gov/healthcare/medicaid/eligibility. Accessed 24 Nov. 2026.","url":"https://www.hhs.nd.gov/healthcare/medicaid/eligibility","usedIn":"Game (parent earns too much for North Dakota Medicaid)" },
-
   { "text":"Ullrich, Rebecca, and Aaron Sojourner. *Child Care Is Key to Our Economic Recovery: Technical Appendix*. Center for Law and Social Policy, Apr. 2020, www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf.","url":"https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf","usedIn":"Game (what paid neighbors and relatives charge for child care, from the National Survey of Early Care and Education)" },
 
-  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" },
-
-  { "text":"\"Hours of Service.\" *MATBUS*, Metro Area Transit, www.matbus.com/riding-matbus/matbus-hours-of-service. Accessed 24 Nov. 2026.","url":"https://www.matbus.com/riding-matbus/matbus-hours-of-service","usedIn":"Game (Fargo bus hours: no Sunday service)" }
+  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" }
 ];

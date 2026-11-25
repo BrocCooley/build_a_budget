@@ -13,7 +13,7 @@ check(CONFIG.basicsMonthly === Math.round((bi.phone + bi.clothes + bi.personal +
 
 // 1) Tax refunds
 console.log("TAX REFUNDS (tax year 2025 rules, paid in March)");
-for (const city of ["fargo", "minneapolis"]) for (const care of ["center", "home"]) {
+for (const city of ["minneapolis"]) for (const care of ["center", "home"]) {
   const cc = CONFIG.cities[city], r = taxRefund(city, cc.wage, cc.childCare[care]);
   console.log(`  ${city.padEnd(11)} ${care.padEnd(6)} EITC ${$(r.eitc)} | care credit ${$(r.careCredit)} | CTC used ${$(r.ctcUsed)} + refundable ${$(r.actc)} | income tax ${$(r.incomeTax)} | MN credits ${$(r.mnCredits)} − MN tax ${$(r.mnTax)} | TOTAL ${$(r.total)}`);
   check(r.total > 0 && r.total < 10000, "refund out of range " + city);
@@ -32,8 +32,8 @@ console.log("\nEVENT ODDS CHECK (share of simulated years with at least one, vs.
 for (const e of CONFIG.events) { const got = counts[e.id] / N; console.log(`  ${e.id.padEnd(8)} simulated ${(got * 100).toFixed(1)}%  survey ${(e.annualChance * 100).toFixed(0)}%`); check(Math.abs(got - e.annualChance) < 0.01, "odds off for " + e.id); }
 
 // 4) One sample year, month by month
-console.log("\nSAMPLE YEAR: Fargo 1BR/home/car, $0 saved, seed 2024, player always uses the card");
-const y = simulateYear("fargo", c0, 0, 2024, null, { policy: () => "card" });
+console.log("\nSAMPLE YEAR: Minneapolis 1BR/home/car, $0 saved, seed 2024, player always uses the card");
+const y = simulateYear("minneapolis", c0, 0, 2024, null, { policy: () => "card" });
 const MON = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
 for (const r of y.months) console.log(`  ${MON[r.m]} events: ${r.events.map((e) => e.id + " " + $(e.cost)).join(", ") || "-"}${r.refund ? " | refund +" + $(r.refund) : ""} | cash ${$(r.endCash)} | card ${$(r.endCard)} (paid ${$(r.cardPay)}) | meals skipped ${r.mealsSkipped} | behind ${$(r.endBehind)}`);
 
@@ -41,7 +41,7 @@ for (const r of y.months) console.log(`  ${MON[r.m]} events: ${r.events.map((e) 
 // 6) 1,000-year summary for every setup and starting savings
 console.log("\n1,000 SIMULATED YEARS PER HOUSEHOLD (emergencies: savings if food is still covered, else card)");
 console.log("  household                       start   %end in debt  median debt  %any hunger  median meals skipped  median net worth");
-for (const city of ["fargo", "minneapolis"]) for (const housing of ["oneBR", "twoBR"]) for (const care of ["center", "home"]) for (const transport of ["car", "bus"]) {
+for (const city of ["minneapolis"]) for (const housing of ["oneBR", "twoBR"]) for (const care of ["center", "home"]) for (const transport of ["car", "bus"]) {
   const c = { housing, care, transport };
   for (const opt of [0]) {
     const start = startSavingsAmount(opt, city, c);

@@ -16,7 +16,7 @@ const m = (n) => (n < 0 ? "-" : " ") + "$" + Math.abs(n).toFixed(2);
 const rows = [];
 let failures = 0;
 
-for (const city of ["fargo", "minneapolis"]) {
+for (const city of ["minneapolis"]) {
   const th = computePath(city, { housing: "oneBR", care: "home", transport: "bus", surprise: "skip" });
   console.log(`\n${CONFIG.cities[city].name}: wage $${th.wage.toFixed(2)}/hr | gross $${th.gross.toFixed(2)}/mo | take-home $${th.net.toFixed(2)}/mo`);
   for (const housing of ["oneBR", "twoBR"])
@@ -35,7 +35,7 @@ for (const city of ["fargo", "minneapolis"]) {
             check = ok ? "ok" : "FAIL";
           }
           rows.push({
-            City: city === "fargo" ? "Fargo" : "Mpls",
+            City: "Mpls",
             Housing: housing, Care: care, Transp: transport, Surprise: surprise,
             Rent: r.housing, Care$: r.care, Trans$: r.transport, Basic$: r.basics, Surp$: r.surprise,
             "Cash left": m(r.leftover), SNAP: r.snap, "Food need": r.need.toFixed(0),
