@@ -64,5 +64,25 @@ window.WORKS_CITED = [
     url: "https://www.dol.gov/agencies/whd/minimum-wage/state", usedIn: "Game (North Dakota minimum wage)" },
 
   { text: "\"USDA Food Plans: Monthly Cost of Food Reports.\" Food and Nutrition Administration, U.S. Department of Agriculture, www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports. Accessed 20 Nov. 2026.",
-    url: "https://www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports", usedIn: "Game (Thrifty Food Plan)" }
+    url: "https://www.fna.usda.gov/research/cnpp/usda-food-plans/cost-food-monthly-reports", usedIn: "Game (Thrifty Food Plan)" },
+
+  { "text":"Katz, Lawrence F., et al. \"Why Do Sectoral Employment Programs Work? Lessons from WorkAdvance.\" NBER Working Paper no. 28248, National Bureau of Economic Research, Dec. 2020, www.nber.org/papers/w28248.","url":"https://www.nber.org/papers/w28248","usedIn":"Game results (what extra help would change): job training raised earnings 11–40%" },
+
+  { "text":"Schaberg, Kelsey. *Meeting the Needs of Job Seekers and Employers: A Synthesis of Findings on Sector Strategies*. MDRC, Sept. 2020, mdrc.org/work/publications/meeting-needs-job-seekers-and-employers.","url":"https://mdrc.org/work/publications/meeting-needs-job-seekers-and-employers","usedIn":"Game results (what extra help would change): Project QUEST +18% pay" },
+
+  { "text":"\"About.\" *Year Up United*, www.yearup.org/about. Accessed 24 Nov. 2026.","url":"https://www.yearup.org/about","usedIn":"Game results (what extra help would change): people served by job training" },
+
+  { "text":"*Per Scholas*, perscholas.org. Accessed 24 Nov. 2026.","url":"https://perscholas.org/","usedIn":"Game results (what extra help would change): people served by job training" },
+
+  { "text":"\"Occupational Employment and Wage Statistics: Cashiers (41-2011), National, May 2025.\" U.S. Bureau of Labor Statistics, data.bls.gov/oes/. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/oes/","usedIn":"Game results (what extra help would change): 3.1 million U.S. cashiers" },
+
+  { "text":"Shafer, Paul R., et al. \"Association of the Implementation of Child Tax Credit Advance Payments With Food Insufficiency in US Households.\" *JAMA Network Open*, vol. 5, no. 1, 2022, e2143296, https://doi.org/10.1001/jamanetworkopen.2021.43296.","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC8759005/","usedIn":"Game results (what extra help would change): monthly Child Tax Credit and food insufficiency" },
+
+  { "text":"Bouchelle, Zoe, et al. \"Food Insufficiency Following Discontinuation of Monthly Child Tax Credit Payments Among Lower-Income US Households.\" *JAMA Health Forum*, vol. 3, no. 11, Nov. 2022, jamanetwork.com/journals/jama-health-forum/fullarticle/2798435.","url":"https://chibe.upenn.edu/publications/food-insufficiency-following-discontinuation-of-monthly-child-tax-credit-payments-among-lower-income-us-households","usedIn":"Game results (what extra help would change): food insufficiency rose after payments ended" },
+
+  { "text":"*Child Care Subsidy Eligibility and Receipt: Calendar Year 2019*. Office of the Assistant Secretary for Planning and Evaluation, U.S. Department of Health and Human Services, Sept. 2022, aspe.hhs.gov/sites/default/files/documents/1d276a590ac166214a5415bee430d5e9/cy2019-child-care-subsidy-eligibility.pdf.","url":"https://aspe.hhs.gov/sites/default/files/documents/1d276a590ac166214a5415bee430d5e9/cy2019-child-care-subsidy-eligibility.pdf","usedIn":"Game results (what extra help would change): 16% of eligible children got child care help","verify":"Check the exact report title on the PDF cover" },
+
+  { "text":"*2024 CCDF Final Rule Fact Sheet*. Office of Child Care, Administration for Children and Families, U.S. Department of Health and Human Services, 2024, acf.gov/sites/default/files/documents/occ/2024_CCDF_Final_Rule_Fact_Sheet.pdf.","url":"https://acf.gov/sites/default/files/documents/occ/2024_CCDF_Final_Rule_Fact_Sheet.pdf","usedIn":"Game results (what extra help would change): 7% child care copay cap" },
+
+  { "text":"\"Restoring Flexibility in the Child Care and Development Fund (CCDF).\" *Federal Register*, vol. 91, 12 May 2026, www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf.","url":"https://www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf","usedIn":"Game results (what extra help would change): 7% copay cap repealed" }
 ];

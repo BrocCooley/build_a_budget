@@ -375,6 +375,24 @@ details.rec[open] summary::after{content:"−"}
 .pbar .track i.acc{background:var(--accent)}
 .opt.nope[disabled]{opacity:.55;animation:none}
 
+/* ---------- Same year, different help ---------- */
+table.cmp{width:100%;border-collapse:collapse;font-size:13.5px}
+table.cmp th,table.cmp td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+table.cmp thead th{font:700 10px/1.2 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+table.cmp td.n,table.cmp th.n{text-align:right;font-family:var(--mono);font-weight:700;white-space:nowrap}
+table.cmp td.red{color:var(--red)}
+table.cmp td.accent{color:var(--accent)}
+table.cmp tr.you th{font-weight:800}
+table.cmp tr.all{background:var(--accent-soft)}
+table.cmp tbody th{font-weight:600}
+.helpcards{display:grid;gap:10px;margin:0 0 14px}
+.helpcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.hc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.hc-top b{font-size:16px}
+.helpcard p{margin:0 0 6px;font-size:14.5px}
+.helpcard p.real{margin:0;color:var(--red)}
+.hc-k{font-weight:700}
+
 /* ---------- Final ---------- */
 .stat .big{font-size:76px}
 .stat p{font-size:17px}
@@ -574,6 +592,16 @@ const CONFIG = {
     cantCover100Under50k: 40
   },
 
+  // "Same year, different help" comparisons on the results screen
+  help: {
+    trainingRaise: 0.18,         // Project QUEST long-term earnings gain: +$5,239/yr, 18% (MDRC). Sector programs: +11% to +40% (Katz et al., NBER)
+    childCareCopayPct: 0.07,     // Federal CCDF cap on family copays, 7% of income (2024 rule; repealed effective July 13, 2026 — Federal Register)
+    subsidyReceiptPct: 16,       // "Of the 12.5 million children potentially eligible ... in 2019, 16 percent received subsidies" (HHS ASPE, Sept 2022)
+    trainedTotal: 87000,         // Year Up "52,000+ students served to date" (yearup.org/about) + Per Scholas "35,000+ learners served" (perscholas.org), checked Nov 2026
+    cashiersUS: 3089410,         // U.S. cashiers employed, May 2025 (BLS OEWS series OEUN000000000000041201101)
+    ctcFoodDropPct: 26           // Food insufficiency among families with children after monthly CTC began, July 2021 (Shafer et al., JAMA Network Open, 2022)
+  },
+
   // Tax refund, paid once a year (tax year 2025 rules). The game's monthly take-home already assumes
   // only payroll tax is withheld, so income tax owed is subtracted here, at tax time.
   tax: {
@@ -710,6 +738,28 @@ const TEXT = {
   "yres.mcMedian": "In a typical year: {debt} in debt, {meals} meals skipped.",
   "yres.mcNote": "Same household, {n} new random years with the same real odds. Emergencies paid from savings when possible, otherwise the card.",
   "yres.seed": "Replay code: {seed}. Anyone can replay this exact year by adding ?seed={seed} to the game's link.",
+  "yres.cmpTitle": "Same year, different help",
+  "yres.cmpSub": "Your exact year again, with the same emergencies. In every row, emergencies are paid from savings when there's enough, otherwise the card. Only the help changes.",
+  "yres.cmpNone": "No extra help",
+  "yres.cmpTrainingShort": "+18% pay (training)",
+  "yres.cmpMonthlyShort": "Monthly tax credits",
+  "yres.cmpCareShort": "Child care help",
+  "yres.cmpYours": "Your year",
+  "yres.cmpTraining": "Job training: +18% pay",
+  "yres.cmpMonthly": "Tax credits paid monthly",
+  "yres.cmpCare": "Child care help ({copay}/mo copay)",
+  "yres.cmpAll": "All three",
+  "yres.cmpRed": "Red months",
+  "yres.cmpMeals": "Meals skipped",
+  "yres.cmpDebt": "Debt (Dec.)",
+  "help.how": "How it could happen: ",
+  "help.real": "What actually happens: ",
+  "help.trainHow": "Job training for higher-paying fields raised earnings 11–40% in randomized studies. One program, Project QUEST, raised pay about 18% for years.",
+  "help.trainReal": "Two of the best-known programs have served about {trained} people in total, over all the years they've run. The U.S. has about {cashiers} cashiers right now.",
+  "help.monthlyHow": "In 2021, the Child Tax Credit was paid every month. Food insufficiency among families with kids dropped about {pct}% after the first payment.",
+  "help.monthlyReal": "The monthly payments ended in December 2021, and food insufficiency rose again. Today the credits come once a year, at tax time.",
+  "help.careHow": "Child care subsidies can limit what a family pays. From 2024 to 2026, federal rules capped family copays at 7% of income.",
+  "help.careReal": "In 2019, only {pct}% of children eligible for a federal child care subsidy got one. The 7% copay cap was repealed in July 2026.",
   "yres.newYear": "Play a new random year",
   "yres.sameYear": "Replay this exact year",
   "yres.raiseBtn": "Replay earning {wage}/hr",
@@ -1066,7 +1116,11 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
   opts = opts || {};
   const city = CONFIG.cities[cityKey];
   const wage = opts.wage != null ? opts.wage : city.wage;
-  const base = pathAtWage(city, Object.assign({}, c, { surprise: undefined }), wage);
+  let base = pathAtWage(city, Object.assign({}, c, { surprise: undefined }), wage);
+  if (opts.careCost != null) {                    // "what if": child care subsidy with a capped copay
+    base = Object.assign({}, base, { care: Math.min(base.care, opts.careCost) });
+    base.snap = snapBenefit(base.gross, base.housing, base.care);
+  }
   const snap = opts.noSnap ? 0 : base.snap;
   const fixed = base.housing + base.care + base.transport + base.basics;
   const refund = taxRefund(cityKey, wage, base.care);
@@ -1078,7 +1132,8 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     const rec = { m, startCash: cash, startCard: card, startBehind: behind, events: [], refund: 0 };
     // 1) Paycheck (and tax refund in March)
     cash += base.net;
-    if (m === CONFIG.year.refundMonth) { rec.refund = refund.total; cash += refund.total; }
+    if (opts.monthlyRefund) { rec.refund = refund.total / 12; cash += rec.refund; }   // "what if": credits paid monthly
+    else if (m === CONFIG.year.refundMonth) { rec.refund = refund.total; cash += refund.total; }
     // 2) Bills, then the card's minimum payment
     cash -= fixed;
     const cp = cardMinPayment(card);
@@ -1617,6 +1672,31 @@ const screens = {
       <p class="cap small">${t("yres.mcMedian", { debt: fmt(mc.medianDebt), meals: mc.medianMeals })}</p>
       <p class="cite">${t("yres.mcNote", { n: mc.runs.toLocaleString("en-US") })}</p></div>`;
 
+    // Same year, different help: replay this exact year (same emergencies, same choices) with one change
+    const H = CONFIG.help, w0 = S.wageOverride ?? c.wage, w1 = w0 * (1 + H.trainingRaise);
+    const copayAt = (w) => Math.round(takeHomeFor(w).gross * H.childCareCopayPct);
+    // Every row uses the same rule for emergencies (savings if there's enough, otherwise the card), so rows compare fairly
+    const run = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, null, Object.assign({ wage: w0, policy: defaultPolicy }, o));
+    const stat = (y) => ({ red: y.months.filter((x) => x.foodGap > 0.005 || x.behindAdded > 0.5).length, meals: y.mealsSkipped, debt: y.card + y.behind });
+    const cmp = [
+      [t("yres.cmpNone"), stat(run({})), "you"],
+      [t("yres.cmpTrainingShort"), stat(run({ wage: w1 })), ""],
+      [t("yres.cmpMonthlyShort"), stat(run({ monthlyRefund: true })), ""],
+      [t("yres.cmpCareShort"), stat(run({ careCost: copayAt(w0) })), ""],
+      [t("yres.cmpAll"), stat(run({ wage: w1, monthlyRefund: true, careCost: copayAt(w1) })), "all"]
+    ];
+    const cell = (v, txt) => `<td class="n ${v > 0.5 ? "red" : "accent"}">${txt}</td>`;
+    const cmpTable = `<div class="figure"><table class="cmp"><thead><tr><th></th><th class="n">${t("yres.cmpRed")}</th><th class="n">${t("yres.cmpMeals")}</th><th class="n">${t("yres.cmpDebt")}</th></tr></thead><tbody>
+      ${cmp.map(([label, x, cls]) => `<tr class="${cls}"><th>${label}</th>${cell(x.red, x.red + "/12")}${cell(x.meals, x.meals.toLocaleString("en-US"))}${cell(x.debt, fmt(x.debt))}</tr>`).join("")}
+      </tbody></table><p class="cap small muted">${t("yres.cmpSub")}</p></div>`;
+    const helpCard = (ico, title, how, howCite, real, realCite) => `<div class="helpcard"><div class="hc-top">${icon(ico)}<b>${title}</b></div>
+      <p><span class="hc-k">${t("help.how", null, true)}</span>${how}${cite(howCite)}</p>
+      <p class="real"><span class="hc-k">${t("help.real", null, true)}</span>${real}${cite(realCite)}</p></div>`;
+    const helpCards = `<div class="helpcards">
+      ${helpCard("dollar", t("yres.cmpTraining"), t("help.trainHow"), "Katz et al., 2021; MDRC", t("help.trainReal", { trained: H.trainedTotal.toLocaleString("en-US"), cashiers: (H.cashiersUS / 1e6).toFixed(1) + " million" }), "Year Up; Per Scholas; BLS, 2025")}
+      ${helpCard("card", t("yres.cmpMonthly"), t("help.monthlyHow", { pct: H.ctcFoodDropPct }), "Shafer et al., 2022", t("help.monthlyReal"), "Bouchelle et al., 2022")}
+      ${helpCard("kid", t("yres.cmpCare", { copay: fmt(copayAt(w0)) }), t("help.careHow"), "ACF, 2024", t("help.careReal", { pct: H.subsidyReceiptPct }), "HHS ASPE, 2022; Federal Register, 2026")}
+    </div>`;
     const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
     const raise = first.wageToClose ? `<button class="btn secondary" data-act="raise" data-val="${first.wageToClose}">${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) })}</button>` : "";
     const other = S.city === "fargo" ? "minneapolis" : "fargo";
@@ -1632,6 +1712,7 @@ const screens = {
       <p class="section">${t("yres.eventsTitle")}</p>${evList}
       <p class="section">${t("results.snapTitle")}</p>${noSnap}
       <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
+      <p class="section">${t("yres.cmpTitle")}</p>${cmpTable}${helpCards}
       ${ctx}
       <p class="small muted">${t("yres.seed", { seed: S.y.seed })}</p>
       <div class="actions">
@@ -1682,6 +1763,10 @@ const screens = {
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i> (May 2026): unexpected expenses and savings. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. <i>Tax inflation adjustments for tax year 2025</i> (EITC, standard deduction, brackets); Child Tax Credit and dependent care credit rules for 2025. <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025" target="_blank" rel="noopener">irs.gov</a></li>
         <li>Minnesota Department of Revenue. <i>Minnesota Child Tax Credit 2025</i>; 2025 standard deduction and income tax brackets. <a href="https://www.revenue.state.mn.us/child-tax-credit" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
+        <li>Katz, Lawrence F., et al. "Why Do Sectoral Employment Programs Work? Lessons from WorkAdvance." NBER Working Paper 28248. <a href="https://www.nber.org/system/files/working_papers/w28248/w28248.pdf" target="_blank" rel="noopener">nber.org</a>; MDRC on Project QUEST. <a href="https://mdrc.org/work/publications/meeting-needs-job-seekers-and-employers/file-full" target="_blank" rel="noopener">mdrc.org</a></li>
+        <li>Year Up United (52,000+ students served) <a href="https://www.yearup.org/about" target="_blank" rel="noopener">yearup.org</a>; Per Scholas (35,000+ learners served) <a href="https://perscholas.org/" target="_blank" rel="noopener">perscholas.org</a>; BLS OEWS, cashiers employment, May 2025.</li>
+        <li>Shafer, Paul R., et al. "Association of the Implementation of Child Tax Credit Advance Payments With Food Insufficiency." <i>JAMA Network Open</i>, 2022. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8759005" target="_blank" rel="noopener">pmc.ncbi.nlm.nih.gov</a>; Bouchelle, Zoe, et al. "Food Insufficiency Following Discontinuation of Monthly Child Tax Credit Payments." <i>JAMA Health Forum</i>, 2022. <a href="https://chibe.upenn.edu/publications/food-insufficiency-following-discontinuation-of-monthly-child-tax-credit-payments-among-lower-income-us-households" target="_blank" rel="noopener">chibe.upenn.edu</a></li>
+        <li>HHS ASPE. <i>Child Care Subsidy Eligibility and Receipt</i>, 2019 (Sept. 2022). <a href="https://aspe.hhs.gov/sites/default/files/documents/1d276a590ac166214a5415bee430d5e9/cy2019-child-care-subsidy-eligibility.pdf" target="_blank" rel="noopener">aspe.hhs.gov</a>; ACF, <i>2024 CCDF Final Rule Fact Sheet</i>. <a href="https://acf.gov/sites/default/files/documents/occ/2024_CCDF_Final_Rule_Fact_Sheet.pdf" target="_blank" rel="noopener">acf.gov</a>; "Restoring Flexibility in the Child Care and Development Fund." <i>Federal Register</i>, 12 May 2026. <a href="https://www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf" target="_blank" rel="noopener">federalregister.gov</a></li>
         <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
       </ol>
       <div class="panel small">
@@ -1872,7 +1957,7 @@ document.addEventListener("click", async (e) => {
    • "Send to Claude" copies your notes + text changes to paste into chat.
    ===================================================================== */
 let EDITOR = null;
-const LOCKED_TEXT = ["final.stat", "final.grid", "intro.stubTax", "savings.context", "ev.stat"];   // statistics: never editable
+const LOCKED_TEXT = ["final.stat", "final.grid", "intro.stubTax", "savings.context", "ev.stat", "help.trainHow", "help.trainReal", "help.monthlyHow", "help.monthlyReal", "help.careHow", "help.careReal"];   // statistics: never editable
 
 function startEditor() {
   const KEY = "build-a-budget-edits-v2", NKEY = "build-a-budget-notes";
