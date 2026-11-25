@@ -482,7 +482,11 @@ body.editmode .tk.tk-locked:hover{background:rgba(0,0,0,.05);box-shadow:0 0 0 2p
    (Easiest way to change things: open the game with ?edit at the end of the URL.)
    ===================================================================== */
 const CONFIG = {
-  hoursPerYear: 2080,            // 40 hrs/week × 52 weeks (full time)
+  hoursPerWeek: 40,              // Full time. BLS Employment Characteristics of Families 2025, Table 5: 80% of employed single mothers (6.02 of 7.54 million)
+                                 // usually work 35+ hours a week; BLS CPS 2025, Table 23: women in sales jobs who usually work full time average 40.5 hours.
+                                 // (Cashiers overall are mostly part-time: 1.0 of 2.49 million work full time; Minneapolis-area retail averages 25.7 hours.)
+  partTimeHours: 25.7,           // Minneapolis-area retail average, 2025 (BLS via FRED SMU27334604200000007A), for the comparison row
+  hoursPerYear: 40 * 52,         // = 2,080 hours a year
   payrollTaxRate: 0.0765,        // Social Security 6.2% + Medicare 1.45% (FICA). Take-home = gross × (1 − 0.0765) = gross × 0.9235
 
   cities: {
@@ -514,7 +518,8 @@ const CONFIG = {
   },
 
   transport: {
-    carMonthly: 350              // ESTIMATE — insurance + gas + payment on an older car
+    carMonthly: 342              // AAA Your Driving Costs 2025, for an older paid-off car (no loan, no depreciation) driven 10,000 miles/yr:
+                                 // fuel 13¢/mi ($1,300) + maintenance, repair & tires 11.04¢/mi ($1,104) + full-coverage insurance $1,694 = $4,098/yr ÷ 12
   },
 
   health: {
@@ -523,6 +528,7 @@ const CONFIG = {
     // IRS Rev. Proc. 2025-25, 2026 applicable percentage table: [from % FPL, to % FPL, initial %, final %] of income paid for the benchmark silver plan
     acaTable: [[0, 133, 2.10, 2.10], [133, 150, 3.14, 4.19], [150, 200, 4.19, 6.60], [200, 250, 6.60, 8.44], [250, 300, 8.44, 9.96], [300, 400, 9.96, 9.96]],
     // MinnesotaCare 2026 premium per adult, family of 2: [annual income up to, $/month] (MN DHS, DHS-4139A-ENG, eff. Jan 1 - Dec 31, 2026)
+    maParent2Annual: 28781,      // Minnesota Medical Assistance, parents, family of 2: 133% FPG = $28,781/yr, eff. 7/1/26–6/30/27 (MN DHS, DHS-3461A-ENG 6-26). $0 premium
     mnCare2: [[7402, 0], [11632, 4], [16919, 6], [19034, 8], [21149, 10], [23264, 12], [25379, 14], [27494, 15], [29609, 16], [31724, 25], [33839, 37], [35954, 44], [38069, 52], [40184, 61], [42299, 71], [42300, 80]]
   },
   ffnCare: {
@@ -551,7 +557,8 @@ const CONFIG = {
     usdaMonthly: 487,            // USDA Thrifty Food Plan, Oct 2026: female 20–50 $254.20 + child 4–5 $188.50 = $442.70, +10% for a 2-person household = $486.97
     adultFemale20to50: 254.20,   // USDA Thrifty Food Plan, Oct 2026
     child4to5: 188.50,           // USDA Thrifty Food Plan, Oct 2026
-    convenienceMarkup: 0.25,     // ESTIMATE — no car, so you shop at the nearby convenience store: food costs +25%
+    convenienceMarkup: 0,        // No markup. Low-income households spend only 2–3% of their food money at convenience stores (USDA ERS, Access to
+                                 // Amber Waves, 2010), and with $1 TAP fares a bus rider can reach a supermarket.
     people: 2,                   // Parent + 4-year-old
     mealsPerDay: 3,
     cite: "USDA, 2026"
@@ -746,6 +753,7 @@ const TEXT = {
   "best.car": "With a car",
   "best.twoBR": "With a 2-bedroom",
   "best.center": "With a licensed center",
+  "best.partTime": "Part-time ({h} hrs/wk)",
   "best.debtPct": "Years in debt",
   "best.note": "Typical (median) of {n} random years each. One change at a time.",
   "close.noRefund": "Without the **{refund}** March tax refund: only **{net}** left all year.",
@@ -847,9 +855,9 @@ const TEXT = {
   "transport.kicker": "Day 2 · Getting to work",
   "transport.title": "Car or bus?",
   "transport.car": "Keep your old car",
-  "transport.car.sub": "Payment, insurance, gas.",
+  "transport.car.sub": "An old car you own outright: gas, insurance, upkeep.",
   "transport.bus": "Take the bus",
-  "transport.bus.sub": "Catch: no car means groceries come from the corner store.",
+  "transport.bus.sub": "$1 a ride with your EBT card. Catch: every trip takes longer, with your kid along.",
   "transport.grocery": "Grocery store",
   "transport.corner": "Corner store",
   "transport.home": "HOME",
@@ -862,7 +870,7 @@ const TEXT = {
   "basics.clothes": "Clothes and shoes for you and your kid",
   "basics.personal": "Soap, shampoo, toothpaste, haircuts",
   "basics.supplies": "Laundry soap, cleaning supplies, toilet paper",
-  "basics.health": "Health insurance for you (your kid is covered free by {kid})",
+  "basics.health": "Health insurance for you and your kid",
   "basics.total": "Every month",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
@@ -1048,6 +1056,7 @@ function snapBenefit(gross, rent, childCare) {
 // Parent's monthly health insurance premium for this city and gross monthly pay
 function healthPremium(city, grossMonthly) {
   const H = CONFIG.health, annual = grossMonthly * 12;
+  if (city.health === "mncare" && annual <= H.maParent2Annual) return 0;   // Medical Assistance: no premium
   if (city.health === "mncare" && annual <= H.mnCare2[H.mnCare2.length - 1][0]) return H.mnCare2.find((b) => annual <= b[0])[1];
   const pct = annual / H.fpl2025For2 * 100;
   const row = H.acaTable.find((r) => pct < r[1]) || H.acaTable[H.acaTable.length - 1];
@@ -1577,9 +1586,8 @@ const screens = {
     return `${dots()}<p class="kicker">${t("transport.kicker")}</p>
       <h2>${t("transport.title")}</h2>
       <div class="opts">
-      ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate") })}
-      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite(city().busCite || "estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper"),
-        extra: `<div class="ptags"><span class="ptag">${t("transport.grocery")} <b>${fmt(CONFIG.food.usdaMonthly)}</b></span><span class="ar">→</span><span class="ptag red">${t("transport.corner")} <b>${fmt(CONFIG.food.usdaMonthly * (1 + CONFIG.food.convenienceMarkup))}</b></span></div>` })}
+      ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("AAA, 2025") })}
+      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite(city().busCite || "estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper") })}
       </div>`;
   },
 
@@ -1765,7 +1773,8 @@ const screens = {
       const alts = [
         S.c.transport !== "car" && [t("best.car"), { transport: "car" }],
         S.c.housing !== "twoBR" && [t("best.twoBR"), { housing: "twoBR" }],
-        S.c.care !== "center" && [t("best.center"), { care: "center" }]
+        S.c.care !== "center" && [t("best.center"), { care: "center" }],
+        [t("best.partTime", { h: CONFIG.partTimeHours }), {}, (S.wageOverride ?? c.wage) * CONFIG.partTimeHours / CONFIG.hoursPerWeek]   // same pay rate, typical retail hours
       ].filter(Boolean);
       const row = (label, m, cls) => `<tr class="${cls || ""}"><th>${label}</th><td class="n ${m.medianRed ? "red" : "accent"}">${m.medianRed}/12</td><td class="n ${m.medianMeals ? "red" : "accent"}">${m.medianMeals}</td><td class="n ${m.pctDebt ? "red" : "accent"}">${m.pctDebt}%</td></tr>`;
       const lucky = fewer <= 33;   // a third of years or fewer have this few emergencies
@@ -1773,7 +1782,7 @@ const screens = {
         <div class="note" style="font-size:16px">${conscious === 3 ? t("best.cheapest") + " " : ""}${t(lucky ? "best.luck" : "best.noLuck", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer })}</div>
         ${alts.length ? `<div class="figure"><table class="cmp"><thead><tr><th>${t("best.head")}</th><th class="n">${t("yres.cmpRed")}</th><th class="n">${t("yres.cmpMeals")}</th><th class="n">${t("best.debtPct")}</th></tr></thead><tbody>
           ${row(t("best.yours"), mc, "you")}
-          ${alts.map(([label, ch]) => row(label, manyYears(S.city, Object.assign({}, S.c, ch), yearStart(), { wage: S.wageOverride }))).join("")}
+          ${alts.map(([label, ch, w]) => row(label, manyYears(S.city, Object.assign({}, S.c, ch), yearStart(), { wage: w ?? S.wageOverride }))).join("")}
         </tbody></table><p class="cap small muted">${t("best.note", { n: mc.runs.toLocaleString("en-US") })}</p></div>` : ""}`;
     }
 
@@ -1877,6 +1886,12 @@ const screens = {
         <li>Board of Governors of the Federal Reserve System. G.19 Consumer Credit: interest rate on credit card plans, accounts assessed interest (TERMCBCCINTNS), via FRED. <a href="https://fred.stlouisfed.org/series/TERMCBCCINTNS" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i>, "Credit," Table 40. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Metro Transit. "Transit Assistance Program (TAP)." <a href="https://www.metrotransit.org/fares-passes/tap/tap-riders/" target="_blank" rel="noopener">metrotransit.org</a></li>
+        <li>U.S. Bureau of Labor Statistics. <i>Employment Characteristics of Families, 2025</i>, Table 5. <a href="https://www.bls.gov/news.release/famee.t05.htm" target="_blank" rel="noopener">bls.gov</a>; Current Population Survey 2025, Tables 11 and 23. <a href="https://www.bls.gov/cps/cpsaat23.htm" target="_blank" rel="noopener">bls.gov</a></li>
+        <li>U.S. Bureau of Labor Statistics. Average weekly hours, production and nonsupervisory employees, retail trade, Minneapolis-St. Paul-Bloomington MSA (SMU27334604200000007A), via FRED. <a href="https://fred.stlouisfed.org/series/SMU27334604200000007A" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
+        <li>AAA. <i>Your Driving Costs 2025</i> (fact sheet). <a href="https://newsroom.aaa.com/wp-content/uploads/2025/09/UPDATE-AAA-Fact-Sheet-Your-Driving-Cost-9.2025-1.pdf" target="_blank" rel="noopener">newsroom.aaa.com</a></li>
+        <li>Ver Ploeg, Michele, et al. "Access to Affordable, Nutritious Food Is Limited in Food Deserts." <i>Amber Waves</i>, USDA Economic Research Service, March 2010. <a href="https://www.ers.usda.gov/amber-waves/2010/march/access-to-affordable-nutritious-food-is-limited-in-food-deserts" target="_blank" rel="noopener">ers.usda.gov</a></li>
+        <li>Minnesota Department of Human Services. <i>Insurance Affordability Programs: Income and Asset Guidelines</i> (DHS-3461A, 6-26). <a href="https://edocs.dhs.state.mn.us/lfserver/Public/DHS-3461A-ENG" target="_blank" rel="noopener">edocs.dhs.state.mn.us</a></li>
+        <li>Chase. "How to Calculate Your Minimum Credit Card Payment." <a href="https://www.chase.com/personal/credit-cards/education/basics/how-to-calculate-your-minimum-credit-card-payment" target="_blank" rel="noopener">chase.com</a>; Internal Revenue Service, IR-2026-12 (refund timing). <a href="https://www.irs.gov/newsroom" target="_blank" rel="noopener">irs.gov</a></li>
         <li>Minnesota Statutes, section 142F.101 (SNAP: gross income at or below 200% of the federal poverty guidelines). <a href="https://www.revisor.mn.gov/statutes/cite/142F.101" target="_blank" rel="noopener">revisor.mn.gov</a></li>
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
@@ -1895,11 +1910,13 @@ const screens = {
       </ol>
       <div class="panel small">
         <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is what the lowest-income fifth of U.S. households actually spent in 2025 on cell phone service (${fmt(CONFIG.basicsItems.phone)}/yr), clothes and shoes (${fmt(CONFIG.basicsItems.clothes)}), personal care (${fmt(CONFIG.basicsItems.personal)}) and housekeeping supplies (${fmt(CONFIG.basicsItems.supplies)}). Those households average 1.5 people, so this is on the low side for a parent and child. Furniture, appliances, health care and entertainment are left out; utilities are already in the rent figures.</p>
-        <p><b>Health insurance (parent):</b> MinnesotaCare, using the 2026 state premium table (the child is covered at $0: MinnesotaCare charges nothing for anyone under 21). Above MinnesotaCare's income limit, the parent would buy a marketplace plan with the premium tax credit (2026 IRS table). Deductibles and copays are not modeled; big medical bills show up as emergencies.</p>
+        <p><b>Health insurance:</b> at this income the parent qualifies for Minnesota Medical Assistance (parents up to 133% of poverty, $28,781/yr for 2), which has no premium; the child is covered too. If pay rises above that, the parent moves to MinnesotaCare (2026 premium table), and above MinnesotaCare's limit to a marketplace plan with the premium tax credit (2026 IRS table).</p>
         <p><b>Child care from a neighbor or relative:</b> the median paid "unlisted" home provider charged $3.60/hr for a 4-year-old in 2012 (NSECE), raised to today's dollars with the BLS day care price index. Free family care is not modeled.</p>
         <p><b>Food:</b> USDA Thrifty Food Plan for October 2026: a woman 20–50 ($254.20) plus a child 4–5 ($188.50), plus 10% for a 2-person household, as USDA suggests = $487/mo.</p>
-        <p><b>Bus:</b> with a SNAP EBT card, Metro Transit's Transit Assistance Program (TAP) charges $1 a ride with a 2½-hour transfer. Two rides each workday = about $43/mo.</p>
-        <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), the corner-store markup when you don't have a car (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), the credit card's minimum payment rule, and refund timing (March).</p>
+        <p><b>Bus:</b> with a SNAP EBT card, Metro Transit's Transit Assistance Program (TAP) charges $1 a ride with a 2½-hour transfer. Two rides each workday = about $43/mo. Bus riders pay normal grocery prices: low-income households spend only 2–3% of their food money at convenience stores (USDA ERS, 2010).</p>
+        <p><b>Car:</b> an older car you own outright, 10,000 miles a year, using AAA's 2025 costs: fuel 13¢/mile, maintenance and repairs 11.04¢/mile, full-coverage insurance $1,694/yr = $342/mo. No car payment.</p>
+        <p><b>Hours:</b> full time, 40 hours a week. 8 in 10 employed single mothers usually work 35 hours or more (BLS, 2025), and women in sales jobs who work full time average 40.5 hours. Many cashiers can't get that many: only about 4 in 10 cashiers work full time, and retail workers in the Minneapolis area average 25.7 hours a week (BLS).</p>
+        <p><b>Estimates:</b> the credit card's minimum payment rule (the greater of $40 or 1% of the balance plus interest, which is Chase's rule) and the refund arriving in March (the IRS said most early filers claiming the EITC would get refunds by March 2, 2026).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
         <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>

@@ -98,5 +98,19 @@ window.WORKS_CITED = [
 
   { "text":"\"Credit.\" *Economic Well-Being of U.S. Households in 2025*, Board of Governors of the Federal Reserve System, May 2026, www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm.","url":"https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm","usedIn":"Game (71% at this income have a credit card; 57% of them carry a balance)" },
 
-  { "text":"\"Transit Assistance Program (TAP).\" *Metro Transit*, Metropolitan Council, www.metrotransit.org/fares-passes/tap/tap-riders/. Accessed 24 Nov. 2026.","url":"https://www.metrotransit.org/fares-passes/tap/tap-riders/","usedIn":"Game (bus: $1 rides with a SNAP EBT card)" }
+  { "text":"\"Transit Assistance Program (TAP).\" *Metro Transit*, Metropolitan Council, www.metrotransit.org/fares-passes/tap/tap-riders/. Accessed 24 Nov. 2026.","url":"https://www.metrotransit.org/fares-passes/tap/tap-riders/","usedIn":"Game (bus: $1 rides with a SNAP EBT card)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Average Weekly Hours of Production Employees: Retail Trade in Minneapolis-St. Paul-Bloomington, MN-WI (MSA) (SMU27334604200000007A).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/SMU27334604200000007A. Accessed 24 Nov. 2026.","url":"https://fred.stlouisfed.org/series/SMU27334604200000007A","usedIn":"Game (context: Minneapolis-area retail workers average 25.7 hours a week)" },
+
+  { "text":"AAA. *Your Driving Costs 2025*. Fact sheet, Sept. 2025, newsroom.aaa.com/wp-content/uploads/2025/09/UPDATE-AAA-Fact-Sheet-Your-Driving-Cost-9.2025-1.pdf.","url":"https://newsroom.aaa.com/wp-content/uploads/2025/09/UPDATE-AAA-Fact-Sheet-Your-Driving-Cost-9.2025-1.pdf","usedIn":"Game (car: $342/mo)" },
+
+  { "text":"Ver Ploeg, Michele, et al. \"Access to Affordable, Nutritious Food Is Limited in “Food Deserts.”\" *Amber Waves*, U.S. Department of Agriculture, Economic Research Service, Mar. 2010, www.ers.usda.gov/amber-waves/2010/march/access-to-affordable-nutritious-food-is-limited-in-food-deserts.","url":"https://www.ers.usda.gov/amber-waves/2010/march/access-to-affordable-nutritious-food-is-limited-in-food-deserts","usedIn":"Game (bus riders pay normal grocery prices)" },
+
+  { "text":"Minnesota Department of Human Services. *Insurance Affordability Programs (IAPs): Income and Asset Guidelines*. DHS-3461A-ENG, June 2026, edocs.dhs.state.mn.us/lfserver/Public/DHS-3461A-ENG.","url":"https://edocs.dhs.state.mn.us/lfserver/Public/DHS-3461A-ENG","usedIn":"Game (free Medical Assistance for parents up to $28,781/yr)" },
+
+  { "text":"\"How to Calculate Your Minimum Credit Card Payment.\" *Chase*, www.chase.com/personal/credit-cards/education/basics/how-to-calculate-your-minimum-credit-card-payment. Accessed 24 Nov. 2026.","url":"https://www.chase.com/personal/credit-cards/education/basics/how-to-calculate-your-minimum-credit-card-payment","usedIn":"Game (minimum payment rule)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Table 5. Employment Status of the Population by Sex, Marital Status, and Presence and Age of Own Children under 18, 2024-2025 Annual Averages.\" *Employment Characteristics of Families*, 2026, www.bls.gov/news.release/famee.t05.htm.","url":"https://www.bls.gov/news.release/famee.t05.htm","usedIn":"Game (hours: 8 in 10 employed single mothers work full time)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Table 23. People at Work by Occupation, Sex, and Usual Full- or Part-Time Status.\" *Labor Force Statistics from the Current Population Survey*, 2026, www.bls.gov/cps/cpsaat23.htm.","url":"https://www.bls.gov/cps/cpsaat23.htm","usedIn":"Game (hours: women in full-time sales jobs average 40.5 hours)" }
 ];
