@@ -24,8 +24,6 @@ window.WORKS_CITED = [
   { text: "\"Minnesota Income Tax Brackets, Standard Deduction and Dependent Exemption Amounts for 2025.\" Minnesota Department of Revenue, www.revenue.state.mn.us/mndor-pp/20636. Accessed 20 Nov. 2026.",
     url: "https://www.revenue.state.mn.us/mndor-pp/20636", usedIn: "Game (Minnesota income tax)" },
 
-  { text: "Glasmeier, Amy K. *Living Wage Calculator*. Massachusetts Institute of Technology, data updated 15 Feb. 2026, livingwage.mit.edu/metros/22020.",
-    url: "https://livingwage.mit.edu/metros/22020", usedIn: "Game (basic necessities, Fargo and Minneapolis)" },
   { text: "\"Appendix B - Table of Standards.\" *SNAP Policy Manual*, North Dakota Department of Health and Human Services, effective 1 Oct. 2026, www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm.",
     url: "https://www.nd.gov/dhs/policymanuals/SNAP/Content/Appendix%20B%20-%20Table%20of%20Standards.htm", usedIn: "Game (SNAP income limit)" },
 
@@ -86,5 +84,19 @@ window.WORKS_CITED = [
 
   { "text":"\"Restoring Flexibility in the Child Care and Development Fund (CCDF).\" *Federal Register*, vol. 91, 12 May 2026, www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf.","url":"https://www.federalregister.gov/documents/2026/05/12/2026-09382/restoring-flexibility-in-the-child-care-and-development-fund-ccdf","usedIn":"Game results (what extra help would change): 7% copay cap repealed" },
 
-  { "text":"\"2021 Child Tax Credit and Advance Child Tax Credit Payments — Topic A: General Information.\" Internal Revenue Service, www.irs.gov/credits-deductions/2021-child-tax-credit-and-advance-child-tax-credit-payments-topic-a-general-information. Accessed 24 Nov. 2026.","url":"https://www.irs.gov/credits-deductions/2021-child-tax-credit-and-advance-child-tax-credit-payments-topic-a-general-information","usedIn":"Game results (what extra help would change): 2021 credit of $3,600, paid $300/mo" }
+  { "text":"\"2021 Child Tax Credit and Advance Child Tax Credit Payments — Topic A: General Information.\" Internal Revenue Service, www.irs.gov/credits-deductions/2021-child-tax-credit-and-advance-child-tax-credit-payments-topic-a-general-information. Accessed 24 Nov. 2026.","url":"https://www.irs.gov/credits-deductions/2021-child-tax-credit-and-advance-child-tax-credit-payments-topic-a-general-information","usedIn":"Game results (what extra help would change): 2021 credit of $3,600, paid $300/mo" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Table 1101. Quintiles of Income before Taxes: Annual Expenditure Means, Shares, Standard Errors, and Relative Standard Errors.\" *Consumer Expenditure Surveys, 2025*, 2026, www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx.","url":"https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx","usedIn":"Game (basic necessities: what the lowest-income fifth of households spends)" },
+
+  { "text":"Internal Revenue Service. *Rev. Proc. 2025-25*. 17 July 2025, www.irs.gov/pub/irs-drop/rp-25-25.pdf.","url":"https://www.irs.gov/pub/irs-drop/rp-25-25.pdf","usedIn":"Game (parent's health insurance in Fargo: 2026 premium tax credit table)" },
+
+  { "text":"\"Poverty Guidelines.\" Office of the Assistant Secretary for Planning and Evaluation, U.S. Department of Health and Human Services, aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines. Accessed 24 Nov. 2026.","url":"https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines","usedIn":"Game (health insurance income limits)" },
+
+  { "text":"Minnesota Department of Human Services. *MinnesotaCare Premium Estimator Table: Effective January 1, 2026 – December 31, 2026*. DHS-4139A-ENG, Sept. 2025, edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG.","url":"https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG","usedIn":"Game (parent's health insurance in Minneapolis)" },
+
+  { "text":"\"Medicaid Eligibility.\" North Dakota Health and Human Services, www.hhs.nd.gov/healthcare/medicaid/eligibility. Accessed 24 Nov. 2026.","url":"https://www.hhs.nd.gov/healthcare/medicaid/eligibility","usedIn":"Game (parent earns too much for North Dakota Medicaid)" },
+
+  { "text":"Ullrich, Rebecca, and Aaron Sojourner. *Child Care Is Key to Our Economic Recovery: Technical Appendix*. Center for Law and Social Policy, Apr. 2020, www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf.","url":"https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf","usedIn":"Game (what paid neighbors and relatives charge for child care, from the National Survey of Early Care and Education)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" }
 ];

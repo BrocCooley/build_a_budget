@@ -10,7 +10,7 @@
 :root{
   --bg:#f3efe6; --card:#fffdf8; --paper:#fffef9; --ink:#17201c; --muted:#5f665f; --faint:#8b918a; --line:#e3ddd0;
   --accent:#1d6b52; --accent-ink:#ffffff; --accent-soft:#dcebe3; --accent-deep:#124a38;
-  --red:#c0331f; --red-soft:#f6ddd7;
+  --red:#c0331f; --red-soft:#f6ddd7; --amber:#b7791f;
   --s1:#17201c; --s2:#3d4641; --s3:#646c67; --s4:#8d938e; --s5:#b6bab4;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Charter,Georgia,serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -335,6 +335,11 @@ details.rec[open] summary::after{content:"−"}
 .ym{position:relative;height:38px;border-radius:8px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;font:700 12px/1 var(--mono);color:var(--faint);transition:background .3s,border-color .3s}
 .ym.ok{background:var(--accent);border-color:var(--accent);color:#fff}
 .ym.bad{background:var(--red);border-color:var(--red);color:#fff}
+.ym.dip{background:var(--amber);border-color:var(--amber);color:#fff}
+.mresult.dip{background:var(--amber)}
+.ylegend{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:-6px 0 12px;font-size:12px;color:var(--muted)}
+.ylegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:-6px}
+.ylegend i.ok{background:var(--accent)} .ylegend i.dip{background:var(--amber)} .ylegend i.bad{background:var(--red)}
 .ym.now{border-color:var(--ink);border-width:2.5px;color:var(--ink)}
 .ym .ev{position:absolute;top:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--ink);color:#fff;font:800 10px/15px var(--mono);text-align:center;font-style:normal}
 .ym .rf{position:absolute;bottom:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:#e9d9a6;color:var(--ink);font:800 10px/15px var(--mono);text-align:center;font-style:normal}
@@ -498,7 +503,10 @@ const CONFIG = {
       childCareCiteHome: "Child Care Aware, 2024",
       busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
       stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
-      stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009."
+      stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009.",
+      health: "aca",             // Parent earns too much for ND Medicaid (adults: $2,489/mo for 2, eff. Apr 1 2026, ND HHS) -> marketplace plan with the premium tax credit. Kid: ND CHIP
+      kidHealth: "CHIP",
+      healthCite: "IRS, 2025; HHS, 2025"
     },
     minneapolis: {
       name: "Minneapolis, MN",
@@ -518,7 +526,10 @@ const CONFIG = {
       childCareCiteHome: "Child Care Aware, 2024",
       busPass: 76,               // ESTIMATE — Metro Transit monthly pass
       stateMinWage: null,
-      stateMinWageNote: ""
+      stateMinWageNote: "",
+      health: "mncare",          // MinnesotaCare (to 200% FPL). Children under 21 pay $0 (MN DHS, DHS-4139A, 2026)
+      kidHealth: "MinnesotaCare",
+      healthCite: "MN DHS, 2026"
     }
   },
 
@@ -526,9 +537,29 @@ const CONFIG = {
     carMonthly: 350              // ESTIMATE — insurance + gas + payment on an older car
   },
 
-  basicsMonthly: 689,            // MIT Living Wage Calculator (data updated Feb 15, 2026), 1 adult + 1 child, "Other" necessities: $8,272/yr ÷ 12.
-                                 // Clothing, housekeeping supplies, personal care, household furnishings & equipment. Same in Fargo and Minneapolis.
-  basicsCite: "MIT Living Wage, 2026",
+  health: {
+    // Parent's health insurance (the 4-year-old is covered at $0 in both states).
+    fpl2025For2: 21150,          // HHS 2025 poverty guideline, household of 2 (2026 marketplace subsidies use the prior year's guideline)
+    // IRS Rev. Proc. 2025-25, 2026 applicable percentage table: [from % FPL, to % FPL, initial %, final %] of income paid for the benchmark silver plan
+    acaTable: [[0, 133, 2.10, 2.10], [133, 150, 3.14, 4.19], [150, 200, 4.19, 6.60], [200, 250, 6.60, 8.44], [250, 300, 8.44, 9.96], [300, 400, 9.96, 9.96]],
+    // MinnesotaCare 2026 premium per adult, family of 2: [annual income up to, $/month] (MN DHS, DHS-4139A-ENG, eff. Jan 1 - Dec 31, 2026)
+    mnCare2: [[7402, 0], [11632, 4], [16919, 6], [19034, 8], [21149, 10], [23264, 12], [25379, 14], [27494, 15], [29609, 16], [31724, 25], [33839, 37], [35954, 44], [38069, 52], [40184, 61], [42299, 71], [42300, 80]]
+  },
+  ffnCare: {
+    // Paid relatives, friends and neighbors ("unlisted paid" home-based providers), 4-year-olds: median $3.60/hr in 2012
+    // (NSECE, "Prices Charged in Early Care and Education", via CLASP 2020 Technical Appendix, Table III). Listed homes: $3.00.
+    hourly2012: 3.60,
+    cpiDaycare2012: 253.141,     // BLS CPI-U Day care and preschool (CUUR0000SEEB03), 2012 average
+    cpiDaycareNow: 407.844,      // same series, October 2026
+    hoursPerMonth: 173           // full time, same hours as the job
+  },
+
+  // Basic necessities = what the LOWEST-income fifth of U.S. households actually spent in 2025, per year
+  // (BLS Consumer Expenditure Surveys 2025, Table 1101, income quintiles; avg. 1.5 people per household, so it is on the low side for a parent + kid).
+  // Left out: furniture/appliances (the "home" emergency covers repairs), utilities (already in HUD rent), health care, entertainment.
+  basicsItems: { phone: 759, clothes: 825, personal: 414, supplies: 494 },   // cellular phone service; apparel and services; personal care products and services; housekeeping supplies
+  basicsMonthly: 208,            // (759 + 825 + 414 + 494) / 12 = $207.67 (checked in tools/test-year.js)
+  basicsCite: "BLS Consumer Expenditure Survey, 2025",
 
   surprise: {
     amount: 400,                 // Matches the Federal Reserve SHED "$400 emergency" benchmark
@@ -585,10 +616,9 @@ const CONFIG = {
   },
 
   savings: {
-    // Starting savings options (GAME DESIGN CHOICE: small amounts, realistic for this household).
     // Context: "4 in 10 adults with [income under $50,000] said they could not cover even a $100 emergency
     // expense with only their savings." Federal Reserve, Economic Well-Being of U.S. Households in 2025 (May 2026), Executive Summary.
-    options: [0, 500, 1000],
+    // Everyone starts the year with $0 saved (a household this short every month has nothing put away).
     cantCover100Under50k: 40
   },
 
@@ -634,18 +664,13 @@ const TEXT = {
 
   "meter.labelYear": "Where you stand (cash minus debts)",
 
-  "savings.kicker": "Day 12 · Before the year starts",
-  "savings.title": "How much do you have saved?",
-  "savings.sub": "Pick where you start. Your year begins in January.",
-  "savings.zero": "Nothing saved",
-  "savings.zero.sub": "Paycheck to paycheck.",
-  "savings.some": "A little cushion",
-  "savings.some.sub": "Enough for a small emergency.",
-  "savings.three": "A bigger cushion",
-  "savings.three.sub": "About as much as one typical emergency costs.",
-  "savings.context": "**{pct} in 100** adults earning under $50,000 couldn't cover even a **$100** emergency from their savings.",
+  "savings.context": "You start the year with **nothing saved**. **{pct} in 100** adults earning under $50,000 couldn't cover even a **$100** emergency from their savings.",
+  "savings.start": "Start the year",
 
   "year.kicker": "Your year · {city}",
+  "year.legendOk": "Money to spare",
+  "year.legendDip": "Got by on savings",
+  "year.legendBad": "Short",
   "year.intro": "Same job, same rent, same bills every month. Pay comes in, bills go out, and life happens. Quiet months play by themselves. The game stops when something needs you.",
   "year.fair": "Emergencies are rolled at random from real yearly odds. They don't know how much money you have.",
   "year.start": "Start January",
@@ -667,6 +692,7 @@ const TEXT = {
   "mc.behind": "Bills you couldn't pay",
   "mc.end": "Cash at month's end",
   "mc.result": "This month",
+  "mc.dip": "Food and bills were covered, but only by spending money left over from earlier months (you started the month with {cash}).",
   "mc.foodShort": "Food ran out on day {days}: {n} meals skipped",
   "mc.foodOk": "Food lasted all month",
   "mc.foodWhy": "Rent, child care, and getting to work were paid first. Food got whatever was left.",
@@ -681,10 +707,11 @@ const TEXT = {
   "refund.mntax": "Minnesota income tax owed",
   "refund.total": "Refund",
   "refund.cite": "(IRS and Minnesota Dept. of Revenue, 2025 tax rules)",
+  "refund.first": "It's in your account now. Then something else happened this month...",
   "refund.catchup": "First, **{amount}** went to bills you were behind on.",
 
   "ev.stat": "**{pct} in 100** adults had a {what} in the past year.",
-  "ev.savings": "Pay from savings",
+  "ev.savings": "Pay with cash",
   "ev.savings.sub": "You have {cash} in cash.",
   "ev.savings.no": "You only have {cash}. Not enough.",
   "ev.card": "Put it on the credit card",
@@ -722,6 +749,7 @@ const TEXT = {
   "yres.cash": "cash left in December",
   "yres.whyTitle": "Why food had to give",
   "yres.why": "Every month, rent, child care, getting to work and basics came first. Skip any of them and you lose your home or your job. Food is the one bill nobody comes to collect. Even with SNAP, a normal month here comes up **{gap}** short.",
+  "yres.whyThin": "Every month, rent, child care, getting to work and basics came first. In a month with no surprises, this budget covers food with only **{spare}** to spare. One emergency and food is what gives, because it's the one bill nobody comes to collect.",
   "yres.yearTitle": "Your year, month by month",
   "yres.chartCash": "Cash",
   "yres.chartDebt": "Debt (card + late bills)",
@@ -801,6 +829,7 @@ const TEXT = {
   "care.center.sub": "Set hours, trained staff. State average for a 4-year-old, full time.",
   "care.home": "Home-based daycare",
   "care.home.sub": "A smaller group in a neighbor's home. State average for a 4-year-old, full time.",
+  "care.ffn": "**Why not a neighbor or a relative?** Paid neighbors, friends and relatives charge about as much per hour as a licensed home daycare: a typical **{hr}/hr** in today's dollars, or about **{mo}** a month full time. Free care from family helps parents who have it, but it takes someone who is free 40+ hours a week.",
   "care.shifts": "**{n} of your {total} shifts** each month go to paying for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
@@ -816,11 +845,13 @@ const TEXT = {
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
-  "basics.sub": "What a family of two needs each month, at the lowest cost.",
-  "basics.phone": "Clothes for you and your kid",
-  "basics.supplies": "Soap, toothpaste, laundry and cleaning supplies",
-  "basics.clothes": "Sheets, towels, and replacing what breaks",
-  "basics.total": "Basic necessities",
+  "basics.sub": "What the lowest-income fifth of U.S. households actually spends, on average. No furniture, no extras.",
+  "basics.phone": "Cell phone service",
+  "basics.clothes": "Clothes and shoes for you and your kid",
+  "basics.personal": "Soap, shampoo, toothpaste, haircuts",
+  "basics.supplies": "Laundry soap, cleaning supplies, toilet paper",
+  "basics.health": "Health insurance for you (your kid is covered free by {kid})",
+  "basics.total": "Every month",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
@@ -998,12 +1029,23 @@ function snapBenefit(gross, rent, childCare) {
   return Math.max(0, Math.floor(s.max2Person - Math.ceil(s.benefitReduction * netIncome)));
 }
 
+// Parent's monthly health insurance premium for this city and gross monthly pay
+function healthPremium(city, grossMonthly) {
+  const H = CONFIG.health, annual = grossMonthly * 12;
+  if (city.health === "mncare" && annual <= H.mnCare2[H.mnCare2.length - 1][0]) return H.mnCare2.find((b) => annual <= b[0])[1];
+  const pct = annual / H.fpl2025For2 * 100;
+  const row = H.acaTable.find((r) => pct < r[1]) || H.acaTable[H.acaTable.length - 1];
+  const share = row[2] + (row[3] - row[2]) * Math.min(1, Math.max(0, (pct - row[0]) / (row[1] - row[0])));
+  return Math.round(annual * share / 100 / 12);
+}
+
 function pathAtWage(city, c, wage) {
   const { gross, net } = takeHomeFor(wage);
   const housing = city.rent[c.housing];
   const care = city.childCare[c.care];
   const transport = c.transport === "car" ? CONFIG.transport.carMonthly : city.busPass;
-  const basics = CONFIG.basicsMonthly;
+  const health = healthPremium(city, gross);                               // parent's health insurance
+  const basics = CONFIG.basicsMonthly + health;                            // "basics" = necessities + health insurance
   const surprise = surpriseCost(c.surprise);
   const leftover = net - housing - care - transport - basics - surprise;   // cash left after bills
   const snap = snapBenefit(gross, housing, care);                         // can only be spent on food
@@ -1019,7 +1061,7 @@ function pathAtWage(city, c, wage) {
   const totalMeals = days * CONFIG.food.people * CONFIG.food.mealsPerDay;
   const perMeal = need / totalMeals;                                      // $ per person per meal
   const mealsSkipped = Math.min(totalMeals, Math.round(foodGap / perMeal));
-  return { wage, gross, net, housing, care, transport, basics, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed, totalMeals, perMeal, mealsSkipped };
+  return { wage, gross, net, housing, care, transport, basics, health, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed, totalMeals, perMeal, mealsSkipped };
 }
 
 function computePath(cityKey, c, wageOverride) {
@@ -1253,10 +1295,11 @@ const IC = {
 const icon = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 
 const S = { screen: "intro", city: null, wageOverride: null, c: {}, y: null };
-const FLOW = ["housing", "care", "transport", "basics", "snap", "savings", "year"];
-const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10, savings: 12 };
+const FLOW = ["housing", "care", "transport", "basics", "snap", "year"];
+const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10 };
 
 function city() { return CONFIG.cities[S.city]; }
+function ffnHourly() { const f = CONFIG.ffnCare; return f.hourly2012 * f.cpiDaycareNow / f.cpiDaycare2012; }
 function path() { return computePath(S.city, S.c, S.wageOverride); }
 
 /* ---------- Meter ---------- */
@@ -1277,7 +1320,7 @@ function cashBalance() {
   if (c.housing) bal -= ct.rent[c.housing];
   if (c.care) bal -= ct.childCare[c.care];
   if (c.transport) bal -= c.transport === "car" ? CONFIG.transport.carMonthly : ct.busPass;
-  if (c.basics) bal -= CONFIG.basicsMonthly;
+  if (c.basics) bal -= path().basics;
   if (c.surprise) bal -= surpriseCost(c.surprise);
   return bal;
 }
@@ -1493,7 +1536,8 @@ const screens = {
       <div class="opts">
       ${opt({ act: "care", val: "center", ico: "kid", title: t("care.center"), price: fmt(cc.center), sub: t("care.center.sub") + cite(ct.childCareCiteCenter), extra: shiftInfo(cc.center) })}
       ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome), extra: shiftInfo(cc.home), tag: t("tag.cheaper") })}
-      </div>`;
+      </div>
+      <div class="note plain small">${t("care.ffn", { hr: "$" + ffnHourly().toFixed(2), mo: fmt(ffnHourly() * CONFIG.ffnCare.hoursPerMonth) })}${cite("NSECE via CLASP, 2020; BLS CPI, 2026")}</div>`;
   },
 
   transport() {
@@ -1511,12 +1555,14 @@ const screens = {
       <h2>${t("basics.title")}</h2>
       <p class="muted">${t("basics.sub")}</p>
       <ul class="auto">
-        <li><span class="ico">${icon("shirt")}</span>${t("basics.phone")}</li>
-        <li><span class="ico">${icon("bag")}</span>${t("basics.supplies")}</li>
-        <li><span class="ico">${icon("home")}</span>${t("basics.clothes")}</li>
-        <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(CONFIG.basicsMonthly)}</span></li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}<span class="amt">${fmt(CONFIG.basicsItems.phone / 12)}</span></li>
+        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}<span class="amt">${fmt(CONFIG.basicsItems.clothes / 12)}</span></li>
+        <li><span class="ico">${icon("bag")}</span>${t("basics.personal")}<span class="amt">${fmt(CONFIG.basicsItems.personal / 12)}</span></li>
+        <li><span class="ico">${icon("home")}</span>${t("basics.supplies")}<span class="amt">${fmt(CONFIG.basicsItems.supplies / 12)}</span></li>
+        <li><span class="ico">${icon("med")}</span>${t("basics.health", { kid: city().kidHealth })}<span class="amt">${fmt(path().health)}</span></li>
+        <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(path().basics)}</span></li>
       </ul>
-      <p class="cite">(${CONFIG.basicsCite})</p>
+      <p class="cite">(${CONFIG.basicsCite}; health insurance: ${city().healthCite})</p>
       <div class="actions">${next("snap", "Continue")}</div>`;
   },
 
@@ -1530,31 +1576,20 @@ const screens = {
       : `<h2>${t("snap.deniedTitle")}</h2>
          <p class="lead">${t("snap.deniedLead", { wage: fmtWage(r.wage) })}${cite(CONFIG.snap.cite)}</p>`;
     return `${dots()}<p class="kicker">${t("snap.kicker")}</p>${body}
-      <div class="actions">${next("savings", "Continue")}</div>`;
+      <div class="figure">${picto(PERSON, "0 0 12 16", CONFIG.savings.cantCover100Under50k, "red")}
+        <p class="cap">${t("savings.context", { pct: CONFIG.savings.cantCover100Under50k })}${cite("Federal Reserve, 2026")}</p></div>
+      <div class="actions"><button class="btn" data-act="savings" data-val="0">${t("savings.start")} <span class="arr">→</span></button></div>`;
   },
 
-  savings() {
-    const c = S.c;
-    return `${dots()}<p class="kicker">${t("savings.kicker")}</p>
-      <h2>${t("savings.title")}</h2>
-      <p class="muted">${t("savings.sub")}</p>
-      <div class="opts">
-      ${opt({ act: "savings", val: "0", ico: "dollar", title: t("savings.zero"), price: "$0", sub: t("savings.zero.sub") })}
-      ${opt({ act: "savings", val: "500", ico: "dollar", title: t("savings.some"), price: "$500", sub: t("savings.some.sub") })}
-      ${opt({ act: "savings", val: "1000", ico: "dollar", title: t("savings.three"), price: "$1,000", sub: t("savings.three.sub") })}
-      </div>
-      <div class="figure">${picto(PERSON, "0 0 12 16", CONFIG.savings.cantCover100Under50k, "red")}
-        <p class="cap">${t("savings.context", { pct: CONFIG.savings.cantCover100Under50k })}${cite("Federal Reserve, 2026")}</p></div>`;
-  },
 
   year() {
     const y = S.y, sim = yearSim();
     const ms = sim.months.filter((r) => !r.partial);
     const p = y.panel;
-    const curM = p && p.type === "event" ? p.p.m : Math.max(0, y.shown);
+    const curM = p && p.type === "event" ? p.p.m : p && p.type === "refundFirst" ? p.m : Math.max(0, y.shown);
     const track = MONTHS.map((nm, i) => {
       const r = ms[i], done = i <= y.shown && r;
-      const cls = !done ? "" : (r.foodGap > 0.005 || r.behindAdded > 0.5 ? "bad" : "ok");
+      const cls = !done ? "" : monthState(r);
       const now = (p && p.type === "event" && p.p.m === i) || (!p && i === 0 && y.shown < 0) ? "now" : "";
       return `<div class="ym ${cls} ${now}" title="${nm}"><span>${nm.slice(0, 1)}</span>${done && r.events.length ? '<i class="ev">!</i>' : ""}${done && r.refund ? '<i class="rf">$</i>' : ""}</div>`;
     }).join("");
@@ -1565,8 +1600,8 @@ const screens = {
       actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
     } else if (p.type === "event") body = eventPanel(p.p);
     else {
-      const r = ms[y.shown];
-      if (p.type === "refund") {
+      const r = p.type === "refundFirst" ? null : ms[y.shown];
+      if (p.type === "refund" || p.type === "refundFirst") {
         const rf = sim.refund;
         body = notif("dollar", "green", t("refund.app"), t("refund.title"), t("refund.text", { amount: fmt(rf.total) }))
           + `<ul class="auto">
@@ -1577,8 +1612,8 @@ const screens = {
             <li><span class="ico">${icon("card")}</span>${t("refund.mntax")}<span class="amt">−${fmt(rf.mnTax)}</span></li>` : ""}
             <li class="tot"><span class="ico">${icon("check")}</span>${t("refund.total")}<span class="amt" style="color:var(--accent)">+${fmt(rf.total)}</span></li></ul>
           <p class="cite">${t("refund.cite")}</p>
-          ${r.behindPaid ? `<div class="note">${t("refund.catchup", { amount: fmt(r.behindPaid) })}</div>` : ""}
-          ${monthCard(r)}`;
+          ${p.type === "refund" && r.behindPaid ? `<div class="note">${t("refund.catchup", { amount: fmt(r.behindPaid) })}</div>` : ""}
+          ${p.type === "refund" ? monthCard(r) : `<div class="note plain small">${t("refund.first")}</div>`}`;
       } else if (p.type === "cut") {
         if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t("cut.yes")}</div>${monthCard(r)}`;
         else {
@@ -1597,17 +1632,21 @@ const screens = {
         body = `<div class="note bad">${t("year.behind", { month: MONTHS[r.m], amount: fmt(r.behindAdded) })}</div>${monthCard(r)}`;
       } else body = monthCard(r);
       const last = y.shown >= CONFIG.year.months - 1;
-      const needsTap = p.type !== "month" || !y.auto || last;   // December always waits for "See your year"
+      const needsTap = p.type !== "month" || !y.auto || last;
+      if (p.type === "refundFirst") { actions = `<button class="btn go" data-act="ycont">${t("year.continue")} <span class="arr">→</span></button>`; }
+      else {   // December always waits for "See your year"
       if (!(p.type === "cut" && !y.cutPicked)) {
         actions = needsTap
           ? `<button class="btn go" data-act="ycont">${last ? t("year.seeResults") : t("year.continue")} <span class="arr">→</span></button>`
           : `<button class="btn secondary" data-act="ypause">${t("year.pause")}</button>`;
         if (needsTap && p.type === "month" && !last) actions += `<button class="btn link" data-act="yplay">${t("year.autoplay")}</button>`;
       }
+      }
     }
     return `<p class="kicker">${t("year.kicker", { city: CONFIG.cities[S.city].name })}</p>
       <h2>${MONTHS[curM]}</h2>
       <div class="ytrack">${track}</div>
+      <p class="ylegend"><i class="ok"></i>${t("year.legendOk", null, true)} <i class="dip"></i>${t("year.legendDip", null, true)} <i class="bad"></i>${t("year.legendBad", null, true)}</p>
       ${body}
       <div class="actions">${actions}</div>`;
   },
@@ -1715,7 +1754,9 @@ const screens = {
       ${tiles}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
       <p class="section">${t("yres.whyTitle")}</p>
-      <div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(Math.max(0, -(b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need))) })}</div>
+      ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need);
+        return g > 0.5 ? `<div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(g) })}</div>`
+          : `<div class="note" style="font-size:16px">${t("yres.whyThin", { spare: fmt(-g) })}</div>`; })()}
       <p class="section">${t("yres.yearTitle")}</p><div class="figure">${chart}</div>
       <div class="note">${refundLine}</div>
       <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
@@ -1769,7 +1810,10 @@ const screens = {
         <li>North Dakota Department of Health and Human Services. <i>SNAP Policy Manual, Appendix B: Table of Standards</i> (effective Oct. 1, 2026). <a href="https://www.nd.gov/dhs/policymanuals/SNAP/" target="_blank" rel="noopener">nd.gov</a></li>
         <li>U.S. Department of Agriculture, Economic Research Service. <i>Household Food Security in the United States in 2024.</i> <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s" target="_blank" rel="noopener">ers.usda.gov</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households (SHED), 2025.</i> <a href="https://www.federalreserve.gov/consumerscommunities/shed.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
-        <li>Massachusetts Institute of Technology. <i>Living Wage Calculator</i>: Fargo, ND-MN and Minneapolis-St. Paul-Bloomington, MN-WI (data updated Feb. 15, 2026). <a href="https://livingwage.mit.edu/metros/22020" target="_blank" rel="noopener">livingwage.mit.edu</a></li>
+        <li>Internal Revenue Service. Rev. Proc. 2025-25 (2026 applicable percentage table). <a href="https://www.irs.gov/pub/irs-drop/rp-25-25.pdf" target="_blank" rel="noopener">irs.gov</a>; HHS ASPE, Poverty Guidelines. <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" rel="noopener">aspe.hhs.gov</a></li>
+        <li>Minnesota Department of Human Services. <i>MinnesotaCare Premium Estimator Table, 2026</i> (DHS-4139A). <a href="https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG" target="_blank" rel="noopener">edocs.dhs.state.mn.us</a>; North Dakota HHS, Medicaid eligibility. <a href="https://www.hhs.nd.gov/healthcare/medicaid/eligibility" target="_blank" rel="noopener">hhs.nd.gov</a></li>
+        <li>Ullrich, Rebecca, and Aaron Sojourner. <i>Child Care Is Key to Our Economic Recovery: Technical Appendix</i>. CLASP, 2020 (NSECE prices by provider type). <a href="https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf" target="_blank" rel="noopener">clasp.org</a>; BLS CPI, Day care and preschool (CUUR0000SEEB03).</li>
+        <li>U.S. Bureau of Labor Statistics. <i>Consumer Expenditure Surveys, 2025</i>, Table 1101: Quintiles of income before taxes. <a href="https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx" target="_blank" rel="noopener">bls.gov/cex</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i> (May 2026): unexpected expenses and savings. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. <i>Tax inflation adjustments for tax year 2025</i> (EITC, standard deduction, brackets); Child Tax Credit and dependent care credit rules for 2025. <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025" target="_blank" rel="noopener">irs.gov</a></li>
         <li>Minnesota Department of Revenue. <i>Minnesota Child Tax Credit 2025</i>; 2025 standard deduction and income tax brackets. <a href="https://www.revenue.state.mn.us/child-tax-credit" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
@@ -1781,7 +1825,9 @@ const screens = {
         <li>U.S. Department of Labor. <i>State Minimum Wage Laws</i> (North Dakota). <a href="https://www.dol.gov/agencies/whd/minimum-wage/state" target="_blank" rel="noopener">dol.gov</a></li>
       </ol>
       <div class="panel small">
-        <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is MIT's "other necessities" for one adult and one child (clothing, housekeeping supplies, personal care, household furnishings). MIT's health care and "civic" costs are left out: at this income the child would likely be covered by Medicaid or CHIP, and civic costs could be called optional.</p>
+        <p><b>Basic necessities:</b> ${fmt(CONFIG.basicsMonthly)}/mo is what the lowest-income fifth of U.S. households actually spent in 2025 on cell phone service (${fmt(CONFIG.basicsItems.phone)}/yr), clothes and shoes (${fmt(CONFIG.basicsItems.clothes)}), personal care (${fmt(CONFIG.basicsItems.personal)}) and housekeeping supplies (${fmt(CONFIG.basicsItems.supplies)}). Those households average 1.5 people, so this is on the low side for a parent and child. Furniture, appliances, health care and entertainment are left out; utilities are already in the rent figures.</p>
+        <p><b>Health insurance (parent):</b> the child is covered at $0 (North Dakota CHIP; MinnesotaCare charges nothing for anyone under 21). Fargo: the parent earns too much for North Dakota Medicaid, so they buy a marketplace plan; with the premium tax credit they pay a set share of income for the benchmark silver plan (2026 IRS table; the larger pandemic-era credits ended after 2025). Minneapolis: MinnesotaCare, using the 2026 state premium table. Deductibles and copays are not modeled; big medical bills show up as emergencies.</p>
+        <p><b>Child care from a neighbor or relative:</b> the median paid "unlisted" home provider charged $3.60/hr for a 4-year-old in 2012 (NSECE), raised to today's dollars with the BLS day care price index. Free family care is not modeled.</p>
         <p><b>Estimates:</b> car costs (${fmt(CONFIG.transport.carMonthly)}/mo), bus passes (Fargo ${fmt(CONFIG.cities.fargo.busPass)}, Minneapolis ${fmt(CONFIG.cities.minneapolis.busPass)}/mo), convenience-store markup (+${Math.round(CONFIG.food.convenienceMarkup * 100)}%), credit card terms, and refund timing (March).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
         <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
@@ -1820,7 +1866,12 @@ function yAdvance() {
   const y = S.y, nextM = y.shown + 1;
   if (nextM >= CONFIG.year.months) return go("results");
   const sim = yearSim();
-  if (sim.pending && sim.pending.m === nextM) { y.panel = { type: "event", p: sim.pending }; yRender(); buzz([60, 40, 60]); return; }
+  if (sim.pending && sim.pending.m === nextM) {
+    // The refund arrives at the start of the month, so show it before that month's emergency
+    const part = sim.months[nextM];
+    if (part && part.refund && !y.seenRefund) { y.seenRefund = true; y.panel = { type: "refundFirst", m: nextM }; yRender(); return; }
+    y.panel = { type: "event", p: sim.pending }; yRender(); buzz([60, 40, 60]); return;
+  }
   const r = sim.months[nextM];
   y.shown = nextM;
   if (r.refund && !y.seenRefund) { y.seenRefund = true; y.panel = { type: "refund" }; }
@@ -1830,13 +1881,17 @@ function yAdvance() {
   yRender();
   if (y.panel.type === "month" && y.auto && nextM < CONFIG.year.months - 1) yTimer = setTimeout(yAdvance, reduceMotion ? 700 : 2000);
 }
+// red: food or bills fell short. amber: everything was paid, but only by spending money left from earlier months. green: money to spare
+function monthChange(r) { return (r.endCash - r.endCard - r.endBehind) - (r.startCash - r.startCard - (r.startBehind || 0)); }
+function monthState(r) { return r.foodGap > 0.005 || r.behindAdded > 0.5 ? "bad" : monthChange(r) < -0.5 ? "dip" : "ok"; }
 // One month's money, line by line
 function monthCard(r) {
   const b = yearSim().base;
   const ln = (label, amt, cls) => `<div class="ml ${cls || ""}"><span>${label}</span><b>${amt}</b></div>`;
-  const change = (r.endCash - r.endCard - r.endBehind) - (r.startCash - r.startCard - (r.startBehind || 0));
+  const change = monthChange(r), st = monthState(r);
   const short = r.foodGap > 0.005;
-  return `<div class="mresult ${change < -0.5 ? "neg" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
+  return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
+  ${st === "dip" ? `<p class="small muted" style="margin:-4px 0 10px">${t("mc.dip", { cash: fmt(r.startCash) })}</p>` : ""}
   <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t("mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
@@ -1928,8 +1983,8 @@ document.addEventListener("click", async (e) => {
     S.y.cutPicked = true; return yRender();
   }
   if (act === "savings") {
-    locked = true; b.classList.add("picked"); b.parentElement.classList.add("locked"); buzz(15); await wait(320); locked = false;
-    S.c.savings = val; S.y = newYearState(seedFromUrl()); meterShown = 0; return go("year");
+    locked = true; buzz(15); await wait(200); locked = false;
+    S.c.savings = "0"; S.y = newYearState(seedFromUrl()); meterShown = 0; return go("year");
   }
   if (act === "yev") {
     if (b.disabled) return;
@@ -1992,7 +2047,7 @@ function startEditor() {
   document.body.classList.add("editing", "editmode");
 
   // ---------- UI shell ----------
-  const SCREENS = ["intro", "housing", "care", "transport", "basics", "snap", "savings", "year", "year-emergency", "results", "final", "sources"];
+  const SCREENS = ["intro", "housing", "care", "transport", "basics", "snap", "year", "year-emergency", "results", "final", "sources"];
   const bar = document.createElement("div");
   bar.id = "edbar";
   bar.innerHTML = `<div class="eb-in">
@@ -2212,7 +2267,7 @@ function startEditor() {
   $("ebJump").addEventListener("change", (e) => jumpTo(e.target.value));
 
   function jumpTo(name) {
-    const order = ["housing", "care", "transport", "basics", "snap", "savings", "year", "year-emergency", "results", "final", "sources"];
+    const order = ["housing", "care", "transport", "basics", "snap", "year", "year-emergency", "results", "final", "sources"];
     const idx = order.indexOf(name);
     closePop();
     if (idx < 0) { S.city = null; S.c = {}; S.y = null; meterShown = 0; return go("intro"); }
@@ -2224,9 +2279,9 @@ function startEditor() {
     if (idx > 2) pick("transport", "car");
     if (idx > 3) c.basics = true;
     if (idx > 4) c.snap = true;
-    if (idx > 5) pick("savings", "0");
+    if (idx > 4) c.savings = "0";
     S.c = c;
-    if (idx >= 6 && idx <= 8) {
+    if (idx >= 5 && idx <= 7) {
       S.y = newYearState(S.y ? S.y.seed : 123457);
       if (name === "year") return go("year");
       if (name === "year-emergency") {            // play forward to the first emergency

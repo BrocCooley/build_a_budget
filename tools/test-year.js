@@ -8,6 +8,8 @@ const { CONFIG, simulateYear, manyYears, taxRefund, rollYear, startSavingsAmount
 const $ = (n) => (n < 0 ? "-$" : "$") + Math.abs(Math.round(n)).toLocaleString("en-US");
 let fails = 0;
 const check = (cond, msg) => { if (!cond) { fails++; console.log("FAIL:", msg); } };
+const bi = CONFIG.basicsItems;
+check(CONFIG.basicsMonthly === Math.round((bi.phone + bi.clothes + bi.personal + bi.supplies) / 12), "basicsMonthly does not match its items");
 
 // 1) Tax refunds
 console.log("TAX REFUNDS (tax year 2025 rules, paid in March)");
@@ -41,7 +43,7 @@ console.log("\n1,000 SIMULATED YEARS PER HOUSEHOLD (emergencies: savings if food
 console.log("  household                       start   %end in debt  median debt  %any hunger  median meals skipped  median net worth");
 for (const city of ["fargo", "minneapolis"]) for (const housing of ["oneBR", "twoBR"]) for (const care of ["center", "home"]) for (const transport of ["car", "bus"]) {
   const c = { housing, care, transport };
-  for (const opt of [0, 1000]) {
+  for (const opt of [0]) {
     const start = startSavingsAmount(opt, city, c);
     const s = manyYears(city, c, start);
     console.log(`  ${(city.slice(0, 5) + " " + housing + "/" + care + "/" + transport).padEnd(30)} ${$(start).padStart(7)}   ${String(s.pctDebt).padStart(3)}%        ${$(s.medianDebt).padStart(8)}     ${String(s.pctHungry).padStart(3)}%        ${String(s.medianMeals).padStart(4)}                ${$(s.medianNet).padStart(8)}`);
