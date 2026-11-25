@@ -335,6 +335,7 @@ details.rec[open] summary::after{content:"−"}
 .ym{position:relative;height:38px;border-radius:8px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;font:700 12px/1 var(--mono);color:var(--faint);transition:background .3s,border-color .3s}
 .ym.ok{background:var(--accent);border-color:var(--accent);color:#fff}
 .ym.bad{background:var(--red);border-color:var(--red);color:#fff}
+ul.close{margin:12px 0 0;padding-left:20px;display:grid;gap:8px;font-size:15px;line-height:1.45}
 .ym.dip{background:var(--amber);border-color:var(--amber);color:#fff}
 .mresult.dip{background:var(--amber)}
 .ylegend{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:-6px 0 12px;font-size:12px;color:var(--muted)}
@@ -502,6 +503,8 @@ const CONFIG = {
       childCareCiteCenter: "Child Care Aware, 2024",
       childCareCiteHome: "Child Care Aware, 2024",
       busPass: 35,               // ESTIMATE — MATBUS (Fargo-Moorhead) monthly pass
+      busNote: "MATBUS runs 6:15 a.m. to 10:15 p.m. on weekdays, from 7:15 a.m. on Saturday, and not at all on Sunday. Early and weekend shifts are hard to reach.",
+      busNoteCite: "MATBUS, 2026",   // matbus.com/riding-matbus/matbus-hours-of-service, checked Nov 24 2026
       stateMinWage: 7.25,        // North Dakota minimum wage = federal $7.25, unchanged since July 2009 (U.S. DOL)
       stateMinWageNote: "North Dakota's minimum wage is $7.25/hr, unchanged since 2009.",
       health: "aca",             // Parent earns too much for ND Medicaid (adults: $2,489/mo for 2, eff. Apr 1 2026, ND HHS) -> marketplace plan with the premium tax credit. Kid: ND CHIP
@@ -630,6 +633,7 @@ const CONFIG = {
     trainedTotal: 87000,         // Year Up "52,000+ students served to date" (yearup.org/about) + Per Scholas "35,000+ learners served" (perscholas.org), checked Nov 2026
     cashiersUS: 3089410,         // U.S. cashiers employed, May 2025 (BLS OEWS series OEUN000000000000041201101)
     ctcFoodDropPct: 26,          // Food insufficiency among families with children after monthly CTC began, July 2021 (Shafer et al., JAMA Network Open, 2022)
+    typicalEmergency: 1500,      // midpoint of the Fed's most common emergency cost range, $1,000-$1,999 (SHED 2025)
     ctc2021PerYoungChild: 3600   // 2021 Child Tax Credit: $3,600 for a child under 6, fully refundable; advance payments were $300/mo (IRS)
   },
 
@@ -741,6 +745,13 @@ const TEXT = {
   "yres.leadDebtCash": "You ended the year {amount} in debt, with only {cash} in cash.",
   "yres.leadHungry": "You stayed out of debt, but the food didn't last.",
   "yres.leadOk": "You made it through the year.",
+  "yres.leadOkSpare": "You made it through the year, with {spare} a month to spare.",
+  "yres.leadOkRefund": "You made it through the year, but only because of your {refund} tax refund.",
+  "yres.closeTitle": "How close was it?",
+  "close.noRefund": "Without your **{refund}** tax refund in March, you'd have ended the year with only **{net}**.",
+  "close.noRefundNeg": "Without your **{refund}** tax refund in March, you'd have ended the year **{net} short**.",
+  "close.oneBill": "A typical emergency costs about **{bill}**. That's **{months} months** of the money you had to spare.",
+  "close.odds": "This year you had **{n}** {em}. Of {runs} random years for this same household, **{pct}%** end in debt or with skipped meals.",
   "yres.redMonths": "months in the red",
   "yres.meals": "meals skipped",
   "yres.short": "short on food, all year",
@@ -1506,7 +1517,7 @@ const screens = {
       <h1><span>${t("intro.title1")}</span><span>${t("intro.title2")}</span><span>${t("intro.title3")}</span></h1>
       <div class="who"><span>${icon("parent")}${t("intro.tag1")}</span><span>${icon("kid")}${t("intro.tag2")}</span><span>${icon("cart")}${t("intro.tag3")}</span></div>
       <p class="lead">${t("intro.lead")}</p>
-      <div class="opts"><p class="kicker" style="margin-top:20px">${t("intro.pick")}</p>${cityBtn("fargo")}${cityBtn("minneapolis")}</div>
+      <div class="opts"><p class="kicker" style="margin-top:20px">${t("intro.pick")}</p>${cityBtn("minneapolis")}${cityBtn("fargo")}</div>
     </div>`;
   },
 
@@ -1545,7 +1556,7 @@ const screens = {
       <h2>${t("transport.title")}</h2>
       <div class="opts">
       ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("estimate") })}
-      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate"), tag: t("tag.cheaper"),
+      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite("estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper"),
         extra: `<div class="ptags"><span class="ptag">${t("transport.grocery")} <b>${fmt(CONFIG.food.usdaMonthly)}</b></span><span class="ar">→</span><span class="ptag red">${t("transport.corner")} <b>${fmt(CONFIG.food.usdaMonthly * (1 + CONFIG.food.convenienceMarkup))}</b></span></div>` })}
       </div>`;
   },
@@ -1668,7 +1679,11 @@ const screens = {
       ? t("yres.leadDebtCash", { amount: `<span class="red">${fmt(debt + behind)}</span>`, cash: fmt(sim.cash) })
       : t("yres.leadDebt", { amount: `<span class="red">${fmt(debt + behind)}</span>` });
     else if (meals > 0) head = t("yres.leadHungry");
-    else head = t("yres.leadOk");
+    else {
+      const sp = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;   // left in a month with no surprises
+      head = sim.netWorth - sim.refund.total < 0 ? t("yres.leadOkRefund", { refund: fmt(sim.refund.total) })
+        : sp > 0.5 ? t("yres.leadOkSpare", { spare: fmt(sp) }) : t("yres.leadOk");
+    }
 
     // Tiles
     const tile = (big, label, cls) => `<div class="tile"><b class="${cls || ""}">${big}</b><span>${label}</span></div>`;
@@ -1718,6 +1733,17 @@ const screens = {
       <p class="cap small">${t("yres.mcMedian", { debt: fmt(mc.medianDebt), meals: mc.medianMeals })}</p>
       <p class="cite">${t("yres.mcNote", { n: mc.runs.toLocaleString("en-US") })}</p></div>`;
 
+    // How close was it? (only shown when food never ran short in a normal month)
+    const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;
+    const noRefund = sim.netWorth - sim.refund.total;
+    const typicalBill = CONFIG.help.typicalEmergency;
+    const badPct = Math.round(mc.results.filter((x) => x.debt > 1 || x.meals > 0).length / mc.runs * 100);
+    const closeList = `<ul class="close">
+      <li>${t(noRefund < 0 ? "close.noRefundNeg" : "close.noRefund", { refund: fmt(sim.refund.total), net: fmt(Math.abs(noRefund)) })}</li>
+      ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), months: (typicalBill / spareMo).toFixed(1) })}${cite("Federal Reserve, 2026")}</li>` : ""}
+      <li>${t("close.odds", { n: evs.length === 0 ? "no" : evs.length, em: evs.length === 1 ? "emergency" : "emergencies", pct: badPct, runs: mc.runs.toLocaleString("en-US") })}</li>
+    </ul>`;
+
     // Same year, different help: replay this exact year (same emergencies) with one change
     const H = CONFIG.help, w0 = S.wageOverride ?? c.wage, w1 = w0 * (1 + H.trainingRaise);
     const copayAt = (w) => Math.round(takeHomeFor(w).gross * H.childCareCopayPct);
@@ -1753,10 +1779,10 @@ const screens = {
       <p class="headline">${head}</p>
       ${tiles}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
-      <p class="section">${t("yres.whyTitle")}</p>
       ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need);
-        return g > 0.5 ? `<div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(g) })}</div>`
-          : `<div class="note" style="font-size:16px">${t("yres.whyThin", { spare: fmt(-g) })}</div>`; })()}
+        if (g > 0.5) return `<p class="section">${t("yres.whyTitle")}</p><div class="note bad" style="font-size:16px">${t("yres.why", { gap: fmt(g) })}</div>`;
+        return `<p class="section">${t("yres.closeTitle")}</p>
+          <div class="note" style="font-size:16px">${t("yres.whyThin", { spare: fmt(-g) })}</div>${closeList}`; })()}
       <p class="section">${t("yres.yearTitle")}</p><div class="figure">${chart}</div>
       <div class="note">${refundLine}</div>
       <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
@@ -1813,6 +1839,7 @@ const screens = {
         <li>Internal Revenue Service. Rev. Proc. 2025-25 (2026 applicable percentage table). <a href="https://www.irs.gov/pub/irs-drop/rp-25-25.pdf" target="_blank" rel="noopener">irs.gov</a>; HHS ASPE, Poverty Guidelines. <a href="https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines" target="_blank" rel="noopener">aspe.hhs.gov</a></li>
         <li>Minnesota Department of Human Services. <i>MinnesotaCare Premium Estimator Table, 2026</i> (DHS-4139A). <a href="https://edocs.dhs.state.mn.us/lfserver/Public/DHS-4139A-ENG" target="_blank" rel="noopener">edocs.dhs.state.mn.us</a>; North Dakota HHS, Medicaid eligibility. <a href="https://www.hhs.nd.gov/healthcare/medicaid/eligibility" target="_blank" rel="noopener">hhs.nd.gov</a></li>
         <li>Ullrich, Rebecca, and Aaron Sojourner. <i>Child Care Is Key to Our Economic Recovery: Technical Appendix</i>. CLASP, 2020 (NSECE prices by provider type). <a href="https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf" target="_blank" rel="noopener">clasp.org</a>; BLS CPI, Day care and preschool (CUUR0000SEEB03).</li>
+        <li>MATBUS. "Hours of Service." <a href="https://www.matbus.com/riding-matbus/matbus-hours-of-service" target="_blank" rel="noopener">matbus.com</a> (checked Nov. 2026)</li>
         <li>U.S. Bureau of Labor Statistics. <i>Consumer Expenditure Surveys, 2025</i>, Table 1101: Quintiles of income before taxes. <a href="https://www.bls.gov/cex/tables/calendar-year/mean-item-share-average-standard-error/cu-income-quintiles-before-taxes-2025.xlsx" target="_blank" rel="noopener">bls.gov/cex</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i> (May 2026): unexpected expenses and savings. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
         <li>Internal Revenue Service. <i>Tax inflation adjustments for tax year 2025</i> (EITC, standard deduction, brackets); Child Tax Credit and dependent care credit rules for 2025. <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2025" target="_blank" rel="noopener">irs.gov</a></li>

@@ -98,5 +98,7 @@ window.WORKS_CITED = [
 
   { "text":"Ullrich, Rebecca, and Aaron Sojourner. *Child Care Is Key to Our Economic Recovery: Technical Appendix*. Center for Law and Social Policy, Apr. 2020, www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf.","url":"https://www.clasp.org/sites/default/files/AppendCCKeytoRecovCLASP.pdf","usedIn":"Game (what paid neighbors and relatives charge for child care, from the National Survey of Early Care and Education)" },
 
-  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" }
+  { "text":"U.S. Bureau of Labor Statistics. \"Consumer Price Index for All Urban Consumers: Day Care and Preschool in U.S. City Average (CUUR0000SEEB03).\" *BLS Data*, data.bls.gov/timeseries/CUUR0000SEEB03. Accessed 24 Nov. 2026.","url":"https://data.bls.gov/timeseries/CUUR0000SEEB03","usedIn":"Game (child care prices in today's dollars)" },
+
+  { "text":"\"Hours of Service.\" *MATBUS*, Metro Area Transit, www.matbus.com/riding-matbus/matbus-hours-of-service. Accessed 24 Nov. 2026.","url":"https://www.matbus.com/riding-matbus/matbus-hours-of-service","usedIn":"Game (Fargo bus hours: no Sunday service)" }
 ];
