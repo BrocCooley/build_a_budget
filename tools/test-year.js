@@ -52,8 +52,9 @@ for (const city of ["minneapolis"]) for (const housing of ["oneBR", "twoBR"]) fo
 // 6) Seasonal bills move money between months but not the yearly total
 for (const housing of ["oneBR", "twoBR"]) {
   let h = 0, cl = 0;
-  for (let m = 0; m < 12; m++) { const x = ctx.seasonalExtra({ housing }, m); h += x.heat; cl += x.clothes; }
-  check(Math.abs(h) < 1 && Math.abs(cl) < 1, "seasonal extras do not sum to $0 for " + housing);
+  let tot = 0;
+  for (let m = 0; m < 12; m++) { const x = ctx.seasonalExtra({ housing, transport: "car" }, m); h += x.heat; cl += x.clothes; tot += x.total; }
+  check(Math.abs(h) < 1 && Math.abs(cl) < 1 && Math.abs(tot) < 2, "seasonal extras do not sum to $0 for " + housing);
 }
 check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra({ housing: "oneBR" }, 6).heat < -25, "heat is not higher in January than July");
 

@@ -154,5 +154,11 @@ window.WORKS_CITED = [
 
   { "text":"U.S. Bureau of Labor Statistics. *Consumer Price Index*: Rent of Primary Residence, Food at Home, and All Items in Minneapolis-St. Paul-Bloomington (CUURS24ASEHA, CUURS24ASAF11, CUURS24ASA0); Day Care and Preschool, U.S. City Average (CUUR0000SEEB03). www.bls.gov/cpi/. Accessed 27 Nov. 2026.","url":"https://www.bls.gov/cpi/","usedIn":"Game (Year 2 price changes)" },
 
-  { "text":"U.S. Bureau of Labor Statistics. \"Average Hourly Earnings of Production and Nonsupervisory Employees: Retail Trade in Minneapolis-St. Paul-Bloomington, MN-WI (MSA) (SMU27334604200000008).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/SMU27334604200000008. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/SMU27334604200000008","usedIn":"Game (Year 2 pay change: +3.8%)" }
+  { "text":"U.S. Bureau of Labor Statistics. \"Average Hourly Earnings of Production and Nonsupervisory Employees: Retail Trade in Minneapolis-St. Paul-Bloomington, MN-WI (MSA) (SMU27334604200000008).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/SMU27334604200000008. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/SMU27334604200000008","usedIn":"Game (Year 2 pay change: +3.8%)" },
+
+  { "text":"KPMG. *Consumer Pulse Survey: Holiday 2025*. KPMG LLP, 2025, kpmg.com/us/en/articles/2025/kpmg-consumer-pulse-survey-holiday-2025.html.","url":"https://kpmg.com/us/en/articles/2025/kpmg-consumer-pulse-survey-holiday-2025.html","usedIn":"Game (holiday gifts: $195 average for shoppers spending under $500; $466 for households under $50,000)" },
+
+  { "text":"U.S. Census Bureau. \"Retail Sales: Automotive Parts, Accessory, and Tire Stores (MRTSSM4413USN)\" and \"Retail Sales: Health and Personal Care Stores (MRTSSM446USN).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/MRTSSM4413USN. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/MRTSSM4413USN","usedIn":"Game (car upkeep and personal care by month)" },
+
+  { "text":"U.S. Energy Information Administration. \"US Regular All Formulations Gas Price (GASREGM)\"; Federal Highway Administration. \"Vehicle Miles Traveled (TRFVOLUSM227NFWA).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/GASREGM. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/GASREGM","usedIn":"Game (gas costs by month)" }
 ];

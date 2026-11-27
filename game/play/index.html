@@ -643,7 +643,8 @@ const CONFIG = {
   },
 
   gifts: {
-    typical: 651,                // Gallup, Oct. 2025: Americans with household income under $50,000 expect to spend $651 on holiday gifts
+    typical: 195,                // KPMG Consumer Pulse, Holiday 2025: shoppers who spend under $500 on the holidays (half of all shoppers) average $195.
+                                 // For comparison: households under $50,000 average $466 (KPMG); Gallup's under-$50,000 gift estimate is $651.
     month: 11                    // December. Free option: Salvation Army Twin Cities Toy Shop (gifts for 16,000 kids in 2025)
   },
 
@@ -653,7 +654,15 @@ const CONFIG = {
                                  // HUD Fair Market Rent already includes utilities, so this only moves heat money into the cold months.
     heatShare: [0.1971, 0.1681, 0.1273, 0.0802, 0.0368, 0.0206, 0.0181, 0.019, 0.019, 0.046, 0.103, 0.1649],
                                  // share of the year's home gas use in each month: EIA, Minnesota residential natural gas consumption, 2021–2025 average
-    clothesShare: [0.0606, 0.0643, 0.0808, 0.0799, 0.0864, 0.0803, 0.0827, 0.0857, 0.076, 0.0821, 0.0976, 0.1235]
+    clothesShare: [0.0606, 0.0643, 0.0808, 0.0799, 0.0864, 0.0803, 0.0827, 0.0857, 0.076, 0.0821, 0.0976, 0.1235],
+    // Car owners: gas ($1,300/yr) and upkeep, repairs and tires ($1,104/yr) from AAA, spread by month.
+    gasShare: [0.0694, 0.0691, 0.0856, 0.086, 0.0942, 0.0941, 0.094, 0.0917, 0.0843, 0.0857, 0.0753, 0.0706],
+                                 // monthly gas price (EIA via FRED GASREGM) × miles driven (FHWA via FRED TRFVOLUSM227NFWA), 2022–2025 average
+    carUpkeepShare: [0.0751, 0.0732, 0.0856, 0.0843, 0.0873, 0.0861, 0.0853, 0.0894, 0.0844, 0.0873, 0.0819, 0.08],
+                                 // auto parts, accessories and tire store sales, not seasonally adjusted (Census via FRED MRTSSM4413USN), 2022–2025
+    personalShare: [0.0797, 0.0754, 0.0823, 0.0804, 0.083, 0.082, 0.0821, 0.0846, 0.0842, 0.0881, 0.0835, 0.0946],
+                                 // personal care ($414/yr): health and personal care store sales, not seasonally adjusted (Census via FRED MRTSSM446USN)
+    carGasYear: 1300, carUpkeepYear: 1104
                                  // share of the year's clothing spending in each month: Census Monthly Retail Trade, clothing stores,
                                  // not seasonally adjusted, 2022–2025 average (FRED MRTSSM4481USN)
   },
@@ -741,9 +750,9 @@ const TEXT = {
   "meter.collections": "IN COLLECTIONS {bal}",
   "ev.gifts.app": "Calendar",
   "ev.gifts.title": "The holidays are here",
-  "ev.gifts.text": "Your kid is 4. What do you do about gifts?",
+  "ev.gifts.text": "Your kid is 4. A few small gifts, or a toy drive?",
   "ev.gifts.short": "Holiday gifts",
-  "ev.gifts.stat": "Families earning under $50,000 planned to spend about **{amt}** on holiday gifts.",
+  "ev.gifts.stat": "Half of holiday shoppers spend under $500; they average **{amt}**. Households earning under $50,000 average $466.",
   "ev.gifts.toy": "Sign up for a toy drive",
   "ev.gifts.toySub": "Free. The Salvation Army's Twin Cities Toy Shop gave gifts to 16,000 kids in 2025. You register ahead and pick up in December.",
   "ev.cardClosed": "Credit card closed",
@@ -752,6 +761,8 @@ const TEXT = {
   "card.chargedOff": "In {month}, after 6 missed payments, the bank closed the card and sent it to collections. Collectors can sue, and it stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "mc.gas": "Gas this month: {amt} (average {avg}; more driving, higher prices)",
+  "mc.upkeep": "Car upkeep and tires this month: {amt} (average {avg})",
   "mc.heat": "Heat this month: {amt} (average {avg})",
   "mc.clothes": "Clothes this month: {amt} (average {avg})",
   "mc.late": "Missed the card's {due} minimum: late fee",
@@ -1485,7 +1496,13 @@ function isRedMonth(r) { return r.foodGap > 0.005 || r.behindAdded > 0.5 || (r.c
 function seasonalExtra(c, m) {
   const Z = CONFIG.seasonal, h = Z.heatMonthly[c.housing] || 0, cl = CONFIG.basicsItems.clothes;
   const heat = h * 12 * Z.heatShare[m] - h, clothes = cl * Z.clothesShare[m] - cl / 12;
-  return { heat, clothes, total: heat + clothes, heatMonth: h * 12 * Z.heatShare[m], heatAvg: h, clothesMonth: cl * Z.clothesShare[m], clothesAvg: cl / 12 };
+  const car = c.transport === "car", pc = CONFIG.basicsItems.personal;
+  const gas = car ? Z.carGasYear * Z.gasShare[m] - Z.carGasYear / 12 : 0;
+  const upkeep = car ? Z.carUpkeepYear * Z.carUpkeepShare[m] - Z.carUpkeepYear / 12 : 0;
+  const personal = pc * Z.personalShare[m] - pc / 12;
+  return { heat, clothes, gas, upkeep, personal, total: heat + clothes + gas + upkeep + personal,
+    heatMonth: h * 12 * Z.heatShare[m], heatAvg: h, clothesMonth: cl * Z.clothesShare[m], clothesAvg: cl / 12,
+    gasMonth: Z.carGasYear * Z.gasShare[m], gasAvg: Z.carGasYear / 12, upkeepMonth: Z.carUpkeepYear * Z.carUpkeepShare[m], upkeepAvg: Z.carUpkeepYear / 12 };
 }
 
 // Paying only the minimum every month: how long until the card is paid off, and how much interest that costs
@@ -2205,6 +2222,9 @@ const screens = {
         <li>Comcast. "Internet Essentials." <a href="https://www.xfinity.com/learn/internet-service/internet-essentials" target="_blank" rel="noopener">xfinity.com</a></li>
         <li>Minnesota Driver and Vehicle Services. "Vehicle Fees" and "Registration Tax." <a href="https://dps.mn.gov/divisions/dvs/vehicle/vehicle-fees" target="_blank" rel="noopener">dps.mn.gov</a></li>
         <li>Minnesota Department of Revenue. <i>Tax Year 2025 Inflation-Adjusted Amounts in Minnesota Statutes</i> (renter's credit, Minn. Stat. 290.0693). <a href="https://revenue.state.mn.us/sites/default/files/2024-12/inflation-adjusted-amounts-2025.pdf" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
+        <li>KPMG. <i>Consumer Pulse Survey: Holiday 2025</i> (fielded Aug. 28–Sept. 4, 2025, n = 2,021). <a href="https://kpmg.com/us/en/articles/2025/kpmg-consumer-pulse-survey-holiday-2025.html" target="_blank" rel="noopener">kpmg.com</a></li>
+        <li>U.S. Census Bureau. Monthly Retail Trade, not seasonally adjusted: auto parts, accessories and tire stores (MRTSSM4413USN); health and personal care stores (MRTSSM446USN), via FRED. <a href="https://fred.stlouisfed.org/series/MRTSSM4413USN" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
+        <li>U.S. Energy Information Administration, regular gasoline price (GASREGM); Federal Highway Administration, vehicle miles traveled (TRFVOLUSM227NFWA), via FRED. <a href="https://fred.stlouisfed.org/series/GASREGM" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Gallup. "Holiday Shoppers Plan to Spend Briskly." Oct. 2025. <a href="https://news.gallup.com/poll/697061/holiday-shoppers-plan-spend-briskly.aspx" target="_blank" rel="noopener">news.gallup.com</a></li>
         <li>The Salvation Army. "Ho, Ho, Hope Has Arrived: 2025 Toy Shop Serving 16,000 Kids in Twin Cities." <a href="https://www.salvationarmyusa.org/usa-central-territory/northern/stories/ho-ho-hope-has-arrived-2025-toy-shop-serving-16000-kids-in-twin-cities/" target="_blank" rel="noopener">salvationarmyusa.org</a></li>
         <li>Board of Governors of the Federal Reserve System. "Uniform Retail Credit Classification and Account Management Policy." <a href="https://www.federalreserve.gov/frrs/guidance/uniform-retail-credit-classification-and-account-management-policy.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
@@ -2253,8 +2273,9 @@ const screens = {
         <p><b>WIC:</b> a 4-year-old qualifies for WIC until age 5, and SNAP or Medical Assistance makes the family income-eligible. The game counts the national average WIC food benefit, $64.71 a month (FY2025, USDA FNS), toward the food budget. WIC buys only set foods and needs an appointment to sign up.</p>
         <p><b>Late rent:</b> if the lease allows it, a landlord can charge a late fee of up to 8% of the overdue rent (Minn. Stat. 504B.177); the game charges it once per late payment. In Minneapolis, a landlord must give 30 days' written notice before filing for eviction for unpaid rent (Minneapolis Code 244.2060).</p>
         <p><b>Year 2 and later:</b> prices and pay change by the most recent year-over-year change (Sept. 2025 to Sept. 2026, since BLS skipped Oct. 2025 during the government shutdown): rent +4.1% (Minneapolis CPI rent), child care +3.1% (U.S. CPI day care and preschool), groceries +2.1% (Minneapolis CPI food at home; SNAP and WIC follow food prices), everything else +3.6% (Minneapolis CPI), pay +3.8% (Minneapolis–St. Paul retail hourly earnings). Tax brackets and benefit income limits are kept at 2025–26 levels.</p>
+        <p><b>Other seasonal costs:</b> for a car owner, gas ($1,300/yr) follows monthly gas prices and miles driven (EIA and FHWA via FRED), so summer costs more; car upkeep and tires ($1,104/yr) follow auto parts and tire store sales by month (Census). Personal care ($414/yr) follows health and personal care store sales. The game uses spending data by month, not guesses about single items like snow tires or sunscreen. Yearly totals don't change.</p>
         <p><b>Internet:</b> Xfinity Internet Essentials, $14.95/mo, for households on SNAP or Medicaid. It's added to basic necessities.</p>
-        <p><b>Holidays:</b> in December you choose: gifts at what households earning under $50,000 planned to spend ($651; Gallup, 2025), or a free toy drive (the Salvation Army's Twin Cities Toy Shop served 16,000 kids in 2025). Comparisons and the 1,000 random years assume the toy drive.</p>
+        <p><b>Holidays:</b> in December you choose: a few small gifts at what lower-spending holiday shoppers spend ($195, the average for the half of shoppers who spend under $500; households under $50,000 average $466; KPMG, 2025), or a free toy drive (the Salvation Army's Twin Cities Toy Shop served 16,000 kids in 2025). Comparisons and the 1,000 random years assume the toy drive.</p>
         <p><b>Credit card:</b> ${(CONFIG.card.apr * 100).toFixed(2)}% interest (Federal Reserve average for accounts charged interest, Aug. 2026). Credit limit ${fmt(CONFIG.card.creditLimit)}, the median for all U.S. card accounts (Philadelphia Fed, 2026). That's generous: new cards for people with credit scores under 660 start at a median of $600. Charges past the limit become unpaid bills. Minimum payment: the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimate). Cash beyond one month of groceries goes to paying the card down. ${CONFIG.card.hasCardPct}% of adults earning $25,000–$49,999 have a credit card (Federal Reserve SHED 2025); the game assumes you do.</p>
         <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
@@ -2323,6 +2344,8 @@ function monthCard(r) {
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
     ${ln(t("mc.bills", null, true), "−" + fmt(r.bills != null ? r.bills : b.housing + b.care + b.transport + b.basics))}
     ${r.seasonal && r.seasonal.heat > 5 ? ln(`<small>${t("mc.heat", { amt: fmt(r.seasonal.heatMonth), avg: fmt(r.seasonal.heatAvg) }, true)}</small>`, "", "muted") : ""}
+    ${r.seasonal && r.seasonal.gas > 8 ? ln(`<small>${t("mc.gas", { amt: fmt(r.seasonal.gasMonth), avg: fmt(r.seasonal.gasAvg) }, true)}</small>`, "", "muted") : ""}
+    ${r.seasonal && r.seasonal.upkeep > 5 ? ln(`<small>${t("mc.upkeep", { amt: fmt(r.seasonal.upkeepMonth), avg: fmt(r.seasonal.upkeepAvg) }, true)}</small>`, "", "muted") : ""}
     ${r.seasonal && r.seasonal.clothes > 8 ? ln(`<small>${t("mc.clothes", { amt: fmt(r.seasonal.clothesMonth), avg: fmt(r.seasonal.clothesAvg) }, true)}</small>`, "", "muted") : ""}
     ${r.tabs ? ln(`<small>${t("mc.tabs", { amt: fmt(r.tabs) }, true)}</small>`, "", "muted") : ""}
     ${r.gift ? ln(r.gift.how === "skip" ? t("mc.giftToy", null, true) : t("mc.gift", null, true) + (r.gift.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), r.gift.how === "skip" ? "$0" : (r.gift.how === "card" ? "" : "−") + fmt(r.gift.cost), r.gift.how === "card" ? "muted" : "") : ""}
@@ -2348,7 +2371,7 @@ function eventPanel(p) {
   const newBal = curBal + Math.min(e.cost, roomLeft);   // card balance right now, plus this bill (up to the limit)
   const mp = cardMinPayment(newBal).pay;
   return `${notif(EV_ICON[e.id], "red", t("ev." + e.id + ".app"), t("ev." + e.id + ".title"), t("ev." + e.id + ".text", { cost: fmt(e.cost) }))}
-    <div class="figure"><p class="cap">${gift ? t("ev.gifts.stat", { amt: fmt(e.cost) }) + cite("Gallup, 2025") : t("ev.stat", { pct: Math.round(ec.annualChance * 100), what: t("ev." + e.id + ".short", null, true).toLowerCase() }) + cite("Federal Reserve, 2026")}</p></div>
+    <div class="figure"><p class="cap">${gift ? t("ev.gifts.stat", { amt: fmt(e.cost) }) + cite("KPMG, 2025") : t("ev.stat", { pct: Math.round(ec.annualChance * 100), what: t("ev." + e.id + ".short", null, true).toLowerCase() }) + cite("Federal Reserve, 2026")}</p></div>
     <div class="opts">
       ${(() => { const s = opt({ act: "yev", val: "savings", ico: "dollar", title: t("ev.savings"), price: fmt(e.cost), sub: canSave ? t("ev.savings.sub", { cash: fmt(p.cash) }) : t("ev.savings.no", { cash: fmt(p.cash) }), tag: canSave ? t("tag.noDebt") : "" }); return canSave ? s : s.replace('<button class="opt"', '<button class="opt nope" disabled'); })()}
       ${p.chargedOff ? opt({ act: "yev", val: "card", ico: "card", title: t("ev.cardClosed"), price: "", sub: t(gift ? "ev.cardClosed.gift" : "ev.cardClosed.sub") }) : opt({ act: "yev", val: "card", ico: "card", title: t("ev.card"), price: fmt(e.cost), sub: (roomLeft < e.cost ? t("ev.card.limit", { room: fmt(roomLeft), rest: fmt(e.cost - roomLeft) }) : t("ev.card.sub", { bal: fmt(newBal), pay: fmt(mp), apr: (CONFIG.card.apr * 100).toFixed(1) + "%" })) + cite("Federal Reserve, 2026") })}
