@@ -685,6 +685,7 @@ const CONFIG = {
     cdctc: { expenseLimit: 3000, maxRate: 0.35, minRate: 0.20, startAGI: 15000, step: 2000 }, // 2025 Child and Dependent Care Credit, 1 child
     mn: {                        // Minnesota state tax credits and income tax (Minneapolis)
       stdDeductionHoH: 22500, rate1: 0.0535,              // 2025 MN head of household standard deduction; 5.35% bracket (to $40,100)
+      dependentExemption: 5200,                          // 2025 MN dependent exemption, one child (Minn. Stat. 290.0121; MN Dept. of Revenue)
       ctcPerChild: 1750, wfcRate: 0.04, wfcEarnedCap: 9480, // 2025 MN Child Tax Credit + Working Family Credit (refundable)
       phaseoutStart: 31950, phaseoutRate: 0.12,           // reduced by 12% of income over $31,950 (non-joint filers)
       // Renter's credit, tax year 2025 (Minn. Stat. 290.0693; MN Dept. of Revenue, Tax Year 2025 Inflation-Adjusted Amounts).
@@ -725,6 +726,8 @@ const TEXT = {
   "year.carryCard": "The card keeps charging interest, and the minimum payment comes out of every paycheck.",
   "year.carryCollections": "The card debt is with a collector now.",
   "yres.yearN": "Year {n}",
+  "save.from": "**Your savings came mostly from your tax refund.** You ended the year {gain} ahead: {refund} was the March tax refund (government tax credits for working parents and renters), and only {pay} came from your paycheck.",
+  "save.fromAll": "**Your savings came from your tax refund.** You ended the year {gain} ahead, but the {refund} March tax refund (government tax credits) is more than all of it: without it, your paycheck would have left you {pay} short.",
   "year.prices": "**Prices went up:** rent +{rent}, child care +{care}, groceries +{food}, everything else +{other}. Your pay went up too: +{wage} a year. Both use the most recent year of government price and pay data.",
   "yres.nextYear": "Play year {n}",
   "yres.nextYearDebt": "Play year {n} (your {amt} in debt comes with you)",
@@ -865,7 +868,7 @@ const TEXT = {
   "best.note": "Typical result of {n} random years each.",
   "close.noRefund": "Without the **{refund}** tax refund: **{net}** left for the whole year.",
   "close.noRefundNeg": "Without the **{refund}** tax refund: **{net} short** for the year.",
-  "close.oneBill": "One typical emergency (**{bill}**) uses up **{months} months** of that spare money.",
+  "close.oneBill": "A typical emergency costs **{bill}**. Saving that from {spare} a month would take **{time}**.",
   "close.odds": "You had **{n}** {em}. {pct}% of random years for this household end in debt or with skipped meals.",
   "yres.redMonths": "months short or borrowing",
   "yres.debtTile": "debt at year's end",
@@ -1134,6 +1137,7 @@ const TEXT = {
   "bl.payNoSnap": "Your paycheck left **{short}** a month too little for food, and this time there was no SNAP to fill the gap.",
   "bl.payOk": "Your paycheck covered food, with **{spare}** a month to spare.",
   "bl.payShort": "Your paycheck didn't even cover the bills: **{left}** short every month, with nothing left for food.",
+  "bl.refundSave": "Anything you saved came mostly from the **{refund}** tax refund each March.",
   "bl.refundAll": "The **{refund}** tax refund covered the gap.",
   "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
   "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
@@ -1322,7 +1326,7 @@ function taxRefund(cityKey, wage, careMonthly, rentMonthly) {
   let mnCredits = 0, mnTax = 0, renterCredit = 0;
   if (cityKey === "minneapolis") {
     const M = T.mn;
-    mnTax = Math.max(0, agi - M.stdDeductionHoH) * M.rate1;
+    mnTax = Math.max(0, agi - M.stdDeductionHoH - M.dependentExemption) * M.rate1;
     mnCredits = Math.max(0, M.ctcPerChild + M.wfcRate * Math.min(earned, M.wfcEarnedCap) - M.phaseoutRate * Math.max(0, Math.max(earned, agi) - M.phaseoutStart));
     const RC = M.renter, hh = Math.max(0, agi - RC.exemption * RC.depMult), row = RC.table.find((r) => hh <= r[0]);
     if (row && rentMonthly) { const rpt = rentMonthly * 12 * RC.rentShare; renterCredit = Math.min(row[3], Math.max(0, (1 - row[2]) * (rpt - row[1] * hh))); }
@@ -1562,7 +1566,8 @@ function bottomLine() {
           <div class="need"><span>${t("bl.rowWic", null, true)}</span><b>−${fmt(b.wic)}</b></div>
         </div>`
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
-          : left < b.need - b.wic ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - b.wic - left) }) : t("bl.payOk", { spare: fmt(left - b.need + b.wic) })))}
+          : left < b.need - b.wic ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - b.wic - left) }) : t("bl.payOk", { spare: fmt(left - b.need + b.wic) }))
+        + (left >= 0 ? " " + t("bl.refundSave", { refund: fmt(sim.refund.total) }) : ""))}
       ${item(t("bl.choicesH"), luckLine)}
       ${debt > 0.5 ? item(t("bl.cardH"), t(sim.card < 0.5 ? "bl.cardBills" : "bl.card", { amt: fmt(debt), card: fmt(sim.card), years: (() => { if (sim.card < 0.5) return ""; if (sim.chargedOff) return t("bl.cardCollections", null, true); const po = minPayoff(sim.card); return t("bl.cardPayoff", { years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) }, true); })() })) : ""}
       ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
@@ -1985,7 +1990,7 @@ const screens = {
       : t("yres.leadDebt", { amount: `<span class="red">${fmt(debt + behind)}</span>` });
     else if (meals > 0) head = t("yres.leadHungry");
     else {
-      const sp = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;   // left in a month with no surprises
+      const sp = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap + b.wic - b.need;   // left in a month with no surprises (WIC and SNAP count toward food)
       head = sim.netWorth - sim.refund.total < 0 ? t("yres.leadOkRefund", { refund: fmt(sim.refund.total) })
         : sp > 0.5 ? t("yres.leadOkSpare", { spare: fmt(sp) }) : t("yres.leadOk");
     }
@@ -2058,13 +2063,13 @@ const screens = {
     }
 
     // How close was it? (only shown when food never ran short in a normal month)
-    const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;
+    const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap + b.wic - b.need;
     const noRefund = sim.netWorth - sim.refund.total;
     const typicalBill = CONFIG.help.typicalEmergency;
     const closeList = `<ul class="close">
       <li>${t("close.spare", { spare: fmt(Math.max(0, spareMo)) })}</li>
       <li>${t(noRefund < 0 ? "close.noRefundNeg" : "close.noRefund", { refund: fmt(sim.refund.total), net: fmt(Math.abs(noRefund)) })}</li>
-      ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), months: (typicalBill / spareMo).toFixed(1) })}${cite("Federal Reserve, 2026")}</li>` : ""}
+      ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), spare: fmt(spareMo), time: (() => { const mo = Math.ceil(typicalBill / spareMo); return mo >= 24 ? (mo / 12).toFixed(1) + " years" : mo + (mo === 1 ? " month" : " months"); })() })}${cite("Federal Reserve, 2026")}</li>` : ""}
     </ul>`;
 
     // The credit card this year, and what happens if you stop here
@@ -2118,8 +2123,11 @@ const screens = {
       ${S.y.noSnap ? `<div class="note bad">${t("yres.noSnapMode", { snap: fmt(b.snap) })}</div>` : ""}
       <p class="headline">${head}</p>
       ${tiles}
+      ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
+        if (gain > 0.5) return `<div class="note">${t(pay >= 0 ? "save.from" : "save.fromAll", { gain: fmt(gain), refund: fmt(rf), pay: fmt(Math.abs(pay)) })}</div>`;
+        return ""; })()}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
-      ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) - b.need);
+      ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) + b.wic - b.need);
         if (g > 0.5) return `<div class="note bad" style="font-size:16px">${t(S.y.noSnap ? "yres.whyNoSnap" : "yres.why", { gap: fmt(g) })}</div>`;
         return `<p class="section">${t("yres.closeTitle")}</p>${closeList}`; })()}
       ${cardBox}
@@ -2235,7 +2243,7 @@ const screens = {
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
         <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
-        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit, Working Family Credit and renter's credit (2025 table: 17% of rent paid, minus a share of income after a $7,280 subtraction for one child), minus Minnesota income tax. The game uses the full rent figure, which includes utilities; renters who pay utilities separately get a little less.</p>
+        <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. The refund assumes free tax filing (for example a free VITA tax site) and arrives in March, since the IRS holds refunds with the Earned Income Tax Credit until mid-February. Minnesota income tax subtracts the standard deduction and a $5,200 exemption for the child. Minneapolis also gets Minnesota's Child Tax Credit, Working Family Credit and renter's credit (2025 table: 17% of rent paid, minus a share of income after a $7,280 subtraction for one child), minus Minnesota income tax. The game uses the full rent figure, which includes utilities; renters who pay utilities separately get a little less.</p>
         <p><b>Seasons:</b> the rent figure already includes utilities (HUD Fair Market Rent). The game moves the heating part ($42/mo for a 1-bedroom, $48 for a 2-bedroom: Minneapolis Public Housing Authority, 2026) into the cold months, following how much gas Minnesota homes use each month (EIA, 2021–2025). Clothes ($825/yr) follow U.S. clothing store sales by month (Census, 2022–2025). Yearly totals don't change. Some utilities offer even monthly billing; the game shows the bills as they come.</p>
         <p><b>Missed card payments:</b> bills are paid first. If there isn't enough left for the card's minimum, the payment is missed and a late fee goes on the card: $32 the first time, $43 for another within six months (the federal limits in force since a court struck down the $8 cap in April 2025). After 6 missed payments (180 days), banks close the card and charge it off; the debt goes to a collector and stays on a credit report for 7 years. In the game a closed card charges no more interest or fees and can't be used. Debt, interest and unpaid bills carry into the next year.</p>
         <p><b>Paycheck deductions:</b> Social Security and Medicare (7.65%) plus the employee half of Minnesota Paid Leave (0.88% of wages in 2026, split evenly by default; MN DEED) = 8.09%. In exchange, workers can take paid family and medical leave.</p>
