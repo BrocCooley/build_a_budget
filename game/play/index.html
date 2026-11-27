@@ -284,6 +284,8 @@ details.rec summary{cursor:pointer;font-weight:700;padding:14px 0;list-style:non
 details.rec summary::-webkit-details-marker{display:none}
 details.rec summary::after{content:"+";margin-left:auto;font:700 20px/1 var(--mono)}
 details.rec[open] summary::after{content:"−"}
+.btn.two{flex-direction:column;gap:3px;line-height:1.2}
+.btn-sub{display:block;font:500 12.5px/1.35 var(--sans);color:var(--muted);text-align:center}
 details.more{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:6px 0 4px}
 details.more[open]{padding-bottom:14px}
 ul.bl{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
@@ -935,7 +937,7 @@ const TEXT = {
   "meter.card": "CARD DEBT {bal} (min. {pay}/mo)",
   "meter.behind": "UNPAID BILLS {amt}",
   "yres.raiseBtn": "What if you earned {wage}/hr?",
-  "yres.raiseWhy": "**{wage}/hr** is the lowest pay that covers a month with no emergencies, with the choices you made.",
+  "yres.raiseWhy": "Lowest pay that covers a month with no emergencies",
 
 
   "intro.kicker": "Build a Budget · a 4-minute game",
@@ -2119,7 +2121,7 @@ const screens = {
       ${helpCard("kid", t("yres.cmpCare", { copay: fmt(copayAt(w0)) }), t("help.careHow"), "ACF, 2024", t("help.careReal", { pct: H.subsidyReceiptPct }), "HHS ASPE, 2022; Federal Register, 2026")}
     </div>`;
     const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
-    const raise = first.wageToClose ? `<p class="small muted" style="margin:10px 0 0">${t("yres.raiseWhy", { wage: fmtWage(first.wageToClose) })}</p><button class="btn secondary" data-act="raise" data-val="${first.wageToClose}">${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) })}</button>` : "";
+    const raise = first.wageToClose ? `<button class="btn secondary two" data-act="raise" data-val="${first.wageToClose}"><span>${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) }, true)}</span><small class="btn-sub">${t("yres.raiseWhy", null, true)}</small></button>` : "";
     return `<p class="kicker">${S.y.yearNum > 1 ? t("yres.yearN", { n: S.y.yearNum }) + " · " : ""}${t("results.choices3", { n: conscious })}</p>
       ${S.y.noSnap ? `<div class="note bad">${t("yres.noSnapMode", { snap: fmt(b.snap) })}</div>` : ""}
       <p class="headline">${head}</p>
