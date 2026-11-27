@@ -720,7 +720,10 @@ const TEXT = {
 
   "year.kicker": "Your year · {city}",
   "year.kickerN": "Year {n} · {city}",
-  "year.carry": "**Year {n} picks up where last year ended:** {cash} in cash, {card} on the credit card, {behind} in unpaid bills. The card keeps charging interest, and the minimum payment comes out of every paycheck.",
+  "year.carry": "**Year {n} picks up where last year ended:** {cash} in cash, {card} on the credit card, {behind} in unpaid bills.",
+  "year.carryClean": "**Year {n} picks up where last year ended:** {cash} in cash and no debt.",
+  "year.carryCard": "The card keeps charging interest, and the minimum payment comes out of every paycheck.",
+  "year.carryCollections": "The card debt is with a collector now.",
   "yres.yearN": "Year {n}",
   "year.prices": "**Prices went up:** rent +{rent}, child care +{care}, groceries +{food}, everything else +{other}. Your pay went up too: +{wage} a year. Both use the most recent year of government price and pay data.",
   "yres.nextYear": "Play year {n}",
@@ -1912,7 +1915,7 @@ const screens = {
     let body = "", actions = "";
     if (y.shown < 0 && !p) {
       const st = S.y.start;
-      body = (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t("year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}</div><div class="note plain small">${t("year.prices", { rent: pctTxt(CONFIG.prices.rent), care: pctTxt(CONFIG.prices.care), food: pctTxt(CONFIG.prices.food), other: pctTxt(CONFIG.prices.other), wage: pctTxt(CONFIG.prices.wage), n: S.y.yearNum - 1 })}${cite("BLS, 2026")}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
+      body = (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t(st.card + st.behind < 0.5 ? "year.carryClean" : "year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}${st.card >= 0.5 ? " " + t(st.chargedOff ? "year.carryCollections" : "year.carryCard") : ""}</div><div class="note plain small">${t("year.prices", { rent: pctTxt(CONFIG.prices.rent), care: pctTxt(CONFIG.prices.care), food: pctTxt(CONFIG.prices.food), other: pctTxt(CONFIG.prices.other), wage: pctTxt(CONFIG.prices.wage), n: S.y.yearNum - 1 })}${cite("BLS, 2026")}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
       actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
     } else if (p.type === "event") body = eventPanel(p.p);
     else {
