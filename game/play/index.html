@@ -841,6 +841,7 @@ const TEXT = {
   "card.payoff": "Paying only the minimum, it takes **{years}** to pay off and **{interest}** more in interest.",
   "card.behind": "Unpaid rent and bills: **{amt}**. After a 30-day notice, the landlord can file for eviction.",
   "bl.cardH": "Your debt",
+  "bl.more": "More: your luck and your debt",
   "bl.card": "You end the year **{amt}** in debt ({card} on the card). {years}",
   "bl.cardBills": "You end the year **{amt}** behind on rent and bills.",
   "bl.cardPayoff": "Paying only the card minimum: **{years}** and **{interest}** more in interest.",
@@ -1048,7 +1049,7 @@ const TEXT = {
   "care.home": "Home-based daycare",
   "care.home.sub": "A small group in someone's home.",
   "care.home.catch": "Catch: hard to find. About 4 in 10 Minnesota in-home daycares closed from 2014 to 2024.",
-  "care.ffn": "**Why not a relative?** Paid friends or family usually cost more than home daycare, and free care only works if someone is free 40+ hours a week.",
+  "care.ffn": "**Why not a relative?** Paid friends or family cost about **{mo}** a month. Free care only works if someone is free 40+ hours a week.",
   "care.shifts": "**{n} of your {total}** shifts a month pay for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
@@ -1065,14 +1066,14 @@ const TEXT = {
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
-  "basics.sub": "A standard low-income budget: what the poorest U.S. households actually spend. No extras.",
+  "basics.sub": "What the lowest-income households actually spend, on average. Clothes cost more in winter and at the holidays.",
   "basics.phone": "Cell phone service",
   "basics.clothes": "Clothes and shoes",
   "basics.personal": "Soap, toothpaste, haircuts",
   "basics.supplies": "Cleaning supplies, toilet paper",
   "basics.internet": "Home internet (low-income plan)",
   "basics.health": "Health insurance",
-  "basics.total": "All of it, every month",
+  "basics.total": "Every month",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
@@ -1181,7 +1182,7 @@ const TEXT = {
   "results.context": "For context: {note}",
   "results.receipt": "See the full receipt",
   "results.next": "The bottom line",
-  "yres.details": "More: every day, emergencies, other help",
+  "yres.details": "More: how close it was, every day, other help",
   "results.raiseBtn": "Replay earning {wage}/hr",
   "results.replay": "Replay from the start",
 
@@ -1660,12 +1661,14 @@ function bottomLine() {
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
           : left < b.need - b.wic ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - b.wic - left) }) : t("bl.payOk", { spare: fmt(left - b.need + b.wic) }))
         + (left >= 0 ? " " + t("bl.refundSave", { refund: fmt(sim.refund.total) }) : ""))}
-      ${item(t("bl.choicesH"), luckLine)}
-      ${debt > 0.5 ? item(t("bl.cardH"), t(sim.card < 0.5 ? "bl.cardBills" : "bl.card", { amt: fmt(debt), card: fmt(sim.card), years: (() => { if (sim.card < 0.5) return ""; if (sim.chargedOff) return t("bl.cardCollections", null, true); const po = minPayoff(sim.card); return t("bl.cardPayoff", { years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) }, true); })() })) : ""}
       ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
       ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > withSnap.mealsSkipped ? " " + t("bl.raiseMore") : ""))}
     </ul>
-    <p class="cap small muted">${t("bl.note")}</p>`;
+    <p class="cap small muted">${t("bl.note")}</p>
+    <details class="rec more"><summary>${t("bl.more")}</summary><ul class="bl">
+      ${item(t("bl.choicesH"), luckLine)}
+      ${debt > 0.5 ? item(t("bl.cardH"), t(sim.card < 0.5 ? "bl.cardBills" : "bl.card", { amt: fmt(debt), card: fmt(sim.card), years: (() => { if (sim.card < 0.5) return ""; if (sim.chargedOff) return t("bl.cardCollections", null, true); const po = minPayoff(sim.card); return t("bl.cardPayoff", { years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) }, true); })() })) : ""}
+    </ul></details>`;
 }
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => (n < -0.5 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
@@ -2013,12 +2016,12 @@ const screens = {
       <h2>${t("basics.title")}</h2>
       <p class="muted">${t("basics.sub")}</p>
       <ul class="auto">
-        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}</li>
-        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}</li>
-        <li><span class="ico">${icon("bag")}</span>${t("basics.personal")}</li>
-        <li><span class="ico">${icon("home")}</span>${t("basics.supplies")}</li>
-        <li><span class="ico">${icon("phone")}</span>${t("basics.internet")}</li>
-        <li><span class="ico">${icon("med")}</span>${t("basics.health", { kid: city().kidHealth })}</li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}<span class="amt">${fmt(CONFIG.basicsItems.phone / 12)}</span></li>
+        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}<span class="amt">${fmt(CONFIG.basicsItems.clothes / 12)}</span></li>
+        <li><span class="ico">${icon("bag")}</span>${t("basics.personal")}<span class="amt">${fmt(CONFIG.basicsItems.personal / 12)}</span></li>
+        <li><span class="ico">${icon("home")}</span>${t("basics.supplies")}<span class="amt">${fmt(CONFIG.basicsItems.supplies / 12)}</span></li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.internet")}<span class="amt">${fmt(CONFIG.basicsItems.internet / 12)}</span></li>
+        <li><span class="ico">${icon("med")}</span>${t("basics.health", { kid: city().kidHealth })}<span class="amt">${fmt(path().health)}</span></li>
         <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(path().basics)}</span></li>
       </ul>
       <p class="cite">(${CONFIG.basicsCite}; health insurance: ${city().healthCite})</p>
@@ -2263,14 +2266,16 @@ const screens = {
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
       ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) + b.wic - b.need);
         if (g > 0.5) return `<div class="note bad" style="font-size:16px">${t(S.y.noSnap ? "yres.whyNoSnap" : "yres.why", { gap: fmt(g) })}</div>`;
-        return `<p class="section">${t("yres.closeTitle")}</p>${closeList}`; })()}
-      ${cardBox}
+        return ""; })()}
+      ${debt + behind > 0.5 ? cardBox : ""}
       <div class="actions">
         ${next("final", t("results.next"), "go")}
         <button class="btn secondary" data-act="ynext">${t(debt + behind > 0.5 ? "yres.nextYearDebt" : "yres.nextYear", { n: (S.y.yearNum || 1) + 1, amt: fmt(debt + behind) })}</button>
       </div>
       <details class="rec more">
         <summary>${t("yres.details")}</summary>
+        ${spareMo > -0.5 ? `<p class="section">${t("yres.closeTitle")}</p>${closeList}` : ""}
+        ${debt + behind > 0.5 ? "" : cardBox}
         ${bestCase}
         <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
         <p class="section">${t("yres.eventsTitle")}</p>${evList}
