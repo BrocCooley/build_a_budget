@@ -1150,8 +1150,8 @@ const TEXT = {
   "bl.onlyWay": "**Only one set of choices stays out of the red:** a 1-bedroom, home daycare and the bus. Every other combination comes up short or borrows money in every one of 1,000 random years.",
   "bl.top": "The bottom line",
   "bl.kicker": "The proof: your year",
-  "bl.big": "of your paycheck went to bills before any food.",
-  "bl.bigOver": "of your paycheck was needed for bills, before any food.",
+  "bl.big": "of your paycheck went to rent, child care, getting to work and basics ({bills} of your {net} take-home pay), before buying any food.",
+  "bl.bigOver": "of your paycheck. Rent, child care, getting to work and basics cost **{bills}** a month, but you only take home **{net}**. That is **{over}** more than you earn, before buying any food.",
   "bl.payH": "Your paycheck, each month",
   "bl.rowPay": "Take-home pay ({hours} hrs/wk at {wage}/hr)",
   "bl.rowBills": "Rent, child care, transport, basics",
@@ -1595,7 +1595,7 @@ function bottomLine() {
     <p class="kicker" style="margin-top:30px">${t("bl.kicker")}</p>
     <div class="stat">
       <div class="big" data-count="${pctBills}" data-dec="0">0%</div>
-      <p>${t(pctBills >= 100 ? "bl.bigOver" : "bl.big")}</p>
+      <p>${t(pctBills >= 100 ? "bl.bigOver" : "bl.big", { bills: fmt(bills), net: fmt(b.net), over: fmt(bills - b.net) })}</p>
     </div>
     <ul class="bl">
       ${item(t("bl.payH"), `<div class="blr">
