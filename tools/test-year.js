@@ -102,5 +102,21 @@ check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra(
   console.log(`YEAR 2: rent ${$(y1.base.housing)} -> ${$(y2.base.housing)}, pay ${y1.base.wage.toFixed(2)} -> ${y2.base.wage.toFixed(2)}/hr, SNAP ${$(y1.base.snap)} -> ${$(y2.base.snap)}.`);
 }
 
+// 10) Each kind of emergency at most once a year; paying the card down with spare cash is the player's choice
+{
+  let dup = 0;
+  for (let k = 0; k < 2000; k++) { const ids = rollYear(1000 + k, true).flat().map((e) => e.id); if (new Set(ids).size !== ids.length) dup++; }
+  check(dup === 0, "an emergency type happened twice in one year");
+  const c = { housing: "oneBR", care: "home", transport: "bus" };
+  const ask = simulateYear("minneapolis", c, 0, 4242, { "11-g": "skip" }, {});
+  let ch = { "11-g": "skip" }, guard = 0, y = ask;
+  while (y.pending && guard++ < 40) { ch[y.pending.m + "-" + y.pending.i] = y.pending.i === "cp" ? "keep" : "card"; y = simulateYear("minneapolis", c, 0, 4242, ch, {}); }
+  const asked = Object.keys(ch).some((k) => k.endsWith("-cp"));
+  const ch2 = Object.assign({}, ch); for (const k in ch2) if (k.endsWith("-cp")) ch2[k] = "pay";
+  const paid = simulateYear("minneapolis", c, 0, 4242, ch2, {});
+  if (asked) check(y.card > paid.card && y.months.every((r) => !r.cardExtra), "keeping the cash should leave a bigger card balance and no extra payments");
+  console.log(`CARD CHOICE: asked ${asked ? "yes" : "no (no spare cash with debt)"}; keep cash -> card ${$(y.card)}, cash ${$(y.cash)}; pay down -> card ${$(paid.card)}, cash ${$(paid.cash)}.`);
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);

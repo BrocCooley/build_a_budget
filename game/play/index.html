@@ -754,6 +754,15 @@ const TEXT = {
   "ev.gifts.short": "Holiday gifts",
   "ev.gifts.stat": "Half of holiday shoppers spend under $500; they average **{amt}**. Households earning under $50,000 average $466.",
   "ev.gifts.toy": "Sign up for a toy drive",
+  "cp.app": "Credit card",
+  "cp.title": "You have extra cash. Pay down the card?",
+  "cp.text": "You owe **{card}** at {apr} interest and have **{cash}** in cash.",
+  "cp.stat": "**{pct} in 100** card holders at this income carry a balance from month to month.",
+  "cp.payAll": "Pay off the card",
+  "cp.pay": "Pay the card down",
+  "cp.paySub": "Stops the interest. Keeps one month of groceries in cash. From now on, spare cash goes to the card.",
+  "cp.keep": "Keep the cash, pay the minimum",
+  "cp.keepSub": "Cash stays on hand for emergencies, but you keep paying {apr} interest on the balance. You decide once a year.",
   "ev.gifts.toySub": "Free. The Salvation Army's Twin Cities Toy Shop gave gifts to 16,000 kids in 2025. You register ahead and pick up in December.",
   "ev.cardClosed": "Credit card closed",
   "ev.cardClosed.sub": "The card is in collections. The whole bill becomes an unpaid bill.",
@@ -1309,14 +1318,14 @@ function rng(seed) {
 
 // Roll a whole year of emergencies from a seed. Same seed → same year. hasCar removes car repairs for bus riders.
 function rollYear(seed, hasCar) {
-  const r = rng(seed), year = [];
+  const r = rng(seed), year = [], had = {};
   for (let m = 0; m < CONFIG.year.months; m++) {
     const list = [];
     for (const e of CONFIG.events) {
       const p = 1 - Math.pow(1 - e.annualChance, 1 / 12);   // monthly chance that matches the yearly odds
       const hit = r(), amt = r();                            // always draw both so sequences stay aligned
       if (e.carOnly && !hasCar) continue;
-      if (hit < p) list.push({ id: e.id, cost: Math.round((e.min + amt * (e.max - e.min)) / 10) * 10 });
+      if (hit < p && !had[e.id]) { had[e.id] = true; list.push({ id: e.id, cost: Math.round((e.min + amt * (e.max - e.min)) / 10) * 10 }); }
     }
     year.push(list);
   }
@@ -1477,7 +1486,15 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     // 5) Catch up on bills you were behind on, if money is left
     if (cash > 0 && behind > 0) { const p = Math.min(cash, behind); cash -= p; behind -= p; rec.behindPaid = p; }
     // 6) Pay down the card with cash beyond one month of groceries (a 22% card costs more than cash earns)
-    if (card > 0.005 && cash > need) { const p = Math.min(card, cash - need); cash -= p; card -= p; cardPaid += p; rec.cardExtra = p; }
+    if (card > 0.005 && cash > need && !chargedOff) {
+      const key = choices && Object.keys(choices).find((k) => k.endsWith("-cp"));
+      let plan = key ? choices[key] : null;
+      if (!plan) {
+        if (opts.policy) plan = "pay";             // comparisons and the 1,000 years pay the card down with spare cash
+        else { months.push(Object.assign(rec, { partial: true })); return { months, pending: { m, i: "cp", ev: { id: "cardpay", cost: Math.min(card, cash - need) }, cash, card, chargedOff }, refund, base, card, cash, behind, interestPaid, events, lateFees, cardCharged, cardPaid }; }
+      }
+      if (plan === "pay") { const p = Math.min(card, cash - need); cash -= p; card -= p; cardPaid += p; rec.cardExtra = p; }
+    }
     rec.endCash = cash; rec.endCard = card; rec.endBehind = behind; rec.endChargedOff = chargedOff;
     months.push(rec);
   }
@@ -2264,7 +2281,7 @@ const screens = {
         <p><b>Hours:</b> full time, 40 hours a week. 8 in 10 employed single mothers usually work 35 hours or more (BLS, 2025), and women in sales jobs who work full time average 40.5 hours. Many cashiers can't get that many: only about 4 in 10 cashiers work full time, and retail workers in the Minneapolis area average 25.7 hours a week (BLS).</p>
         <p><b>Estimates:</b> the credit card's minimum payment rule (the greater of $40 or 1% of the balance plus interest, which is Chase's rule) and the refund arriving in March (the IRS said most early filers claiming the EITC would get refunds by March 2, 2026).</p>
         <p><b>SNAP:</b> estimated with the federal FY2027 formula. Gross pay minus a 20% earned-income deduction, the ${fmt(CONFIG.snap.standardDeduction)} standard deduction and the full child care cost, then an excess shelter deduction (rent above half of that income, capped at ${fmt(CONFIG.snap.excessShelterCap)}). Benefit = ${fmt(CONFIG.snap.max2Person)} − 30% of what's left. Eligibility ends above ${fmt(CONFIG.snap.grossLimit2Person)}/mo gross. Rent figures already include utilities, so no utility allowance is added.</p>
-        <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
+        <p><b>A year:</b> every month repeats the same pay, rent, child care, transport, basic necessities, and SNAP. Emergencies are rolled at random each month so that each one happens with the yearly odds the Federal Reserve reports (car repair 30% per year, car owners only; home or appliance repair 22%; medical 21%; phone or computer 18%; legal bills, taxes, or fines 10%). Each kind can happen at most once a year, since the survey asks whether people had at least one. Each cost is drawn from the survey's median cost range ($1,000–$1,999; $500–$999 for phones; $2,000–$4,999 for legal). Left out: child care cost increases (3%) and "other" (6%), because the survey gives no cost for them. The home or appliance rate is for all adults, including homeowners; renters may face it less often. The rolls come from a replay code (seed), not from how the player is doing.</p>
         <p><b>Each month:</b> pay the bills and the credit card's minimum payment first; bills the paycheck can't cover pile up as "behind". Then emergencies (savings or card). Then food: SNAP first, then cash. Whatever is missing is skipped meals. Unused SNAP stays on the EBT card. Leftover cash first catches up late bills.</p>
         <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. The refund assumes free tax filing (for example a free VITA tax site) and arrives in March, since the IRS holds refunds with the Earned Income Tax Credit until mid-February. Minnesota income tax subtracts the standard deduction and a $5,200 exemption for the child. Minneapolis also gets Minnesota's Child Tax Credit, Working Family Credit and renter's credit (2025 table: 17% of rent paid, minus a share of income after a $7,280 subtraction for one child), minus Minnesota income tax. The game uses the full rent figure, which includes utilities; renters who pay utilities separately get a little less.</p>
         <p><b>Seasons:</b> the rent figure already includes utilities (HUD Fair Market Rent). The game moves the heating part ($42/mo for a 1-bedroom, $48 for a 2-bedroom: Minneapolis Public Housing Authority, 2026) into the cold months, following how much gas Minnesota homes use each month (EIA, 2021–2025). Clothes ($825/yr) follow U.S. clothing store sales by month (Census, 2022–2025). Yearly totals don't change. Some utilities offer even monthly billing; the game shows the bills as they come.</p>
@@ -2276,7 +2293,7 @@ const screens = {
         <p><b>Other seasonal costs:</b> for a car owner, gas ($1,300/yr) follows monthly gas prices and miles driven (EIA and FHWA via FRED), so summer costs more; car upkeep and tires ($1,104/yr) follow auto parts and tire store sales by month (Census). Personal care ($414/yr) follows health and personal care store sales. The game uses spending data by month, not guesses about single items like snow tires or sunscreen. Yearly totals don't change.</p>
         <p><b>Internet:</b> Xfinity Internet Essentials, $14.95/mo, for households on SNAP or Medicaid. It's added to basic necessities.</p>
         <p><b>Holidays:</b> in December you choose: a few small gifts at what lower-spending holiday shoppers spend ($195, the average for the half of shoppers who spend under $500; households under $50,000 average $466; KPMG, 2025), or a free toy drive (the Salvation Army's Twin Cities Toy Shop served 16,000 kids in 2025). Comparisons and the 1,000 random years assume the toy drive.</p>
-        <p><b>Credit card:</b> ${(CONFIG.card.apr * 100).toFixed(2)}% interest (Federal Reserve average for accounts charged interest, Aug. 2026). Credit limit ${fmt(CONFIG.card.creditLimit)}, the median for all U.S. card accounts (Philadelphia Fed, 2026). That's generous: new cards for people with credit scores under 660 start at a median of $600. Charges past the limit become unpaid bills. Minimum payment: the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimate). Cash beyond one month of groceries goes to paying the card down. ${CONFIG.card.hasCardPct}% of adults earning $25,000–$49,999 have a credit card (Federal Reserve SHED 2025); the game assumes you do.</p>
+        <p><b>Credit card:</b> ${(CONFIG.card.apr * 100).toFixed(2)}% interest (Federal Reserve average for accounts charged interest, Aug. 2026). Credit limit ${fmt(CONFIG.card.creditLimit)}, the median for all U.S. card accounts (Philadelphia Fed, 2026). That's generous: new cards for people with credit scores under 660 start at a median of $600. Charges past the limit become unpaid bills. Minimum payment: the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimate). When you have more cash than one month of groceries, you choose once a year whether to pay the card down or keep the cash and pay only the minimum (the comparisons and 1,000 random years pay it down). ${CONFIG.card.hasCardPct}% of adults earning $25,000–$49,999 have a credit card (Federal Reserve SHED 2025); the game assumes you do.</p>
         <p><b>1,000 years:</b> the same household replayed with 1,000 new random years and the same odds. In those runs, an emergency is paid from savings if that still leaves money for food, otherwise it goes on the card.</p>
         <p><b>Meals:</b> cost per meal = monthly food cost ÷ (${CONFIG.daysInMonth} days × ${CONFIG.food.people} people × ${CONFIG.food.mealsPerDay} meals). Meals skipped = food shortfall ÷ cost per meal. Days covered = food budget ÷ monthly food cost × ${CONFIG.daysInMonth}.</p>
         <p style="margin:0"><b>Notes:</b> Take-home pay = gross minus 7.65% payroll tax. Annual tax credits (EITC, child tax credits) are paid once a year at tax time and are not included in monthly cash flow. Items marked "estimate" are approximations.</p>
@@ -2287,7 +2304,7 @@ const screens = {
 
 /* ---------- The year: helpers ---------- */
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const EV_ICON = { car: "wrench", medical: "med", phone: "phone", home: "home", legal: "card", gifts: "kid" };
+const EV_ICON = { cardpay: "card", car: "wrench", medical: "med", phone: "phone", home: "home", legal: "card", gifts: "kid" };
 function yearStart() { return S.y && S.y.start ? S.y.start.cash : startSavingsAmount(S.c.savings, S.city, S.c, S.wageOverride); }
 // Debt carried in from last year (Year 2 and later)
 function startOpts() { const st = S.y && S.y.start; return st ? { startCard: st.card, startBehind: st.behind, lastLate: st.lastLate, startChargedOff: st.chargedOff, startMissed: st.missed, priceYears: (S.y.yearNum || 1) - 1 } : {}; }
@@ -2365,6 +2382,15 @@ function monthCard(r) {
 }
 // An emergency arrives: pay from savings or put it on the card
 function eventPanel(p) {
+  if (p.ev.id === "cardpay") {
+    const C = CONFIG.card, min = cardMinPayment(p.card).pay;
+    return `${notif("card", "red", t("cp.app"), t("cp.title"), t("cp.text", { card: fmt(p.card), cash: fmt(p.cash), apr: (C.apr * 100).toFixed(1) + "%" }))}
+      <div class="figure"><p class="cap">${t("cp.stat", { pct: C.carryPct })}${cite("Federal Reserve, 2026")}</p></div>
+      <div class="opts">
+        ${opt({ act: "yev", val: "pay", ico: "dollar", title: t(p.ev.cost >= p.card - 0.5 ? "cp.payAll" : "cp.pay"), price: fmt(p.ev.cost), sub: t("cp.paySub") })}
+        ${opt({ act: "yev", val: "keep", ico: "card", title: t("cp.keep"), price: fmt(min) + "/mo", sub: t("cp.keepSub", { apr: (C.apr * 100).toFixed(1) + "%" }) })}
+      </div>`;
+  }
   const e = p.ev, ec = CONFIG.events.find((x) => x.id === e.id), gift = e.id === "gifts";
   const canSave = p.cash >= e.cost;
   const curBal = yearSim().card, roomLeft = p.chargedOff ? 0 : Math.max(0, CONFIG.card.creditLimit - curBal);
