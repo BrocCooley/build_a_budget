@@ -116,5 +116,13 @@ window.WORKS_CITED = [
 
   { "text":"Yang, Hannah. \"Minnesota Is Losing More Child Care Providers amid Rising Costs and Sticky Red Tape.\" *MPR News*, 4 Sept. 2025, www.mprnews.org/story/2025/09/04/minnesota-losing-more-child-care-providers.","url":"https://www.mprnews.org/story/2025/09/04/minnesota-losing-more-child-care-providers","usedIn":"Game (home daycare catch: about 10,000 in-home programs in 2014, 5,781 at the end of 2024)" },
 
-  { "text":"U.S. Census Bureau. \"Means of Transportation to Work by Selected Characteristics (S0802): Minneapolis City, Minnesota.\" *American Community Survey 1-Year Estimates*, 2024, data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000.","url":"https://data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000","usedIn":"Game (bus catch: 44.6-minute average transit commute vs. 21.2 minutes driving alone)" }
+  { "text":"U.S. Census Bureau. \"Means of Transportation to Work by Selected Characteristics (S0802): Minneapolis City, Minnesota.\" *American Community Survey 1-Year Estimates*, 2024, data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000.","url":"https://data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000","usedIn":"Game (bus catch: 44.6-minute average transit commute vs. 21.2 minutes driving alone)" },
+
+  { "text":"Minneapolis Public Housing Authority. *2026 Payment Standards and Utility Chart*. Nov. 2025, mphaonline.org/wp-content/uploads/2025/11/2026-Payment-Standards-and-Utility-Chart.pdf.","url":"https://mphaonline.org/wp-content/uploads/2025/11/2026-Payment-Standards-and-Utility-Chart.pdf","usedIn":"Game (heat: $42/mo for a 1-bedroom, $48 for a 2-bedroom apartment)" },
+
+  { "text":"U.S. Energy Information Administration. \"Minnesota Natural Gas Residential Consumption (Million Cubic Feet).\" *Natural Gas Data*, released 30 Oct. 2026, www.eia.gov/dnav/ng/hist/n3010mn2m.htm.","url":"https://www.eia.gov/dnav/ng/hist/n3010mn2m.htm","usedIn":"Game (heat bills by month, 2021–2025 average)" },
+
+  { "text":"U.S. Census Bureau. \"Retail Sales: Clothing Stores (MRTSSM4481USN).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/MRTSSM4481USN. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/MRTSSM4481USN","usedIn":"Game (clothes spending by month, 2022–2025 average)" },
+
+  { "text":"\"CFPB Credit Card Late Fees Rule Vacated by Texas District Court.\" *Holland & Knight*, 22 Apr. 2025, www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court.","url":"https://www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court","usedIn":"Game (card late fees: $32 first, $43 repeat)" }
 ];

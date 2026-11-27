@@ -3,7 +3,7 @@ const fs = require("fs"), vm = require("vm"), path = require("path");
 const html = fs.readFileSync(path.join(__dirname, "..", "game", "play", "index.html"), "utf8");
 const ctx = {};
 vm.runInNewContext(html.slice(html.indexOf("const CONFIG"), html.indexOf("// </calc>")) +
-  "\nObject.assign(this,{CONFIG,computePath,pathAtWage,simulateYear,manyYears,taxRefund,rollYear,startSavingsAmount,cardMinPayment,defaultPolicy});", ctx);
+  "\nObject.assign(this,{CONFIG,computePath,pathAtWage,simulateYear,manyYears,taxRefund,rollYear,startSavingsAmount,cardMinPayment,defaultPolicy,seasonalExtra,minPayoff});", ctx);
 const { CONFIG, simulateYear, manyYears, taxRefund, rollYear, startSavingsAmount } = ctx;
 const $ = (n) => (n < 0 ? "-$" : "$") + Math.abs(Math.round(n)).toLocaleString("en-US");
 let fails = 0;
@@ -49,5 +49,26 @@ for (const city of ["minneapolis"]) for (const housing of ["oneBR", "twoBR"]) fo
     console.log(`  ${(city.slice(0, 5) + " " + housing + "/" + care + "/" + transport).padEnd(30)} ${$(start).padStart(7)}   ${String(s.pctDebt).padStart(3)}%        ${$(s.medianDebt).padStart(8)}     ${String(s.pctHungry).padStart(3)}%        ${String(s.medianMeals).padStart(4)}                ${$(s.medianNet).padStart(8)}`);
   }
 }
+// 6) Seasonal bills move money between months but not the yearly total
+for (const housing of ["oneBR", "twoBR"]) {
+  let h = 0, cl = 0;
+  for (let m = 0; m < 12; m++) { const x = ctx.seasonalExtra({ housing }, m); h += x.heat; cl += x.clothes; }
+  check(Math.abs(h) < 1 && Math.abs(cl) < 1, "seasonal extras do not sum to $0 for " + housing);
+}
+check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra({ housing: "oneBR" }, 6).heat < -25, "heat is not higher in January than July");
+
+// 7) Credit card: missed minimums get a late fee; debt carries into next year; paying the minimum pays it off eventually
+{
+  const c = { housing: "twoBR", care: "center", transport: "car" };
+  const y1 = simulateYear("minneapolis", c, 0, 1006, null, { policy: ctx.defaultPolicy, noSnap: true, foodOnCard: true });
+  check(y1.lateFees > 0, "a household that cannot pay its card should be charged late fees");
+  check(y1.months.every((r) => !r.lateFee || r.lateFee === CONFIG.card.lateFeeFirst || r.lateFee === CONFIG.card.lateFeeRepeat), "late fee amount");
+  const y2 = simulateYear("minneapolis", c, y1.cash, 2006, null, { policy: ctx.defaultPolicy, noSnap: true, foodOnCard: true, startCard: y1.card, startBehind: y1.behind, lastLate: y1.lastLate });
+  check(y2.months[0].startCard === y1.card && y2.months[0].startBehind === y1.behind, "year 2 does not start with year 1 debt");
+  const po = ctx.minPayoff(2000);
+  check(po.months > 12 && po.months < 1200 && po.interest > 0, "minimum-payment payoff of $2,000 looks wrong");
+  console.log(`\nCARD: worst no-SNAP year: late fees ${$(y1.lateFees)}, card ${$(y1.card)}, unpaid bills ${$(y1.behind)}. Year 2 ends ${$(y2.card + y2.behind)} in debt. $2,000 at the minimum: ${po.months} months, ${$(po.interest)} interest.`);
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);
