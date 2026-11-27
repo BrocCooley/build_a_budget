@@ -142,5 +142,17 @@ window.WORKS_CITED = [
 
   { "text":"Board of Governors of the Federal Reserve System. \"Uniform Retail Credit Classification and Account Management Policy.\" *Federal Reserve Regulatory Service*, www.federalreserve.gov/frrs/guidance/uniform-retail-credit-classification-and-account-management-policy.htm.","url":"https://www.federalreserve.gov/frrs/guidance/uniform-retail-credit-classification-and-account-management-policy.htm","usedIn":"Game (cards are charged off at 180 days past due)" },
 
-  { "text":"\"How Long Does Negative Information Remain on My Credit Report?\" *Consumer Financial Protection Bureau*, www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/.","url":"https://www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/","usedIn":"Game (collections stay on a credit report for 7 years)" }
+  { "text":"\"How Long Does Negative Information Remain on My Credit Report?\" *Consumer Financial Protection Bureau*, www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/.","url":"https://www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/","usedIn":"Game (collections stay on a credit report for 7 years)" },
+
+  { "text":"U.S. Department of Agriculture, Food and Nutrition Service. \"WIC Program.\" *Program Data*, www.fns.usda.gov/pd/wic-program. Accessed 27 Nov. 2026.","url":"https://www.fns.usda.gov/pd/wic-program","usedIn":"Game (WIC: $64.71/mo average food benefit, FY2025)" },
+
+  { "text":"Minnesota Department of Employment and Economic Development. \"Premiums.\" *Minnesota Paid Leave*, mn.gov/deed/paidleave/employers/premiums/. Accessed 27 Nov. 2026.","url":"https://mn.gov/deed/paidleave/employers/premiums/","usedIn":"Game (paycheck: 0.44% employee share of the 0.88% Paid Leave premium)" },
+
+  { "text":"Minnesota Statutes, section 504B.177, \"Late Fees.\" *Office of the Revisor of Statutes*, www.revisor.mn.gov/statutes/cite/504B.177.","url":"https://www.revisor.mn.gov/statutes/cite/504B.177","usedIn":"Game (late rent fee: up to 8%)" },
+
+  { "text":"City of Minneapolis. \"Renter Notifications.\" www.minneapolismn.gov/business-services/licenses-permits-inspections/rental-licenses/renter-protections-disclosures/renter-notifications/. Accessed 27 Nov. 2026.","url":"https://www.minneapolismn.gov/business-services/licenses-permits-inspections/rental-licenses/renter-protections-disclosures/renter-notifications/","usedIn":"Game (30-day notice before an eviction filing in Minneapolis)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. *Consumer Price Index*: Rent of Primary Residence, Food at Home, and All Items in Minneapolis-St. Paul-Bloomington (CUURS24ASEHA, CUURS24ASAF11, CUURS24ASA0); Day Care and Preschool, U.S. City Average (CUUR0000SEEB03). www.bls.gov/cpi/. Accessed 27 Nov. 2026.","url":"https://www.bls.gov/cpi/","usedIn":"Game (Year 2 price changes)" },
+
+  { "text":"U.S. Bureau of Labor Statistics. \"Average Hourly Earnings of Production and Nonsupervisory Employees: Retail Trade in Minneapolis-St. Paul-Bloomington, MN-WI (MSA) (SMU27334604200000008).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/SMU27334604200000008. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/SMU27334604200000008","usedIn":"Game (Year 2 pay change: +3.8%)" }
 ];

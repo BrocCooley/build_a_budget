@@ -87,5 +87,19 @@ check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra(
   check(paid.months[11].gift.cost === CONFIG.gifts.typical || paid.months[11].gift.how === "card", "choosing to pay for gifts should cost the Gallup amount");
 }
 
+// 9) Year 2 prices and pay; WIC; rent late fee
+{
+  const c = { housing: "oneBR", care: "home", transport: "bus" };
+  const y1 = simulateYear("minneapolis", c, 0, 1006, null, { policy: ctx.defaultPolicy });
+  const y2 = simulateYear("minneapolis", c, 0, 1006, null, { policy: ctx.defaultPolicy, priceYears: 1 });
+  check(Math.abs(y2.base.housing / y1.base.housing - (1 + CONFIG.prices.rent)) < 1e-9, "year 2 rent should rise by the CPI rent change");
+  check(Math.abs(y2.base.wage / y1.base.wage - (1 + CONFIG.prices.wage)) < 1e-9, "year 2 pay should rise by the earnings change");
+  check(y1.months.every((r) => Math.abs(r.wicUsed - CONFIG.food.wicMonthly) < 0.01), "WIC should cover part of food every month");
+  const bad = simulateYear("minneapolis", { housing: "twoBR", care: "center", transport: "car" }, 0, 1006, null, { policy: ctx.defaultPolicy, noSnap: true });
+  check(bad.months.every((r) => r.rentLateFee <= 0.08 * bad.base.housing + 0.01), "rent late fee above the 8% cap");
+  check(bad.months.some((r) => r.rentLateFee > 0), "unpaid rent should get a late fee");
+  console.log(`YEAR 2: rent ${$(y1.base.housing)} -> ${$(y2.base.housing)}, pay ${y1.base.wage.toFixed(2)} -> ${y2.base.wage.toFixed(2)}/hr, SNAP ${$(y1.base.snap)} -> ${$(y2.base.snap)}.`);
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);

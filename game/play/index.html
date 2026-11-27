@@ -502,7 +502,17 @@ const CONFIG = {
                                  // (Cashiers overall are mostly part-time: 1.0 of 2.49 million work full time; Minneapolis-area retail averages 25.7 hours.)
   partTimeHours: 25.7,           // Minneapolis-area retail average, 2025 (BLS via FRED SMU27334604200000007A), for the comparison row
   hoursPerYear: 40 * 52,         // = 2,080 hours a year
-  payrollTaxRate: 0.0765,        // Social Security 6.2% + Medicare 1.45% (FICA). Take-home = gross × (1 − 0.0765) = gross × 0.9235
+  // Year 2 and later: prices and pay change by the latest year-over-year change (Sept. 2025 → Sept. 2026; BLS skipped Oct. 2025 in the shutdown)
+  prices: {
+    rent: 0.0407,                // CPI rent of primary residence, Minneapolis–St. Paul (BLS CUURS24ASEHA)
+    care: 0.0313,                // CPI day care and preschool, U.S. city average (BLS CUUR0000SEEB03)
+    food: 0.0207,                // CPI food at home, Minneapolis–St. Paul (BLS CUURS24ASAF11). SNAP and WIC amounts follow food prices.
+    other: 0.0364,               // CPI all items, Minneapolis–St. Paul (BLS CUURS24ASA0): transport and basic necessities
+    wage: 0.0380                 // average hourly earnings, retail production and nonsupervisory workers, Minneapolis–St. Paul MSA (BLS, FRED SMU27334604200000008)
+  },
+  rentLateFeePct: 0.08,          // Minnesota caps a late fee at 8% of the overdue rent (Minn. Stat. 504B.177), if the lease allows one
+  payrollTaxRate: 0.0809,        // Social Security 6.2% + Medicare 1.45% (FICA) + Minnesota Paid Leave employee share 0.44%
+                                 // (2026 premium 0.88% of wages, split evenly between employer and employee by default; MN DEED). Take-home = gross × 0.9191
 
   cities: {
     // Minneapolis only (the game used to include Fargo, ND)
@@ -571,6 +581,8 @@ const CONFIG = {
   },
 
   food: {
+    wicMonthly: 64.71,           // WIC average monthly food benefit per participant, FY2025 (USDA FNS WIC Program data). A 4-year-old qualifies until age 5;
+                                 // SNAP and Medical Assistance make the family automatically income-eligible. WIC buys only set foods (milk, cereal, eggs, fruit, vegetables…).
     usdaMonthly: 487,            // USDA Thrifty Food Plan, Oct 2026: female 20–50 $254.20 + child 4–5 $188.50 = $442.70, +10% for a 2-person household = $486.97
     adultFemale20to50: 254.20,   // USDA Thrifty Food Plan, Oct 2026
     child4to5: 188.50,           // USDA Thrifty Food Plan, Oct 2026
@@ -710,8 +722,10 @@ const TEXT = {
   "year.kickerN": "Year {n} · {city}",
   "year.carry": "**Year {n} picks up where last year ended:** {cash} in cash, {card} on the credit card, {behind} in unpaid bills. The card keeps charging interest, and the minimum payment comes out of every paycheck.",
   "yres.yearN": "Year {n}",
+  "year.prices": "**Prices went up:** rent +{rent}, child care +{care}, groceries +{food}, everything else +{other}. Your pay went up too: +{wage} a year. Both use the most recent year of government price and pay data.",
   "yres.nextYear": "Play year {n}",
   "yres.nextYearDebt": "Play year {n} (your {amt} in debt comes with you)",
+  "mc.rentLate": "Late fee on unpaid rent (up to 8%)",
   "mc.tabs": "Car tabs (yearly registration): {amt}",
   "mc.gift": "Holiday gifts",
   "mc.giftToy": "Holiday gifts from a toy drive",
@@ -744,7 +758,7 @@ const TEXT = {
   "card.left": "Still owed in December: **{amt}**.",
   "card.clear": "Paid off by December.",
   "card.payoff": "If you stop here and pay only the minimum (about {pay} a month to start), it takes **{years}** to pay off and costs **{interest}** more in interest.",
-  "card.behind": "Unpaid rent and bills: **{amt}**, still owed. Landlords can charge late fees and file for eviction.",
+  "card.behind": "Unpaid rent and bills: **{amt}**, still owed. In Minneapolis a landlord must give 30 days' written notice, then can file for eviction.",
   "bl.cardH": "Your debt",
   "bl.card": "You end the year **{amt}** in debt ({card} on the card). {years}",
   "bl.cardBills": "You end the year **{amt}** behind on rent and bills.",
@@ -761,7 +775,7 @@ const TEXT = {
   "year.autoplay": "Auto-play the quiet months",
   "year.cutLeadNoSnap": "Without SNAP, you're {gap} short for food. What do you cut?",
   "year.cutLead": "Even with SNAP, you're {gap} short for food. What do you cut?",
-  "year.behind": "The paycheck didn't cover the bills. You're **{amount}** behind on rent and bills.",
+  "year.behind": "The paycheck didn't cover the bills. You're **{amount}** behind on rent and bills. The landlord can add a late fee, and after a 30-day notice (Minneapolis rule), file for eviction.",
 
   "mc.pay": "Paycheck",
   "mc.refund": "Tax refund",
@@ -770,8 +784,8 @@ const TEXT = {
   "mc.catchup": "Catching up on late bills",
   "mc.cardFood": "Groceries on the credit card",
   "mc.cardExtra": "Extra payment on the card",
-  "mc.food": "Food ({snap} SNAP + {cash} cash)",
-  "mc.foodCard": "Food ({snap} SNAP + {cash} cash + {card} on the card)",
+  "mc.food": "Food ({wic} WIC + {snap} SNAP + {cash} cash)",
+  "mc.foodCard": "Food ({wic} WIC + {snap} SNAP + {cash} cash + {card} on the card)",
   "mc.skipped": "{n} meals skipped",
   "mc.covered": "Covered",
   "mc.behind": "Bills you couldn't pay",
@@ -927,7 +941,7 @@ const TEXT = {
   "intro.lead": "Pick your bills. Then live a year and see if the food lasts.",
   "intro.pick": "Your city",
   "intro.stubPay": "{wage}/hr × {hours} hrs a month",
-  "intro.stubTax": "Payroll tax (7.65%)",
+  "intro.stubTax": "Payroll taxes (Social Security, Medicare, MN Paid Leave: 8.09%)",
   "intro.stubNet": "Take-home / month",
   "replay.banner": "Replay: this time you earn **{wage}/hr** instead of {oldWage}. Same choices. Let's see.",
 
@@ -980,6 +994,7 @@ const TEXT = {
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
+  "snap.wic": "**Your kid also gets WIC** until age 5: about **{amt}** a month in set foods like milk, cereal, eggs, fruit and vegetables. You pick it up with a separate WIC card after an appointment.",
   "snap.what": "**SNAP** (once called food stamps) is federal money for groceries, for families with low incomes.",
   "snap.lead": "**{amount}** a month on an EBT card (Electronic Benefits Transfer). It works like a debit card, but only for food. Rent and bills still come from your paycheck.",
   "snap.note": "SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.",
@@ -1111,6 +1126,7 @@ const TEXT = {
   "bl.rowBills": "Rent, child care, transport, basics",
   "bl.rowLeft": "Left for food",
   "bl.rowFood": "Food for 2 (USDA's cheapest healthy diet)",
+  "bl.rowWic": "WIC foods for your kid",
   "bl.pay": "Your paycheck left **{short}** a month too little for food. SNAP had to fill that gap.",
   "bl.payNoSnap": "Your paycheck left **{short}** a month too little for food, and this time there was no SNAP to fill the gap.",
   "bl.payOk": "Your paycheck covered food, with **{spare}** a month to spare.",
@@ -1186,13 +1202,13 @@ function surpriseCost(choice) {
 }
 
 // Monthly SNAP benefit (federal formula). Returns 0 if over the gross income limit.
-function snapBenefit(gross, rent, childCare) {
+function snapBenefit(gross, rent, childCare, maxScale) {
   const s = CONFIG.snap;
   if (gross > s.grossLimit2Person) return 0;
   const adjusted = Math.max(0, gross * (1 - s.earnedIncomeDeduction) - s.standardDeduction - childCare);
   const excessShelter = Math.min(s.excessShelterCap, Math.max(0, rent - adjusted / 2));
   const netIncome = Math.max(0, adjusted - excessShelter);
-  return Math.max(0, Math.floor(s.max2Person - Math.ceil(s.benefitReduction * netIncome)));
+  return Math.max(0, Math.floor(s.max2Person * (maxScale || 1) - Math.ceil(s.benefitReduction * netIncome)));
 }
 
 // Parent's monthly health insurance premium for this city and gross monthly pay
@@ -1216,19 +1232,20 @@ function pathAtWage(city, c, wage) {
   const surprise = surpriseCost(c.surprise);
   const leftover = net - housing - care - transport - basics - surprise;   // cash left after bills
   const snap = snapBenefit(gross, housing, care);                         // can only be spent on food
-  const foodMoney = snap + Math.max(0, leftover);
+  const wic = CONFIG.food.wicMonthly || 0;                                // WIC foods for the 4-year-old
+  const foodMoney = snap + wic + Math.max(0, leftover);
   const need = CONFIG.food.usdaMonthly * (c.transport === "bus" ? 1 + CONFIG.food.convenienceMarkup : 1);
   const foodGap = Math.max(0, need - foodMoney);                          // short on groceries
   const billsBehind = Math.max(0, -leftover);                             // short on rent/bills (SNAP can't pay these)
   const shortfall = foodGap + billsBehind;
   const gap = shortfall > 0 ? shortfall : need - foodMoney;               // > 0 short, <= 0 = money to spare
-  const gapNoSnap = need - leftover;                                      // same path, no SNAP
+  const gapNoSnap = need - wic - leftover;                                // same path, no SNAP
   const days = CONFIG.daysInMonth;
   const daysFed = Math.min(days, Math.floor(foodMoney / need * days));    // days the food budget covers
   const totalMeals = days * CONFIG.food.people * CONFIG.food.mealsPerDay;
   const perMeal = need / totalMeals;                                      // $ per person per meal
   const mealsSkipped = Math.min(totalMeals, Math.round(foodGap / perMeal));
-  return { wage, gross, net, housing, care, transport, basics, health, surprise, leftover, snap, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed, totalMeals, perMeal, mealsSkipped };
+  return { wage, gross, net, housing, care, transport, basics, health, surprise, leftover, snap, wic, foodMoney, need, foodGap, billsBehind, gap, gapNoSnap, daysFed, totalMeals, perMeal, mealsSkipped };
 }
 
 function computePath(cityKey, c, wageOverride) {
@@ -1329,11 +1346,19 @@ function defaultPolicy(ev, st) { return st.cash - ev.cost >= st.foodCashNeeded ?
 function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
   opts = opts || {};
   const city = CONFIG.cities[cityKey];
-  const wage = opts.wage != null ? opts.wage : city.wage;
+  const yrs = opts.priceYears || 0, PG = CONFIG.prices, grow = (r) => Math.pow(1 + r, yrs);
+  const wage = (opts.wage != null ? opts.wage : city.wage) * grow(PG.wage);
   let base = pathAtWage(city, Object.assign({}, c, { surprise: undefined }), wage);
+  if (yrs > 0) {                                  // a later year: prices and pay have changed
+    base = Object.assign({}, base);
+    base.housing *= grow(PG.rent); base.care *= grow(PG.care); base.transport *= grow(PG.other);
+    base.basics = CONFIG.basicsMonthly * grow(PG.other) + base.health;
+    base.need *= grow(PG.food); base.wic *= grow(PG.food); base.perMeal = base.need / base.totalMeals;
+    base.snap = snapBenefit(base.gross, base.housing, base.care, grow(PG.food));
+  }
   if (opts.careCost != null) {                    // "what if": child care subsidy with a capped copay
     base = Object.assign({}, base, { care: Math.min(base.care, opts.careCost) });
-    base.snap = snapBenefit(base.gross, base.housing, base.care);
+    base.snap = snapBenefit(base.gross, base.housing, base.care, grow(PG.food));
   }
   const snap = opts.noSnap ? 0 : base.snap;
   const fixed = base.housing + base.care + base.transport + base.basics;
@@ -1363,7 +1388,13 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     rec.seasonal = sx; rec.bills = fixed + sx.total + rec.tabs;
     cash -= rec.bills;
     rec.behindAdded = 0;
-    if (cash < 0) { rec.behindAdded = -cash; behind += -cash; cash = 0; }
+    rec.rentLateFee = 0;
+    if (cash < 0) {
+      rec.behindAdded = -cash; behind += -cash; cash = 0;
+      // Late rent: one late fee per overdue payment, at most 8% of the overdue rent (Minn. Stat. 504B.177)
+      rec.rentLateFee = Math.round(Math.min(rec.behindAdded, base.housing) * CONFIG.rentLateFeePct * 100) / 100;
+      behind += rec.rentLateFee; rec.behindAdded += rec.rentLateFee;
+    }
     const cp = chargedOff ? { interest: 0, pay: 0 } : cardMinPayment(card);   // a closed (charged-off) card has no monthly minimum; a collector holds the debt
     card += cp.interest; interestPaid += cp.interest;
     rec.cardInterest = cp.interest; rec.cardDue = cp.pay;
@@ -1378,8 +1409,8 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     } else if (cp.pay > 0.5) missed = 0;
     // 3) Emergencies
     const snapAvail = snap + snapCarry;
-    const need = base.need;
-    const foodCashNeeded = Math.max(0, need - snapAvail);
+    const need = base.need, wicUsed = Math.min(base.wic || 0, need);
+    const foodCashNeeded = Math.max(0, need - wicUsed - snapAvail);
     for (let i = 0; i < events[m].length; i++) {
       const ev = events[m][i];
       let how = choices && choices[m + "-" + i];
@@ -1408,12 +1439,12 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
       rec.gift = { how, cost: how === "skip" ? 0 : G.typical };
     }
     // 4) Food: SNAP first, then cash. Whatever's missing is skipped meals.
-    const snapUsed = Math.min(snapAvail, need);
+    const snapUsed = Math.min(snapAvail, need - wicUsed);
     snapCarry = snapAvail - snapUsed;
-    const cashFood = Math.min(cash, need - snapUsed);
+    const cashFood = Math.min(cash, need - wicUsed - snapUsed);
     cash -= cashFood;
-    rec.snapUsed = snapUsed; rec.cashFood = cashFood;
-    let gap = Math.max(0, need - snapUsed - cashFood);
+    rec.wicUsed = wicUsed; rec.snapUsed = snapUsed; rec.cashFood = cashFood;
+    let gap = Math.max(0, need - wicUsed - snapUsed - cashFood);
     rec.cardFood = 0;
     if (foodOnCard && gap > 0.005) {             // groceries on the card, up to the credit limit
       rec.cardFood = Math.min(gap, room()); card += rec.cardFood; cardCharged += rec.cardFood; gap -= rec.cardFood;
@@ -1421,7 +1452,7 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     }
     rec.foodGap = gap;
     rec.mealsSkipped = Math.min(base.totalMeals, Math.round(rec.foodGap / base.perMeal));
-    rec.daysFed = Math.min(days, Math.floor((snapUsed + cashFood + rec.cardFood) / need * days));
+    rec.daysFed = Math.min(days, Math.floor((wicUsed + snapUsed + cashFood + rec.cardFood) / need * days));
     // 5) Catch up on bills you were behind on, if money is left
     if (cash > 0 && behind > 0) { const p = Math.min(cash, behind); cash -= p; behind -= p; rec.behindPaid = p; }
     // 6) Pay down the card with cash beyond one month of groceries (a 22% card costs more than cash earns)
@@ -1466,7 +1497,7 @@ function manyYears(cityKey, c, startSavings, opts) {
   opts = opts || {};
   const n = opts.runs || CONFIG.year.runs, out = [];
   for (let k = 0; k < n; k++) {
-    const y = simulateYear(cityKey, c, startSavings, 1000003 + k * 7919, null, { policy: defaultPolicy, wage: opts.wage, noSnap: opts.noSnap, foodOnCard: opts.foodOnCard, startCard: opts.startCard, startBehind: opts.startBehind, lastLate: opts.lastLate, startChargedOff: opts.startChargedOff, startMissed: opts.startMissed });
+    const y = simulateYear(cityKey, c, startSavings, 1000003 + k * 7919, null, { policy: defaultPolicy, wage: opts.wage, noSnap: opts.noSnap, foodOnCard: opts.foodOnCard, startCard: opts.startCard, startBehind: opts.startBehind, lastLate: opts.lastLate, startChargedOff: opts.startChargedOff, startMissed: opts.startMissed, priceYears: opts.priceYears });
     out.push({ debt: y.card + y.behind, cash: y.cash, net: y.netWorth, meals: y.mealsSkipped, shortMonths: y.shortMonths, red: y.redMonths, events: y.events.reduce((a, l) => a + l.length, 0) });
   }
   const pct = (f) => Math.round(out.filter(f).length / n * 100);
@@ -1521,13 +1552,14 @@ function bottomLine() {
     </div>
     <ul class="bl">
       ${item(t("bl.payH"), `<div class="blr">
-          <div><span>${t("bl.rowPay", { hours: CONFIG.hoursPerWeek, wage: fmtWage(w0) }, true)}</span><b>${fmt(b.net)}</b></div>
+          <div><span>${t("bl.rowPay", { hours: CONFIG.hoursPerWeek, wage: fmtWage(b.wage) }, true)}</span><b>${fmt(b.net)}</b></div>
           <div><span>${t("bl.rowBills", null, true)}</span><b>−${fmt(bills)}</b></div>
-          <div class="tot"><span>${t("bl.rowLeft", null, true)}</span><b class="${left < b.need ? "red" : ""}">${fmt(Math.max(0, left))}</b></div>
+          <div class="tot"><span>${t("bl.rowLeft", null, true)}</span><b class="${left < b.need - b.wic ? "red" : ""}">${fmt(Math.max(0, left))}</b></div>
           <div class="need"><span>${t("bl.rowFood", null, true)}</span><b>${fmt(b.need)}</b></div>
+          <div class="need"><span>${t("bl.rowWic", null, true)}</span><b>−${fmt(b.wic)}</b></div>
         </div>`
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
-          : left < b.need ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - left) }) : t("bl.payOk", { spare: fmt(left - b.need) })))}
+          : left < b.need - b.wic ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - b.wic - left) }) : t("bl.payOk", { spare: fmt(left - b.need + b.wic) })))}
       ${item(t("bl.choicesH"), luckLine)}
       ${debt > 0.5 ? item(t("bl.cardH"), t(sim.card < 0.5 ? "bl.cardBills" : "bl.card", { amt: fmt(debt), card: fmt(sim.card), years: (() => { if (sim.card < 0.5) return ""; if (sim.chargedOff) return t("bl.cardCollections", null, true); const po = minPayoff(sim.card); return t("bl.cardPayoff", { years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) }, true); })() })) : ""}
       ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
@@ -1537,6 +1569,7 @@ function bottomLine() {
 }
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => (n < -0.5 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+const pctTxt = (r) => (r * 100).toFixed(1) + "%";
 const fmtWage = (n) => "$" + Number(n).toFixed(2);
 const pct = (a, b) => Math.round(a / b * 100) + "%";
 const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -1853,6 +1886,7 @@ const screens = {
       ? `<h2>${t("snap.title")}</h2>
          <div class="ebtcard"><div class="lbl">EBT · SNAP</div><div class="chip"></div><div class="bal">${fmt(r.snap)}.00</div><div class="foot">FOOD ONLY · MONTHLY</div></div>
          <p class="lead">${t("snap.lead", { amount: fmt(r.snap) })}${cite(CONFIG.snap.cite)}</p>
+         <div class="note plain small">${t("snap.wic", { amt: fmt(CONFIG.food.wicMonthly) })}${cite("USDA FNS, 2025")}</div>
          <p class="small muted">${t("snap.what")}</p>`
       : `<h2>${t("snap.deniedTitle")}</h2>
          <p class="lead">${t("snap.deniedLead", { wage: fmtWage(r.wage) })}${cite(CONFIG.snap.cite)}</p>
@@ -1878,7 +1912,7 @@ const screens = {
     let body = "", actions = "";
     if (y.shown < 0 && !p) {
       const st = S.y.start;
-      body = (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t("year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
+      body = (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t("year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}</div><div class="note plain small">${t("year.prices", { rent: pctTxt(CONFIG.prices.rent), care: pctTxt(CONFIG.prices.care), food: pctTxt(CONFIG.prices.food), other: pctTxt(CONFIG.prices.other), wage: pctTxt(CONFIG.prices.wage), n: S.y.yearNum - 1 })}${cite("BLS, 2026")}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
       actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
     } else if (p.type === "event") body = eventPanel(p.p);
     else {
@@ -2148,6 +2182,12 @@ const screens = {
         <li>U.S. Energy Information Administration. Minnesota Natural Gas Residential Consumption, monthly. <a href="https://www.eia.gov/dnav/ng/hist/n3010mn2m.htm" target="_blank" rel="noopener">eia.gov</a></li>
         <li>U.S. Census Bureau. Monthly Retail Trade: Clothing Stores, not seasonally adjusted (MRTSSM4481USN), via FRED. <a href="https://fred.stlouisfed.org/series/MRTSSM4481USN" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Holland &amp; Knight. "CFPB Credit Card Late Fees Rule Vacated by Texas District Court." Apr. 22, 2025. <a href="https://www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court" target="_blank" rel="noopener">hklaw.com</a></li>
+        <li>U.S. Department of Agriculture, Food and Nutrition Service. WIC Program data: average monthly food cost per participant, FY2025. <a href="https://www.fns.usda.gov/pd/wic-program" target="_blank" rel="noopener">fns.usda.gov</a></li>
+        <li>Minnesota Department of Employment and Economic Development. "Paid Leave: Premiums." <a href="https://mn.gov/deed/paidleave/employers/premiums/" target="_blank" rel="noopener">mn.gov/deed</a></li>
+        <li>Minnesota Statutes, section 504B.177, "Late Fees." <a href="https://www.revisor.mn.gov/statutes/cite/504B.177" target="_blank" rel="noopener">revisor.mn.gov</a></li>
+        <li>City of Minneapolis. "Renter Notifications" (pre-eviction filing notice, 30 days). <a href="https://www.minneapolismn.gov/business-services/licenses-permits-inspections/rental-licenses/renter-protections-disclosures/renter-notifications/" target="_blank" rel="noopener">minneapolismn.gov</a></li>
+        <li>U.S. Bureau of Labor Statistics. Consumer Price Index: rent of primary residence, food at home and all items, Minneapolis–St. Paul (CUURS24ASEHA, CUURS24ASAF11, CUURS24ASA0); day care and preschool, U.S. (CUUR0000SEEB03). <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener">bls.gov</a></li>
+        <li>U.S. Bureau of Labor Statistics. Average hourly earnings, production and nonsupervisory employees, retail trade, Minneapolis–St. Paul MSA (SMU27334604200000008), via FRED. <a href="https://fred.stlouisfed.org/series/SMU27334604200000008" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Comcast. "Internet Essentials." <a href="https://www.xfinity.com/learn/internet-service/internet-essentials" target="_blank" rel="noopener">xfinity.com</a></li>
         <li>Minnesota Driver and Vehicle Services. "Vehicle Fees" and "Registration Tax." <a href="https://dps.mn.gov/divisions/dvs/vehicle/vehicle-fees" target="_blank" rel="noopener">dps.mn.gov</a></li>
         <li>Minnesota Department of Revenue. <i>Tax Year 2025 Inflation-Adjusted Amounts in Minnesota Statutes</i> (renter's credit, Minn. Stat. 290.0693). <a href="https://revenue.state.mn.us/sites/default/files/2024-12/inflation-adjusted-amounts-2025.pdf" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
@@ -2195,6 +2235,10 @@ const screens = {
         <p><b>Tax refund (March):</b> 2025 federal rules for a head of household with one child: Earned Income Tax Credit, Child Tax Credit (refundable part up to $1,700), and the Child and Dependent Care Credit, minus federal income tax owed. Minneapolis also gets Minnesota's Child Tax Credit, Working Family Credit and renter's credit (2025 table: 17% of rent paid, minus a share of income after a $7,280 subtraction for one child), minus Minnesota income tax. The game uses the full rent figure, which includes utilities; renters who pay utilities separately get a little less.</p>
         <p><b>Seasons:</b> the rent figure already includes utilities (HUD Fair Market Rent). The game moves the heating part ($42/mo for a 1-bedroom, $48 for a 2-bedroom: Minneapolis Public Housing Authority, 2026) into the cold months, following how much gas Minnesota homes use each month (EIA, 2021–2025). Clothes ($825/yr) follow U.S. clothing store sales by month (Census, 2022–2025). Yearly totals don't change. Some utilities offer even monthly billing; the game shows the bills as they come.</p>
         <p><b>Missed card payments:</b> bills are paid first. If there isn't enough left for the card's minimum, the payment is missed and a late fee goes on the card: $32 the first time, $43 for another within six months (the federal limits in force since a court struck down the $8 cap in April 2025). After 6 missed payments (180 days), banks close the card and charge it off; the debt goes to a collector and stays on a credit report for 7 years. In the game a closed card charges no more interest or fees and can't be used. Debt, interest and unpaid bills carry into the next year.</p>
+        <p><b>Paycheck deductions:</b> Social Security and Medicare (7.65%) plus the employee half of Minnesota Paid Leave (0.88% of wages in 2026, split evenly by default; MN DEED) = 8.09%. In exchange, workers can take paid family and medical leave.</p>
+        <p><b>WIC:</b> a 4-year-old qualifies for WIC until age 5, and SNAP or Medical Assistance makes the family income-eligible. The game counts the national average WIC food benefit, $64.71 a month (FY2025, USDA FNS), toward the food budget. WIC buys only set foods and needs an appointment to sign up.</p>
+        <p><b>Late rent:</b> if the lease allows it, a landlord can charge a late fee of up to 8% of the overdue rent (Minn. Stat. 504B.177); the game charges it once per late payment. In Minneapolis, a landlord must give 30 days' written notice before filing for eviction for unpaid rent (Minneapolis Code 244.2060).</p>
+        <p><b>Year 2 and later:</b> prices and pay change by the most recent year-over-year change (Sept. 2025 to Sept. 2026, since BLS skipped Oct. 2025 during the government shutdown): rent +4.1% (Minneapolis CPI rent), child care +3.1% (U.S. CPI day care and preschool), groceries +2.1% (Minneapolis CPI food at home; SNAP and WIC follow food prices), everything else +3.6% (Minneapolis CPI), pay +3.8% (Minneapolis–St. Paul retail hourly earnings). Tax brackets and benefit income limits are kept at 2025–26 levels.</p>
         <p><b>Internet:</b> Xfinity Internet Essentials, $14.95/mo, for households on SNAP or Medicaid. It's added to basic necessities.</p>
         <p><b>Holidays:</b> in December you choose: gifts at what households earning under $50,000 planned to spend ($651; Gallup, 2025), or a free toy drive (the Salvation Army's Twin Cities Toy Shop served 16,000 kids in 2025). Comparisons and the 1,000 random years assume the toy drive.</p>
         <p><b>Credit card:</b> ${(CONFIG.card.apr * 100).toFixed(2)}% interest (Federal Reserve average for accounts charged interest, Aug. 2026). Credit limit ${fmt(CONFIG.card.creditLimit)}, the median for all U.S. card accounts (Philadelphia Fed, 2026). That's generous: new cards for people with credit scores under 660 start at a median of $600. Charges past the limit become unpaid bills. Minimum payment: the larger of ${fmt(CONFIG.card.minPaymentFloor)} or interest plus 1% of the balance (estimate). Cash beyond one month of groceries goes to paying the card down. ${CONFIG.card.hasCardPct}% of adults earning $25,000–$49,999 have a credit card (Federal Reserve SHED 2025); the game assumes you do.</p>
@@ -2211,7 +2255,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const EV_ICON = { car: "wrench", medical: "med", phone: "phone", home: "home", legal: "card", gifts: "kid" };
 function yearStart() { return S.y && S.y.start ? S.y.start.cash : startSavingsAmount(S.c.savings, S.city, S.c, S.wageOverride); }
 // Debt carried in from last year (Year 2 and later)
-function startOpts() { const st = S.y && S.y.start; return st ? { startCard: st.card, startBehind: st.behind, lastLate: st.lastLate, startChargedOff: st.chargedOff, startMissed: st.missed } : {}; }
+function startOpts() { const st = S.y && S.y.start; return st ? { startCard: st.card, startBehind: st.behind, lastLate: st.lastLate, startChargedOff: st.chargedOff, startMissed: st.missed, priceYears: (S.y.yearNum || 1) - 1 } : {}; }
 function yearSim() { return simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: !!S.y.noSnap }, startOpts())); }
 function seedFromUrl() { const m = location.search.match(/[?&]seed=(\d{1,9})/); return m ? +m[1] : null; }
 function newYearState(seed) {
@@ -2259,7 +2303,7 @@ function monthCard(r) {
   const short = r.foodGap > 0.005;
   return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
   ${st === "dip" ? `<p class="small muted" style="margin:-4px 0 10px">${t("mc.dip", { cash: fmt(r.startCash) })}</p>` : ""}
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { snap: fmt(r.snapUsed), cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { wic: fmt(r.wicUsed || 0), snap: fmt(r.snapUsed), cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
@@ -2269,6 +2313,7 @@ function monthCard(r) {
     ${r.tabs ? ln(`<small>${t("mc.tabs", { amt: fmt(r.tabs) }, true)}</small>`, "", "muted") : ""}
     ${r.gift ? ln(r.gift.how === "skip" ? t("mc.giftToy", null, true) : t("mc.gift", null, true) + (r.gift.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), r.gift.how === "skip" ? "$0" : (r.gift.how === "card" ? "" : "−") + fmt(r.gift.cost), r.gift.how === "card" ? "muted" : "") : ""}
     ${r.cardPay > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(r.cardPay)) : ""}
+    ${r.rentLateFee > 0 ? ln(`<span class="red">${t("mc.rentLate", null, true)}</span>`, `<span class="red">+${fmt(r.rentLateFee)}</span>`) : ""}
     ${r.lateFee > 0 ? ln(`<span class="red">${t("mc.late", { due: fmt(r.cardDue) }, true)}</span>`, `<span class="red">+${fmt(r.lateFee)}</span>`) : ""}
     ${r.chargedOff ? ln(`<span class="red">${t("mc.chargedOff", null, true)}</span>`, "") : ""}
     ${r.cardInterest > 0.5 ? ln(`<small>${t("mc.interest", null, true)}</small>`, `<small>+${fmt(r.cardInterest)}</small>`, "muted") : ""}
