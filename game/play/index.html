@@ -663,27 +663,27 @@ const TEXT = {
 
   "meter.labelYear": "Where you stand (cash minus debts)",
 
-  "savings.context": "You start the year with **nothing saved**. **{pct} in 100** adults earning under $50,000 couldn't cover even a **$100** emergency from their savings.",
+  "savings.context": "You start with **$0 saved**. **{pct} in 100** adults earning under $50,000 couldn't cover a $100 emergency.",
   "savings.start": "Start the year",
 
   "year.kicker": "Your year · {city}",
-  "year.legendOk": "Money to spare",
-  "year.legendDip": "Got by on savings",
-  "year.legendBad": "Short or borrowed",
-  "year.intro": "Same job, same rent, same bills every month. Pay comes in, bills go out, and life happens. Quiet months play by themselves. The game stops when something needs you.",
+  "year.legendOk": "OK",
+  "year.legendDip": "Used savings",
+  "year.legendBad": "Short",
+  "year.intro": "Same pay and bills every month. Emergencies hit at real-world odds. The game stops when you need to choose.",
   "year.fair": "Emergencies are rolled at random from real yearly odds. They don't know how much money you have.",
   "year.start": "Start January",
   "year.continue": "Keep going",
   "year.seeResults": "See your year",
   "year.pause": "Pause",
   "year.autoplay": "Auto-play the quiet months",
-  "year.cutLeadNoSnap": "It's {month}. Without SNAP, you're {gap} short for food this month. What do you cut?",
-  "year.cutLead": "It's {month}. Even with SNAP, you're {gap} short for food this month. What do you cut?",
-  "year.behind": "In {month}, the paycheck didn't cover all the bills. You fell **{amount}** behind on rent and bills.",
+  "year.cutLeadNoSnap": "Without SNAP, you're {gap} short for food. What do you cut?",
+  "year.cutLead": "Even with SNAP, you're {gap} short for food. What do you cut?",
+  "year.behind": "The paycheck didn't cover the bills. You're **{amount}** behind on rent and bills.",
 
   "mc.pay": "Paycheck",
   "mc.refund": "Tax refund",
-  "mc.bills": "Rent, child care, transport, basics",
+  "mc.bills": "Rent and bills",
   "mc.cardPay": "Credit card minimum payment",
   "mc.catchup": "Catching up on late bills",
   "mc.cardFood": "Groceries on the credit card",
@@ -695,14 +695,14 @@ const TEXT = {
   "mc.behind": "Bills you couldn't pay",
   "mc.end": "Cash at month's end",
   "mc.result": "This month",
-  "mc.dip": "Food and bills were covered, but only by spending money left over from earlier months (you started the month with {cash}).",
+  "mc.dip": "Covered only with money left from earlier months.",
   "mc.foodShort": "Food ran out on day {days}: {n} meals skipped",
   "mc.foodOk": "Food lasted all month",
-  "mc.foodWhy": "Rent, child care, and getting to work were paid first. Food got whatever was left.",
+  "mc.foodWhy": "Bills come first. Food gets what's left.",
 
   "refund.app": "IRS",
   "refund.title": "Your tax refund arrived",
-  "refund.text": "**{amount}** from the Earned Income Tax Credit and child credits.",
+  "refund.text": "**{amount}** in tax credits for working parents.",
   "refund.eitc": "Earned Income Tax Credit",
   "refund.ctc": "Child Tax Credit + child care credit",
   "refund.fedtax": "Federal income tax owed",
@@ -710,16 +710,16 @@ const TEXT = {
   "refund.mntax": "Minnesota income tax owed",
   "refund.total": "Refund",
   "refund.cite": "(IRS and Minnesota Dept. of Revenue, 2025 tax rules)",
-  "refund.first": "It's in your account now. Then something else happened this month...",
-  "refund.catchup": "First, **{amount}** went to bills you were behind on.",
+  "refund.first": "Then something else happened...",
+  "refund.catchup": "**{amount}** went to bills you were behind on.",
 
-  "ev.stat": "**{pct} in 100** adults had a {what} in the past year.",
+  "ev.stat": "**{pct} in 100** adults had a {what} last year.",
   "ev.savings": "Pay with cash",
-  "ev.savings.sub": "You have {cash} in cash.",
-  "ev.savings.no": "You only have {cash}. Not enough.",
+  "ev.savings.sub": "You have {cash}.",
+  "ev.savings.no": "You only have {cash}.",
   "ev.card": "Put it on the credit card",
-  "ev.card.limit": "Only {room} left before your limit. The other {rest} becomes an unpaid bill.",
-  "ev.card.sub": "Card balance becomes {bal}. Minimum payment about {pay}/mo at {apr} interest.",
+  "ev.card.limit": "Only {room} left on the card. The other {rest} becomes an unpaid bill.",
+  "ev.card.sub": "Balance {bal}. About {pay}/mo at {apr} interest.",
   "ev.car.app": "Auto shop",
   "ev.car.title": "The car won't start",
   "ev.car.text": "The repair is **{cost}**. Without the car, you can't get to work.",
@@ -734,7 +734,7 @@ const TEXT = {
   "ev.phone.short": "Phone replacement",
   "ev.home.app": "Landlord",
   "ev.home.title": "Something at home breaks",
-  "ev.home.text": "A broken appliance, or a repair your lease makes you pay for: **{cost}**.",
+  "ev.home.text": "A broken appliance or a repair you have to pay for: **{cost}**.",
   "ev.home.short": "Home or appliance repair",
   "ev.legal.app": "Mail",
   "ev.legal.title": "A bill you didn't see coming",
@@ -748,7 +748,7 @@ const TEXT = {
   "yres.leadOkSpare": "You made it through the year, with {spare} a month to spare.",
   "yres.leadOkRefund": "You made it through the year, but only because of your {refund} tax refund.",
   "yres.closeTitle": "How close was it?",
-  "close.spare": "A normal month: **{spare}** to spare.",
+  "close.spare": "A month with no emergencies: **{spare}** to spare.",
   "best.titleBestLucky": "Best case, and lucky",
   "best.titleBest": "Best case",
   "best.title": "A lucky year",
@@ -763,21 +763,21 @@ const TEXT = {
   "best.center": "With a licensed center",
   "best.partTime": "Part-time ({h} hrs/wk)",
   "best.debtPct": "Years in debt",
-  "best.note": "Typical (median) of {n} random years each. One change at a time.",
-  "close.noRefund": "Without the **{refund}** March tax refund: only **{net}** left all year.",
-  "close.noRefundNeg": "Without the **{refund}** March tax refund: **{net} short** for the year.",
-  "close.oneBill": "One typical emergency (**{bill}**) = **{months} months** of that spare money.",
+  "best.note": "Typical result of {n} random years each.",
+  "close.noRefund": "Without the **{refund}** tax refund: **{net}** left for the whole year.",
+  "close.noRefundNeg": "Without the **{refund}** tax refund: **{net} short** for the year.",
+  "close.oneBill": "One typical emergency (**{bill}**) eats **{months} months** of that.",
   "close.odds": "You had **{n}** {em}. {pct}% of random years for this household end in debt or with skipped meals.",
   "yres.redMonths": "months short or borrowing",
-  "yres.debtTile": "debt in December (card {card} + unpaid bills {bills})",
+  "yres.debtTile": "debt at year's end",
   "yres.meals": "meals skipped",
   "yres.short": "short on food, all year",
   "yres.card": "credit card debt ({interest} in interest)",
   "yres.behind": "behind on rent and bills",
   "yres.cash": "cash left in December",
   "yres.whyTitle": "Why food had to give",
-  "yres.why": "Rent, child care, getting to work and basics get paid first, or you lose your home or job. Even with SNAP, a normal month comes up **{gap}** short.",
-  "yres.whyNoSnap": "Rent, child care, getting to work and basics get paid first, or you lose your home or job. Without SNAP, a normal month comes up **{gap}** short.",
+  "yres.why": "Bills come first, or you lose your home or job. Even with SNAP, a month with no emergencies is **{gap}** short.",
+  "yres.whyNoSnap": "Bills come first, or you lose your home or job. Without SNAP, a month with no emergencies is **{gap}** short.",
   "yres.whyThin": "Every month, rent, child care, getting to work and basics came first. In a month with no surprises, this budget covers food with only **{spare}** to spare. One emergency and food is what gives, because it's the one bill nobody comes to collect.",
   "yres.yearTitle": "Your year, month by month",
   "yres.chartCash": "Cash",
@@ -794,14 +794,14 @@ const TEXT = {
   "yres.mcDebt": "Years that ended in debt",
   "yres.mcHungry": "Years with skipped meals",
   "yres.mcMedian": "In a typical year: {debt} in debt, {meals} meals skipped.",
-  "yres.mcNote": "Same household, {n} random years at real odds.",
-  "yres.seed": "Replay code: {seed}. Anyone can replay this exact year by adding ?seed={seed} to the game's link.",
+  "yres.mcNote": "{n} random years, same household.",
+  "yres.seed": "Replay code: {seed} (add ?seed={seed} to the link).",
   "yres.cmpTitle": "Same year, different help",
-  "yres.cmpSub": "Your exact year again, same emergencies. Only the help changes. Every row except the first includes SNAP.",
+  "yres.cmpSub": "Your exact year, same emergencies. Only the help changes.",
   "yres.cmpNone": "SNAP only (today)",
   "yres.cmpNoSnap": "Without SNAP",
-  "yres.cmpMore": "Why more skipped meals in the {rows} row? The extra money went first to rent and bills you had fallen behind on, so food didn't get it. Your debt went down instead.",
-  "yres.cmpMoreRaise": "Why more skipped meals in the {rows} row? The extra money went first to rent and bills you had fallen behind on, and SNAP gets smaller when pay goes up or child care costs go down, so less was left for food. Your debt went down instead.",
+  "yres.cmpMore": "More skipped meals in the {rows} row? The extra money paid late rent and bills first. Debt went down instead.",
+  "yres.cmpMoreRaise": "More skipped meals in the {rows} row? The extra money paid late bills first, and SNAP shrinks as income rises. Debt went down instead.",
   "yres.cmpTrainingShort": "+18% pay (training)",
   "yres.cmpMonthlyShort": "$300/mo child tax credit",
   "yres.cmpCareShort": "Child care help",
@@ -815,18 +815,18 @@ const TEXT = {
   "yres.cmpDebt": "Debt (Dec.)",
   "help.how": "How it could happen: ",
   "help.real": "What actually happens: ",
-  "help.trainHow": "Job training for higher-paying fields raised earnings 11–40% in randomized studies. One program, Project QUEST, raised pay about 18% for years.",
-  "help.trainReal": "Two of the best-known programs have served about {trained} people in total, over all the years they've run. The U.S. has about {cashiers} cashiers right now.",
-  "help.monthlyHow": "In 2021, the Child Tax Credit was raised to $3,600 for a child under 6 and paid out as $300 a month. Food insufficiency among families with kids dropped about {pct}% after the first payment.",
-  "help.monthlyReal": "The monthly payments ended in December 2021, and food insufficiency rose again. Today the credit is smaller and comes once a year, at tax time.",
-  "help.careHow": "Child care subsidies can limit what a family pays. From 2024 to 2026, federal rules capped family copays at 7% of income.",
-  "help.careReal": "In 2019, only {pct}% of children eligible for a federal child care subsidy got one. The 7% copay cap was repealed in July 2026.",
+  "help.trainHow": "In randomized studies, job training raised pay 11–40%. Project QUEST: about 18%, for years.",
+  "help.trainReal": "Two top programs have trained about {trained} people, ever. The U.S. has {cashiers} cashiers.",
+  "help.monthlyHow": "In 2021 the credit paid $300 a month per young child. Families with kids going without enough food fell about {pct}%.",
+  "help.monthlyReal": "The monthly payments ended after 2021, and the number going without rose again.",
+  "help.careHow": "Subsidies cap what families pay. From 2024 to 2026, the cap was 7% of income.",
+  "help.careReal": "In 2019, only {pct}% of eligible kids got a subsidy. The 7% cap was repealed in July 2026.",
   "yres.newYear": "Play a new random year",
   "yres.sameYear": "Replay this exact year",
   "yres.noSnapBtn": "Replay this year without SNAP",
   "yres.withSnapBtn": "Replay this year with SNAP",
-  "yres.noSnapMode": "**You played this year without SNAP.** Same job, same bills, same emergencies. The only difference: no {snap} a month for groceries.",
-  "year.noSnapMode": "Replaying without SNAP: no {snap} a month for groceries.",
+  "yres.noSnapMode": "**No SNAP this time.** Same job, bills and emergencies, minus {snap} a month for groceries.",
+  "year.noSnapMode": "No SNAP this time: −{snap} a month for groceries.",
   "meter.noSnap": "NO SNAP",
   "yres.raiseBtn": "Replay earning {wage}/hr",
 
@@ -838,7 +838,7 @@ const TEXT = {
   "intro.tag1": "Single parent",
   "intro.tag2": "Kid, age 4",
   "intro.tag3": "Cashier, 40 hrs/week",
-  "intro.lead": "Set up your budget. Then live a year of it and see if the food lasts.",
+  "intro.lead": "Pick your bills. Then live a year and see if the food lasts.",
   "intro.pick": "Your city",
   "intro.stubPay": "{wage}/hr × {hours} hrs",
   "intro.stubTax": "Payroll tax (7.65%)",
@@ -859,20 +859,20 @@ const TEXT = {
 
   "care.kicker": "Day 1 · Your shift starts at 7",
   "care.title": "Who watches your kid?",
-  "care.sub": "Full-time care for a 4-year-old, every month.",
+  "care.sub": "Full-time care for a 4-year-old.",
   "care.center": "Licensed center",
-  "care.center.sub": "Set hours, trained staff. State average for a 4-year-old, full time.",
+  "care.center.sub": "Set hours, trained staff.",
   "care.home": "Home-based daycare",
-  "care.home.sub": "A smaller group in a neighbor's home. State average for a 4-year-old, full time.",
-  "care.ffn": "**Why not a neighbor or a relative?** Paid neighbors, friends and relatives charge about as much per hour as a licensed home daycare: a typical **{hr}/hr** in today's dollars, or about **{mo}** a month full time. Free care from family helps parents who have it, but it takes someone who is free 40+ hours a week.",
-  "care.shifts": "**{n} of your {total} shifts** each month go to paying for this.",
+  "care.home.sub": "A small group in someone's home.",
+  "care.ffn": "**Why not a relative?** Paid friends or family charge about **{hr}** an hour, around **{mo}** a month full time. Free care only works if someone is free 40+ hours a week.",
+  "care.shifts": "**{n} of {total}** shifts a month pay for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
   "transport.title": "Car or bus?",
   "transport.car": "Keep your old car",
-  "transport.car.sub": "An old car you own outright: gas, insurance, upkeep.",
+  "transport.car.sub": "Paid off. Gas, insurance, repairs.",
   "transport.bus": "Take the bus",
-  "transport.bus.sub": "$1 a ride with your EBT card. Catch: every trip takes longer, with your kid along.",
+  "transport.bus.sub": "$1 rides with your EBT card. Slower, with your kid along.",
   "transport.grocery": "Grocery store",
   "transport.corner": "Corner store",
   "transport.home": "HOME",
@@ -880,18 +880,18 @@ const TEXT = {
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
-  "basics.sub": "What the lowest-income fifth of U.S. households actually spends, on average. No furniture, no extras.",
+  "basics.sub": "What the lowest-income households actually spend. No extras.",
   "basics.phone": "Cell phone service",
-  "basics.clothes": "Clothes and shoes for you and your kid",
-  "basics.personal": "Soap, shampoo, toothpaste, haircuts",
-  "basics.supplies": "Laundry soap, cleaning supplies, toilet paper",
-  "basics.health": "Health insurance for you and your kid",
+  "basics.clothes": "Clothes and shoes",
+  "basics.personal": "Soap, toothpaste, haircuts",
+  "basics.supplies": "Cleaning supplies, toilet paper",
+  "basics.health": "Health insurance",
   "basics.total": "Every month",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
-  "snap.what": "**What is SNAP?** The Supplemental Nutrition Assistance Program, once called food stamps. It's run by the U.S. Department of Agriculture. Each month it puts money on an EBT card that works like a debit card, but only for groceries. How much you get depends on your income and bills.",
-  "snap.lead": "**{amount}** a month in food assistance, loaded onto an EBT card.",
+  "snap.what": "**SNAP** (once called food stamps) is federal money for groceries, for families with low incomes.",
+  "snap.lead": "**{amount}** a month on an EBT card. Food only: rent and bills still come from your paycheck.",
   "snap.note": "SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.",
   "snap.deniedTitle": "No SNAP this time.",
   "snap.deniedLead": "At {wage}/hr, you earn too much to qualify.",
@@ -931,14 +931,14 @@ const TEXT = {
   "cut.phone": "Phone",
   "cut.phone.no": "Your manager texts the schedule. Miss a shift, risk the job.",
   "cut.food": "Food",
-  "cut.food.sub": "Smaller meals. Skip some. Hope it's enough.",
+  "cut.food.sub": "Smaller meals. Skipped meals.",
   "cut.notOption": "Not really an option",
   "cut.yes": "Food is the one bill nobody comes to collect. So food is what gives.",
-  "cut.yesCard": "From now on, when food runs short, groceries go on the card, until it hits its {limit} limit. Then food is what gives.",
+  "cut.yesCard": "From now on, groceries go on the card when cash runs out, up to its {limit} limit. After that, meals get skipped.",
   "cut.card": "Put groceries on the credit card",
-  "cut.card.sub": "Eat now, pay later at {apr} interest. The minimum payment comes out of every paycheck after this.",
+  "cut.card.sub": "Eat now, pay {apr} interest later.",
   "cut.cardStat": "{has} in 100 adults at this income have a credit card. {carry} in 100 of them carry a balance.",
-  "year.maxed": "In {month}, the card hit its {limit} limit. No more groceries on credit. Now food is what gives.",
+  "year.maxed": "The card hit its {limit} limit. No more groceries on credit. Now meals get skipped.",
   "cut.next": "See how far the food goes",
 
   "food.kicker": "Day 1–30 · Groceries",
@@ -994,7 +994,7 @@ const TEXT = {
   "results.context": "For context: {note}",
   "results.receipt": "See the full receipt",
   "results.next": "The bottom line",
-  "yres.details": "Details: every day, emergencies, 1,000 more years, other kinds of help",
+  "yres.details": "More: every day, emergencies, other help",
   "results.raiseBtn": "Replay earning {wage}/hr",
   "results.replay": "Replay from the start",
 
@@ -1010,27 +1010,27 @@ const TEXT = {
 
   "final.kicker": "The bigger picture",
   "bl.kicker": "The bottom line: your year",
-  "bl.big": "of your take-home pay went to rent, child care, getting to work and basics, before any food.",
-  "bl.bigOver": "of your take-home pay was needed for rent, child care, getting to work and basics. That's more than you earned, before any food.",
+  "bl.big": "of your paycheck went to bills before any food.",
+  "bl.bigOver": "of your paycheck was needed for bills, before any food.",
   "bl.payH": "Your paycheck",
-  "bl.pay": "{hours} hours a week at {wage}/hr brought home **{net}** a month. After the bills, **{left}** was left for food that costs **{food}** a month.",
-  "bl.payShort": "{hours} hours a week at {wage}/hr brought home **{net}** a month. The bills alone came to **{left}** more than that, with nothing left for food that costs **{food}** a month.",
-  "bl.refundAll": "Your **{refund}** tax refund in March covered the difference.",
-  "bl.refundPart": "Your **{refund}** tax refund in March covered only part of the difference.",
-  "bl.raiseMore": "(The raise went first to rent and bills you were behind on, and SNAP shrinks as pay rises, so more meals were skipped than at your pay. Debt went down instead.)",
+  "bl.pay": "Full time at {wage}/hr: **{net}** a month. After rent, child care, transport and basics, **{left}** was left for **{food}** of food.",
+  "bl.payShort": "Full time at {wage}/hr: **{net}** a month. Rent, child care, transport and basics ran **{left}** over that.",
+  "bl.refundAll": "The **{refund}** tax refund covered the gap.",
+  "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
+  "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
   "bl.choicesH": "Your choices",
-  "bl.cheapest": "You picked the cheapest option every time.",
-  "bl.choices": "You made {n} of 3 cheapest choices.",
-  "bl.yours": "Your year: **{meals}** meals skipped, **{debt}** in debt.",
-  "bl.lucky": "You had {n} {em}; only {pct}% of years have that few. In **{bad}%** of 1,000 random years, this same household ends up in debt or skipping meals.",
-  "bl.odds": "In **{bad}%** of 1,000 random years, this same household ends up in debt or skipping meals.",
+  "bl.cheapest": "Cheapest option every time.",
+  "bl.choices": "{n} of 3 cheapest options.",
+  "bl.yours": "Result: **{meals}** meals skipped, **{debt}** debt.",
+  "bl.lucky": "You had {n} {em}; only {pct}% of years are that lucky. **{bad}%** of 1,000 random years end in debt or skipped meals.",
+  "bl.odds": "**{bad}%** of 1,000 random years end in debt or skipped meals.",
   "bl.snapH": "SNAP",
-  "bl.snap": "SNAP added **{snap}** a month for groceries. This same year without it: {without} With it: {with}",
+  "bl.snap": "Same year without its **{snap}** a month: {without} With it: {with}",
   "bl.incomeH": "More income",
-  "bl.income": "This same year with 18% higher pay (job training): {raised} With higher pay, a monthly child tax credit and child care help together: {all}",
-  "bl.yr": "**{meals}** meals skipped, **{debt}** in debt.",
-  "bl.note": "Every comparison replays your exact year: same emergencies, same choices. Only the money changes.",
-  "final.stat": "of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.",
+  "bl.income": "Same year, 18% higher pay: {raised} Higher pay, child tax credit and child care help: {all}",
+  "bl.yr": "**{meals}** meals skipped, **{debt}** debt.",
+  "bl.note": "Comparisons replay your exact year. Only the money changes.",
+  "final.stat": "of U.S. households were food insecure in 2024, the most since 2014.",
   "final.grid": "About **{n} in every 100** households.",
   "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and emergencies at real-world odds.",
   "final.sources": "Sources",
@@ -1686,7 +1686,6 @@ const screens = {
       ? `<h2>${t("snap.title")}</h2>
          <div class="ebtcard"><div class="lbl">EBT · SNAP</div><div class="chip"></div><div class="bal">${fmt(r.snap)}.00</div><div class="foot">FOOD ONLY · MONTHLY</div></div>
          <p class="lead">${t("snap.lead", { amount: fmt(r.snap) })}${cite(CONFIG.snap.cite)}</p>
-         <div class="note plain small">${t("snap.note")}</div>
          <p class="small muted">${t("snap.what")}</p>`
       : `<h2>${t("snap.deniedTitle")}</h2>
          <p class="lead">${t("snap.deniedLead", { wage: fmtWage(r.wage) })}${cite(CONFIG.snap.cite)}</p>
@@ -1711,8 +1710,7 @@ const screens = {
     }).join("");
     let body = "", actions = "";
     if (y.shown < 0 && !p) {
-      body = `<div class="note plain">${t("year.intro")}</div>
-        <p class="small muted">${t("year.fair")}</p>`;
+      body = `<div class="note plain">${t("year.intro")}</div>`;
       actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
     } else if (p.type === "event") body = eventPanel(p.p);
     else {
@@ -1720,14 +1718,7 @@ const screens = {
       if (p.type === "refund" || p.type === "refundFirst") {
         const rf = sim.refund;
         body = notif("dollar", "green", t("refund.app"), t("refund.title"), t("refund.text", { amount: fmt(rf.total) }))
-          + `<ul class="auto">
-            <li><span class="ico">${icon("kid")}</span>${t("refund.eitc")}<span class="amt">+${fmt(rf.eitc)}</span></li>
-            <li><span class="ico">${icon("kid")}</span>${t("refund.ctc")}<span class="amt">+${fmt(rf.actc + rf.ctcUsed + rf.careCredit)}</span></li>
-            <li><span class="ico">${icon("card")}</span>${t("refund.fedtax")}<span class="amt">−${fmt(rf.incomeTax)}</span></li>
-            ${rf.mnCredits ? `<li><span class="ico">${icon("kid")}</span>${t("refund.mn")}<span class="amt">+${fmt(rf.mnCredits)}</span></li>
-            <li><span class="ico">${icon("card")}</span>${t("refund.mntax")}<span class="amt">−${fmt(rf.mnTax)}</span></li>` : ""}
-            <li class="tot"><span class="ico">${icon("check")}</span>${t("refund.total")}<span class="amt" style="color:var(--accent)">+${fmt(rf.total)}</span></li></ul>
-          <p class="cite">${t("refund.cite")}</p>
+          + `<p class="cite">${t("refund.cite")}</p>
           ${p.type === "refund" && r.behindPaid ? `<div class="note">${t("refund.catchup", { amount: fmt(r.behindPaid) })}</div>` : ""}
           ${p.type === "refund" ? monthCard(r) : `<div class="note plain small">${t("refund.first")}</div>`}`;
       } else if (p.type === "cut") {
@@ -1743,8 +1734,7 @@ const screens = {
             ${opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "" })}
             ${opt({ act: "cut", val: "card", ico: "card", title: t("cut.card"), price: "", sub: t("cut.card.sub", { apr: (CONFIG.card.apr * 100).toFixed(1) + "%" }) })}
             ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
-            </div>
-            <p class="small muted">${t("cut.cardStat", { has: CONFIG.card.hasCardPct, carry: CONFIG.card.carryPct })}${cite("Federal Reserve, 2026")}</p>`;
+            </div>`;
         }
       } else if (p.type === "maxed") {
         body = `<div class="note bad" style="font-size:17px">${t("year.maxed", { month: MONTHS[r.m], limit: fmt(CONFIG.card.creditLimit) })}</div>${monthCard(r)}`;
@@ -1866,12 +1856,10 @@ const screens = {
     const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap - b.need;
     const noRefund = sim.netWorth - sim.refund.total;
     const typicalBill = CONFIG.help.typicalEmergency;
-    const badPct = Math.round(mc.results.filter((x) => x.debt > 1 || x.meals > 0).length / mc.runs * 100);
     const closeList = `<ul class="close">
       <li>${t("close.spare", { spare: fmt(Math.max(0, spareMo)) })}</li>
       <li>${t(noRefund < 0 ? "close.noRefundNeg" : "close.noRefund", { refund: fmt(sim.refund.total), net: fmt(Math.abs(noRefund)) })}</li>
       ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), months: (typicalBill / spareMo).toFixed(1) })}${cite("Federal Reserve, 2026")}</li>` : ""}
-      <li>${t("close.odds", { n: evs.length === 0 ? "no" : evs.length, em: evs.length === 1 ? "emergency" : "emergencies", pct: badPct, runs: mc.runs.toLocaleString("en-US") })}</li>
     </ul>`;
 
     // Same year, different help: replay this exact year (same emergencies) with one change
