@@ -118,5 +118,13 @@ check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra(
   console.log(`CARD CHOICE: asked ${asked ? "yes" : "no (no spare cash with debt)"}; keep cash -> card ${$(y.card)}, cash ${$(y.cash)}; pay down -> card ${$(paid.card)}, cash ${$(paid.cash)}.`);
 }
 
+// 11) The bottom line says only 1-bedroom + home daycare + bus stays out of the red. Keep that claim true.
+for (const housing of ["oneBR", "twoBR"]) for (const care of ["home", "center"]) for (const transport of ["bus", "car"]) {
+  const m = manyYears("minneapolis", { housing, care, transport }, 0, {});
+  const redYears = m.results.filter((x) => x.red > 0).length / m.runs;
+  if (housing === "oneBR" && care === "home" && transport === "bus") check(redYears < 0.01, "the cheapest choices should almost never have a red month");
+  else check(redYears === 1, `${housing}/${care}/${transport} should be short or borrowing in every year (claim on the bottom line)`);
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);
