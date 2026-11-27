@@ -738,7 +738,7 @@ const TEXT = {
   "year.carryCard": "The card keeps charging interest, and the minimum payment comes out of every paycheck.",
   "year.carryCollections": "The card debt is with a collector now.",
   "yres.yearN": "Year {n}",
-  "save.from": "**Your savings came mostly from your tax refund.** You ended the year {gain} ahead: {refund} was the March tax refund (government tax credits for working parents and renters), and only {pay} came from your paycheck.",
+  "save.from": "**Most of what you saved came from your {refund} tax refund.** Your paycheck alone added {pay} all year.",
   "save.fromAll": "**Your savings came from your tax refund.** You ended the year {gain} ahead, but the {refund} March tax refund (government tax credits) is more than all of it: without it, your paycheck would have left you {pay} short.",
   "year.prices": "**Prices went up:** rent +{rent}, child care +{care}, groceries +{food}, everything else +{other}. Your pay went up too: +{wage} a year. Both use the most recent year of government price and pay data.",
   "yres.nextYear": "Play year {n}",
@@ -746,8 +746,8 @@ const TEXT = {
   "mc.rentLate": "Late fee on unpaid rent (up to 8%)",
   "mc.tabs": "Car tabs (yearly registration): {amt}",
   "mc.gift": "Holiday gifts",
-  "mc.giftToy": "Holiday gifts from a toy drive",
-  "mc.chargedOff": "6 missed payments: the bank closed your card and sent the debt to collections",
+  "mc.giftToy": "Holiday gifts (toy drive)",
+  "mc.chargedOff": "Card closed after 6 missed payments: sent to collections",
   "meter.collections": "IN COLLECTIONS {bal}",
   "ev.gifts.app": "Calendar",
   "ev.gifts.title": "The holidays are here",
@@ -768,9 +768,16 @@ const TEXT = {
   "ev.cardClosed": "Credit card closed",
   "ev.cardClosed.sub": "The card is in collections. The whole bill becomes an unpaid bill.",
   "ev.cardClosed.gift": "The card is in collections. No gifts on credit: this means the toy drive.",
-  "card.chargedOff": "In {month}, after 6 missed payments, the bank closed the card and sent it to collections. Collectors can sue, and it stays on your credit report for 7 years.",
+  "card.chargedOff": "In {month}, after 6 missed payments, the card went to collections. It stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "mc.extra": "more this month: {list}",
+  "mc.x.heat": "heat",
+  "mc.x.clothes": "clothes",
+  "mc.x.gas": "gas",
+  "mc.x.upkeep": "car upkeep",
+  "mc.x.tabs": "car tabs",
+  "mc.fees": "Late fees",
   "mc.gas": "Gas this month: {amt} (average {avg}; more driving, higher prices)",
   "mc.upkeep": "Car upkeep and tires this month: {amt} (average {avg})",
   "mc.heat": "Heat this month: {amt} (average {avg})",
@@ -780,14 +787,16 @@ const TEXT = {
   "mc.cardBal": "Card balance",
   "card.title": "Your credit card",
   "card.titleBills": "Unpaid bills",
+  "card.summary": "You borrowed **{charged}** on the card and paid **{cost}** in interest and late fees.",
+  "card.summaryFree": "You borrowed **{charged}** on the card.",
   "card.start": "Carried in from last year: **{amt}**.",
   "card.charged": "Charged this year: **{amt}**.",
   "card.costs": "Interest: **{interest}**. Late fees: **{fees}**.",
   "card.paid": "You paid **{amt}** toward it.",
   "card.left": "Still owed in December: **{amt}**.",
   "card.clear": "Paid off by December.",
-  "card.payoff": "If you stop here and pay only the minimum (about {pay} a month to start), it takes **{years}** to pay off and costs **{interest}** more in interest.",
-  "card.behind": "Unpaid rent and bills: **{amt}**, still owed. In Minneapolis a landlord must give 30 days' written notice, then can file for eviction.",
+  "card.payoff": "Paying only the minimum, it takes **{years}** to pay off and **{interest}** more in interest.",
+  "card.behind": "Unpaid rent and bills: **{amt}**. After a 30-day notice, the landlord can file for eviction.",
   "bl.cardH": "Your debt",
   "bl.card": "You end the year **{amt}** in debt ({card} on the card). {years}",
   "bl.cardBills": "You end the year **{amt}** behind on rent and bills.",
@@ -809,12 +818,12 @@ const TEXT = {
   "mc.pay": "Paycheck",
   "mc.refund": "Tax refund",
   "mc.bills": "Rent and bills",
-  "mc.cardPay": "Credit card minimum payment",
+  "mc.cardPay": "Credit card payment",
   "mc.catchup": "Catching up on late bills",
   "mc.cardFood": "Groceries on the credit card",
   "mc.cardExtra": "Extra payment on the card",
-  "mc.food": "Food ({wic} WIC + {snap} SNAP + {cash} cash)",
-  "mc.foodCard": "Food ({wic} WIC + {snap} SNAP + {cash} cash + {card} on the card)",
+  "mc.food": "SNAP and WIC, plus {cash} from your paycheck",
+  "mc.foodCard": "SNAP and WIC, plus {cash} cash and {card} on the card",
   "mc.skipped": "{n} meals skipped",
   "mc.covered": "Covered",
   "mc.behind": "Bills you couldn't pay",
@@ -996,8 +1005,8 @@ const TEXT = {
   "care.home": "Home-based daycare",
   "care.home.sub": "A small group in someone's home.",
   "care.home.catch": "Catch: hard to find. About 4 in 10 Minnesota in-home daycares closed from 2014 to 2024.",
-  "care.ffn": "**Why not a relative?** Paid friends or family charge about **{hr}** an hour, around **{mo}** a month full time. Free care only works if someone is free 40+ hours a week.",
-  "care.shifts": "**{n} of your {total}** work shifts each month go to paying for this.",
+  "care.ffn": "**Why not a relative?** Paid friends or family cost about **{mo}** a month. Free care only works if someone is free 40+ hours a week.",
+  "care.shifts": "**{n} of your {total}** shifts a month pay for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
   "transport.title": "Car or bus?",
@@ -1024,9 +1033,9 @@ const TEXT = {
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
-  "snap.wic": "**Your kid also gets WIC** until age 5: about **{amt}** a month in set foods like milk, cereal, eggs, fruit and vegetables. You pick it up with a separate WIC card after an appointment.",
+  "snap.wic": "**Your kid also gets WIC** until age 5: about **{amt}** a month in foods like milk, eggs and fruit.",
   "snap.what": "**SNAP** (once called food stamps) is federal money for groceries, for families with low incomes.",
-  "snap.lead": "**{amount}** a month on an EBT card (Electronic Benefits Transfer). It works like a debit card, but only for food. Rent and bills still come from your paycheck.",
+  "snap.lead": "**{amount}** a month on an EBT card (Electronic Benefits Transfer). It works like a debit card, but only for food.",
   "snap.note": "SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.",
   "snap.deniedTitle": "No SNAP this time.",
   "snap.deniedLead": "At {wage}/hr, you earn too much to qualify.",
@@ -1150,19 +1159,19 @@ const TEXT = {
   "bl.onlyWay": "**Only one set of choices stays out of the red:** a 1-bedroom, home daycare and the bus. Every other combination comes up short or borrows money in every one of 1,000 random years.",
   "bl.top": "The bottom line",
   "bl.kicker": "The proof: your year",
-  "bl.big": "of your paycheck went to rent, child care, getting to work and basics ({bills} of your {net} take-home pay), before buying any food.",
-  "bl.bigOver": "of your paycheck. Rent, child care, getting to work and basics cost **{bills}** a month, but you only take home **{net}**. That is **{over}** more than you earn, before buying any food.",
+  "bl.big": "of your paycheck went to bills before any food ({bills} of {net}).",
+  "bl.bigOver": "of your paycheck: bills cost **{bills}**, but you take home **{net}**. That's before any food.",
   "bl.payH": "Your paycheck, each month",
   "bl.rowPay": "Take-home pay ({hours} hrs/wk at {wage}/hr)",
   "bl.rowBills": "Rent, child care, transport, basics",
   "bl.rowLeft": "Left for food",
   "bl.rowFood": "Food for 2 (USDA's cheapest healthy diet)",
   "bl.rowWic": "WIC foods for your kid",
-  "bl.pay": "Your paycheck left **{short}** a month too little for food. SNAP had to fill that gap.",
-  "bl.payNoSnap": "Your paycheck left **{short}** a month too little for food, and this time there was no SNAP to fill the gap.",
-  "bl.payOk": "Your paycheck covered food, with **{spare}** a month to spare.",
-  "bl.payShort": "Your paycheck didn't even cover the bills: **{left}** short every month, with nothing left for food.",
-  "bl.refundSave": "Anything you saved came mostly from the **{refund}** tax refund each March.",
+  "bl.pay": "That's **{short}** a month too little for food. SNAP fills the gap.",
+  "bl.payNoSnap": "That's **{short}** a month too little for food, and no SNAP to fill it.",
+  "bl.payOk": "Food is covered, with **{spare}** a month to spare.",
+  "bl.payShort": "Bills alone run **{left}** over your paycheck every month.",
+  "bl.refundSave": "Any savings came mostly from the **{refund}** March tax refund.",
   "bl.refundAll": "The **{refund}** tax refund covered the gap.",
   "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
   "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
@@ -1172,16 +1181,16 @@ const TEXT = {
   "bl.choices": "You picked {n} of 3 cheapest options.",
   "bl.yours": "Result: **{meals}** meals skipped, **{debt}** in debt.",
   "bl.lucky": "**You got lucky.**",
-  "bl.luckyOdds": "**{bad}%** of 1,000 random years for this household end in debt or skipped meals.",
+  "bl.luckyOdds": "**{bad}%** of years like this end in debt or skipped meals.",
   "bl.calm": "You had {n} {em}; only {pct}% of years are that calm.",
   "bl.unlucky": "**An unlucky year:** {ok}% of random years for this household end with no debt and no skipped meals.",
-  "bl.odds": "**{bad}%** of 1,000 random years for this household end in debt or skipped meals.",
+  "bl.odds": "**{bad}%** of years like this end in debt or skipped meals.",
   "bl.snapH": "SNAP",
-  "bl.snap": "Same year without its **{snap}** a month: {without} With it: {with}",
+  "bl.snap": "Without its **{snap}** a month: {without} With it: {with}",
   "bl.incomeH": "More income",
-  "bl.income": "Same year, 18% higher pay: {raised} Higher pay, child tax credit and child care help: {all}",
+  "bl.income": "With 18% higher pay: {raised} Plus child tax credit and child care help: {all}",
   "bl.yr": "**{meals}** meals skipped, **{debt}** in debt.",
-  "bl.note": "Comparisons replay your exact year. Only the money changes.",
+  "bl.note": "Same year, same emergencies. Only the money changes.",
   "final.stat": "of U.S. households were food insecure in 2024, the most since 2014.",
   "final.grid": "About **{n} in every 100** households.",
   "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and emergencies at real-world odds.",
@@ -2108,7 +2117,6 @@ const screens = {
     const typicalBill = CONFIG.help.typicalEmergency;
     const closeList = `<ul class="close">
       <li>${t("close.spare", { spare: fmt(Math.max(0, spareMo)) })}</li>
-      <li>${t(noRefund < 0 ? "close.noRefundNeg" : "close.noRefund", { refund: fmt(sim.refund.total), net: fmt(Math.abs(noRefund)) })}</li>
       ${spareMo > 0.5 ? `<li>${t("close.oneBill", { bill: fmt(typicalBill), spare: fmt(spareMo), time: (() => { const mo = Math.ceil(typicalBill / spareMo); return mo >= 24 ? (mo / 12).toFixed(1) + " years" : mo + (mo === 1 ? " month" : " months"); })() })}${cite("Federal Reserve, 2026")}</li>` : ""}
     </ul>`;
 
@@ -2117,10 +2125,7 @@ const screens = {
     if (sim.cardCharged > 0.5 || sim.startCard > 0.5 || debt > 0.5) {
       const po = debt > 0.5 && !sim.chargedOff ? minPayoff(debt) : null;
       cardBox = `<p class="section">${t("card.title")}</p><ul class="close">
-        ${sim.startCard > 0.5 ? `<li>${t("card.start", { amt: fmt(sim.startCard) })}</li>` : ""}
-        ${sim.cardCharged > 0.5 ? `<li>${t("card.charged", { amt: fmt(sim.cardCharged) })}</li>` : ""}
-        <li>${t("card.costs", { interest: fmt(sim.interestPaid), fees: fmt(sim.lateFees) })}</li>
-        <li>${t("card.paid", { amt: fmt(sim.cardPaid) })}</li>
+        <li>${t(sim.interestPaid + sim.lateFees > 0.5 ? "card.summary" : "card.summaryFree", { charged: fmt(sim.cardCharged + sim.startCard), cost: fmt(sim.interestPaid + sim.lateFees) })}</li>
         ${sim.chargedOff ? `<li class="red">${t("card.chargedOff", { month: sim.chargeOffMonth != null ? MONTHS[sim.chargeOffMonth] : t("card.lastYear", null, true), amt: fmt(debt) })}</li>` : ""}
         <li>${debt > 0.5 ? t("card.left", { amt: fmt(debt) }) : t("card.clear")}</li>
         ${po ? `<li>${t("card.payoff", { pay: fmt(cardMinPayment(debt).pay), years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) })}</li>` : ""}
@@ -2164,7 +2169,7 @@ const screens = {
       <p class="headline">${head}</p>
       ${tiles}
       ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
-        if (gain > 0.5) return `<div class="note">${t(pay >= 0 ? "save.from" : "save.fromAll", { gain: fmt(gain), refund: fmt(rf), pay: fmt(Math.abs(pay)) })}</div>`;
+        if (gain > 0.5 && pay >= 0) return `<div class="note">${t("save.from", { gain: fmt(gain), refund: fmt(rf), pay: fmt(pay) })}</div>`;
         return ""; })()}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
       ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) + b.wic - b.need);
@@ -2356,30 +2361,29 @@ function monthCard(r) {
   const ln = (label, amt, cls) => `<div class="ml ${cls || ""}"><span>${label}</span><b>${amt}</b></div>`;
   const change = monthChange(r), st = monthState(r);
   const short = r.foodGap > 0.005;
+  // Seasonal extras: name them, don't itemize them
+  const sx = r.seasonal || {}, extra = [];
+  if (sx.heat > 5) extra.push(t("mc.x.heat", null, true));
+  if (sx.clothes > 8) extra.push(t("mc.x.clothes", null, true));
+  if (sx.gas > 8) extra.push(t("mc.x.gas", null, true));
+  if (sx.upkeep > 5) extra.push(t("mc.x.upkeep", null, true));
+  if (r.tabs) extra.push(t("mc.x.tabs", null, true));
+  const cardPaid = (r.cardPay || 0) + (r.cardExtra || 0), fees = (r.rentLateFee || 0) + (r.lateFee || 0);
   return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
-  ${st === "dip" ? `<p class="small muted" style="margin:-4px 0 10px">${t("mc.dip", { cash: fmt(r.startCash) })}</p>` : ""}
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { wic: fmt(r.wicUsed || 0), snap: fmt(r.snapUsed), cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
-    ${ln(t("mc.bills", null, true), "−" + fmt(r.bills != null ? r.bills : b.housing + b.care + b.transport + b.basics))}
-    ${r.seasonal && r.seasonal.heat > 5 ? ln(`<small>${t("mc.heat", { amt: fmt(r.seasonal.heatMonth), avg: fmt(r.seasonal.heatAvg) }, true)}</small>`, "", "muted") : ""}
-    ${r.seasonal && r.seasonal.gas > 8 ? ln(`<small>${t("mc.gas", { amt: fmt(r.seasonal.gasMonth), avg: fmt(r.seasonal.gasAvg) }, true)}</small>`, "", "muted") : ""}
-    ${r.seasonal && r.seasonal.upkeep > 5 ? ln(`<small>${t("mc.upkeep", { amt: fmt(r.seasonal.upkeepMonth), avg: fmt(r.seasonal.upkeepAvg) }, true)}</small>`, "", "muted") : ""}
-    ${r.seasonal && r.seasonal.clothes > 8 ? ln(`<small>${t("mc.clothes", { amt: fmt(r.seasonal.clothesMonth), avg: fmt(r.seasonal.clothesAvg) }, true)}</small>`, "", "muted") : ""}
-    ${r.tabs ? ln(`<small>${t("mc.tabs", { amt: fmt(r.tabs) }, true)}</small>`, "", "muted") : ""}
-    ${r.gift ? ln(r.gift.how === "skip" ? t("mc.giftToy", null, true) : t("mc.gift", null, true) + (r.gift.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), r.gift.how === "skip" ? "$0" : (r.gift.how === "card" ? "" : "−") + fmt(r.gift.cost), r.gift.how === "card" ? "muted" : "") : ""}
-    ${r.cardPay > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(r.cardPay)) : ""}
-    ${r.rentLateFee > 0 ? ln(`<span class="red">${t("mc.rentLate", null, true)}</span>`, `<span class="red">+${fmt(r.rentLateFee)}</span>`) : ""}
-    ${r.lateFee > 0 ? ln(`<span class="red">${t("mc.late", { due: fmt(r.cardDue) }, true)}</span>`, `<span class="red">+${fmt(r.lateFee)}</span>`) : ""}
-    ${r.chargedOff ? ln(`<span class="red">${t("mc.chargedOff", null, true)}</span>`, "") : ""}
-    ${r.cardInterest > 0.5 ? ln(`<small>${t("mc.interest", null, true)}</small>`, `<small>+${fmt(r.cardInterest)}</small>`, "muted") : ""}
+    ${ln(t("mc.bills", null, true) + (extra.length ? ` <small>(${t("mc.extra", { list: extra.join(", ") }, true)})</small>` : ""), "−" + fmt(r.bills != null ? r.bills : b.housing + b.care + b.transport + b.basics))}
     ${r.events.map((e) => ln(t("ev." + e.id + ".short", null, true) + (e.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), (e.how === "card" ? "" : "−") + fmt(e.cost), e.how === "card" ? "muted" : "")).join("")}
-    ${r.cardFood > 0.5 ? ln(`<span class="red">${t("mc.cardFood", null, true)}</span>`, `<span class="red">${fmt(r.cardFood)}</span>`) : ""}
+    ${r.gift && r.gift.how !== "skip" ? ln(t("mc.gift", null, true) + (r.gift.how === "card" ? ` <small>(${t("yres.onCard", null, true)})</small>` : ""), (r.gift.how === "card" ? "" : "−") + fmt(r.gift.cost), r.gift.how === "card" ? "muted" : "") : ""}
+    ${r.gift && r.gift.how === "skip" ? ln(t("mc.giftToy", null, true), "$0", "muted") : ""}
+    ${cardPaid > 0.5 ? ln(t("mc.cardPay", null, true), "−" + fmt(cardPaid)) : ""}
     ${r.behindPaid ? ln(t("mc.catchup", null, true), "−" + fmt(r.behindPaid)) : ""}
-    ${r.cardExtra > 0.5 ? ln(t("mc.cardExtra", null, true), "−" + fmt(r.cardExtra)) : ""}
+    ${fees > 0 ? ln(`<span class="red">${t("mc.fees", null, true)}</span>`, `<span class="red">+${fmt(fees)}</span>`) : ""}
+    ${r.cardFood > 0.5 ? ln(`<span class="red">${t("mc.cardFood", null, true)}</span>`, `<span class="red">${fmt(r.cardFood)}</span>`) : ""}
     ${r.behindAdded > 0.5 ? ln(`<span class="red">${t("mc.behind", null, true)}</span>`, `<span class="red">${fmt(r.behindAdded)}</span>`) : ""}
-    ${r.endCard > 0.5 ? ln(t("mc.cardBal", null, true), fmt(r.endCard), "muted") : ""}
+    ${r.chargedOff ? ln(`<span class="red">${t("mc.chargedOff", null, true)}</span>`, "") : ""}
     ${ln(t("mc.end", null, true), fmt(r.endCash), "tot")}
   </div>`;
 }
