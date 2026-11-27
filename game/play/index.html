@@ -294,6 +294,20 @@ ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;
 .onlyway{font-size:16px;line-height:1.45;margin:14px 0 0;padding:12px 14px;border-left:4px solid var(--red);background:var(--red-soft);border-radius:0 12px 12px 0}
 .claimsub{font-family:var(--serif);font-size:20px;line-height:1.3;font-weight:700;margin:0}
 .catch{display:block;margin-top:6px;color:var(--red);font-weight:600}
+.ladder{display:flex;align-items:stretch;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;margin:0 -2px;-webkit-overflow-scrolling:touch}
+.rung{flex:0 0 68%;max-width:250px;scroll-snap-align:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:6px}
+.rung.you{flex-basis:46%;background:var(--ink);color:#fff;border-color:var(--ink)}
+.rung.you .rk{color:rgba(255,255,255,.7)}
+.rung.best{border-style:dashed}
+.rk{font:700 10.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.rc{margin:0;font-size:14px}
+.rbig{margin:0;font:800 19px/1.25 var(--sans)}
+.ralt{margin-top:auto;border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35;background:var(--paper)}
+.ralt span{display:block;color:var(--muted)}
+.ralt b{display:block}
+.ralt.better{background:var(--accent-soft)}
+.ralt.worse{background:var(--red-soft)}
+.rarrow{align-self:center;font:700 22px/1 var(--sans);color:var(--faint);flex:0 0 auto}
 .blr{font-size:14.5px;margin:2px 0 10px}
 .blr div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
 .blr div b{font-family:var(--mono);white-space:nowrap}
@@ -738,6 +752,35 @@ const TEXT = {
   "year.carryCard": "The card keeps charging interest, and the minimum payment comes out of every paycheck.",
   "year.carryCollections": "The card debt is with a collector now.",
   "yres.yearN": "Year {n}",
+  "lad.title": "Your path: what each choice did",
+  "lad.yourYear": "Your year",
+  "lad.you": "You:",
+  "lad.instead": "Instead: {other}",
+  "lad.debt": "{amt} in debt",
+  "lad.both": "{cash} in cash but {debt} in debt",
+  "lad.ahead": "{amt} in cash, no debt",
+  "lad.meals": "{n} meals skipped",
+  "lad.housing": "Housing",
+  "lad.care": "Child care",
+  "lad.work": "Getting to work",
+  "lad.bus": "the bus",
+  "lad.car": "your car",
+  "lad.emerg": "Emergencies",
+  "lad.onCard": "put them on the card",
+  "lad.cash": "pay with cash",
+  "lad.short": "When food ran short",
+  "lad.foodCard": "put groceries on the card",
+  "lad.foodSkip": "skip meals",
+  "lad.cardplan": "Extra cash",
+  "lad.payCard": "pay down the card",
+  "lad.keepCash": "keep the cash",
+  "lad.gifts": "Holidays",
+  "lad.toy": "toy drive",
+  "lad.gift": "small gifts",
+  "lad.cheapest": "Cheapest path",
+  "lad.same": "Same result",
+  "lad.cheapestWhat": "1-bedroom, home daycare, bus",
+  "lad.note": "Swipe →. Each card replays your exact year with one choice changed. Green = would have ended better, red = worse.",
   "save.from": "**Most of what you saved came from your {refund} tax refund.** Your paycheck alone added {pay} all year.",
   "save.fromAll": "**Your savings came from your tax refund.** You ended the year {gain} ahead, but the {refund} March tax refund (government tax credits) is more than all of it: without it, your paycheck would have left you {pay} short.",
   "year.prices": "**Prices went up:** rent +{rent}, child care +{care}, groceries +{food}, everything else +{other}. Your pay went up too: +{wage} a year. Both use the most recent year of government price and pay data.",
@@ -852,8 +895,8 @@ const TEXT = {
   "ev.savings.sub": "You have {cash}.",
   "ev.savings.no": "You only have {cash}.",
   "ev.card": "Put it on the credit card",
-  "ev.card.limit": "Only {room} left on the card. The other {rest} becomes an unpaid bill.",
-  "ev.card.sub": "Card balance: {bal}. Minimum payment: about {pay} a month at {apr} interest.",
+  "ev.card.limit": "Only {room} left on the card; the rest becomes an unpaid bill.",
+  "ev.card.sub": "About {pay} a month at {apr} interest.",
   "ev.car.app": "Auto shop",
   "ev.car.title": "The car won't start",
   "ev.car.text": "The repair is **{cost}**. Without the car, you can't get to work.",
@@ -1005,7 +1048,7 @@ const TEXT = {
   "care.home": "Home-based daycare",
   "care.home.sub": "A small group in someone's home.",
   "care.home.catch": "Catch: hard to find. About 4 in 10 Minnesota in-home daycares closed from 2014 to 2024.",
-  "care.ffn": "**Why not a relative?** Paid friends or family cost about **{mo}** a month. Free care only works if someone is free 40+ hours a week.",
+  "care.ffn": "**Why not a relative?** Paid friends or family usually cost more than home daycare, and free care only works if someone is free 40+ hours a week.",
   "care.shifts": "**{n} of your {total}** shifts a month pay for this.",
 
   "transport.kicker": "Day 2 · Getting to work",
@@ -1022,14 +1065,14 @@ const TEXT = {
 
   "basics.kicker": "Day 6 · Autopay",
   "basics.title": "These happen no matter what.",
-  "basics.sub": "What the lowest-income households actually spend, on average. Clothes cost more in winter and at the holidays.",
+  "basics.sub": "A standard low-income budget: what the poorest U.S. households actually spend. No extras.",
   "basics.phone": "Cell phone service",
   "basics.clothes": "Clothes and shoes",
   "basics.personal": "Soap, toothpaste, haircuts",
   "basics.supplies": "Cleaning supplies, toilet paper",
   "basics.internet": "Home internet (low-income plan)",
   "basics.health": "Health insurance",
-  "basics.total": "Every month",
+  "basics.total": "All of it, every month",
 
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
@@ -1859,6 +1902,51 @@ const notif = (ico, cls, app, title, text) =>
 const next = (to, label, cls = "") => `<button class="btn ${cls}" data-act="next" data-val="${to}">${label} <span class="arr">→</span></button>`;
 const cite = (s) => s ? `<span class="cite">(${s})</span>` : "";
 
+
+// Your path: each decision, what you chose, and how this same year ends if you'd chosen the other way (one change at a time)
+function pathLadder() {
+  const base = Object.assign({ wage: S.wageOverride, noSnap: !!S.y.noSnap, policy: defaultPolicy }, startOpts());
+  const run = (c, ch) => simulateYear(S.city, Object.assign({}, S.c, c || {}), yearStart(), S.y.seed, Object.assign({}, S.y.choices, ch || {}), base);
+  const end = (y) => {
+    const net = y.netWorth - (yearStart() - (S.y.start ? S.y.start.card + S.y.start.behind : 0));
+    const debt = y.card + y.behind, money = debt > 0.5 ? (y.cash > 0.5 ? t("lad.both", { cash: fmt(y.cash), debt: fmt(debt) }, true) : t("lad.debt", { amt: fmt(debt) }, true)) : t("lad.ahead", { amt: fmt(y.cash) }, true);
+    return money + (y.mealsSkipped ? " · " + t("lad.meals", { n: y.mealsSkipped.toLocaleString("en-US") }, true) : "");
+  };
+  const score = (y) => y.cash - y.card - y.behind - y.mealsSkipped * 20;   // only to color better/worse
+  const mine = run();
+  const rungs = [];
+  const add = (step, chose, other, alt) => rungs.push({ step, chose, other, alt });
+  const L = { oneBR: t("housing.oneBR", null, true), twoBR: t("housing.twoBR", null, true), home: t("care.home", null, true), center: t("care.center", null, true), bus: t("lad.bus", null, true), car: t("lad.car", null, true) };
+  const flip = { oneBR: "twoBR", twoBR: "oneBR", home: "center", center: "home", bus: "car", car: "bus" };
+  add(t("lad.housing", null, true), L[S.c.housing], L[flip[S.c.housing]], run({ housing: flip[S.c.housing] }));
+  add(t("lad.care", null, true), L[S.c.care], L[flip[S.c.care]], run({ care: flip[S.c.care] }));
+  add(t("lad.work", null, true), L[S.c.transport], L[flip[S.c.transport]], run({ transport: flip[S.c.transport] }));
+  const ch = S.y.choices, evKeys = Object.keys(ch).filter((k) => /^\d+-\d+$/.test(k));
+  if (evKeys.length) {
+    const onCard = evKeys.filter((k) => ch[k] === "card").length, alt = {};
+    evKeys.forEach((k) => (alt[k] = ch[k] === "card" ? "savings" : "card"));
+    add(t("lad.emerg", null, true), t(onCard ? "lad.onCard" : "lad.cash", null, true), t(onCard ? "lad.cash" : "lad.onCard", null, true), run(null, alt));
+  }
+  if (ch.food) add(t("lad.short", null, true), t(ch.food === "card" ? "lad.foodCard" : "lad.foodSkip", null, true), t(ch.food === "card" ? "lad.foodSkip" : "lad.foodCard", null, true), run(null, { food: ch.food === "card" ? "skip" : "card" }));
+  const cpKey = Object.keys(ch).find((k) => k.endsWith("-cp"));
+  if (cpKey) add(t("lad.cardplan", null, true), t(ch[cpKey] === "pay" ? "lad.payCard" : "lad.keepCash", null, true), t(ch[cpKey] === "pay" ? "lad.keepCash" : "lad.payCard", null, true), run(null, { [cpKey]: ch[cpKey] === "pay" ? "keep" : "pay" }));
+  if (ch["11-g"]) add(t("lad.gifts", null, true), t(ch["11-g"] === "skip" ? "lad.toy" : "lad.gift", null, true), t(ch["11-g"] === "skip" ? "lad.gift" : "lad.toy", null, true), run(null, { "11-g": ch["11-g"] === "skip" ? "savings" : "skip" }));
+  const cheap = run({ housing: "oneBR", care: "home", transport: "bus" });
+  const cell = (r) => {
+    const d = score(r.alt) - score(mine), cls = d > 25 ? "better" : d < -25 ? "worse" : "same";
+    return `<div class="rung"><p class="rk">${r.step}</p><p class="rc">${t("lad.you", null, true)} <b>${r.chose}</b></p>
+      <div class="ralt ${cls}"><span>${t("lad.instead", { other: r.other }, true)}</span><b>${Math.abs(d) < 1 ? t("lad.same", null, true) : end(r.alt)}</b></div></div>`;
+  };
+  return `<p class="section">${t("lad.title")}</p>
+    <div class="ladder">
+      <div class="rung you"><p class="rk">${t("lad.yourYear", null, true)}</p><p class="rbig">${end(mine)}</p></div>
+      ${rungs.map(cell).join('<span class="rarrow">›</span>')}
+      <span class="rarrow">›</span>
+      <div class="rung best"><p class="rk">${t("lad.cheapest", null, true)}</p><p class="rc">${t("lad.cheapestWhat", null, true)}</p><div class="ralt ${score(cheap) - score(mine) > 25 ? "better" : "same"}"><b>${end(cheap)}</b></div></div>
+    </div>
+    <p class="cap small muted">${t("lad.note")}</p>`;
+}
+
 /* ---------- Screens ---------- */
 const screens = {
   intro() {
@@ -1925,12 +2013,12 @@ const screens = {
       <h2>${t("basics.title")}</h2>
       <p class="muted">${t("basics.sub")}</p>
       <ul class="auto">
-        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}<span class="amt">${fmt(CONFIG.basicsItems.phone / 12)}</span></li>
-        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}<span class="amt">${fmt(CONFIG.basicsItems.clothes / 12)}</span></li>
-        <li><span class="ico">${icon("bag")}</span>${t("basics.personal")}<span class="amt">${fmt(CONFIG.basicsItems.personal / 12)}</span></li>
-        <li><span class="ico">${icon("home")}</span>${t("basics.supplies")}<span class="amt">${fmt(CONFIG.basicsItems.supplies / 12)}</span></li>
-        <li><span class="ico">${icon("phone")}</span>${t("basics.internet")}<span class="amt">${fmt(CONFIG.basicsItems.internet / 12)}</span></li>
-        <li><span class="ico">${icon("med")}</span>${t("basics.health", { kid: city().kidHealth })}<span class="amt">${fmt(path().health)}</span></li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.phone")}</li>
+        <li><span class="ico">${icon("shirt")}</span>${t("basics.clothes")}</li>
+        <li><span class="ico">${icon("bag")}</span>${t("basics.personal")}</li>
+        <li><span class="ico">${icon("home")}</span>${t("basics.supplies")}</li>
+        <li><span class="ico">${icon("phone")}</span>${t("basics.internet")}</li>
+        <li><span class="ico">${icon("med")}</span>${t("basics.health", { kid: city().kidHealth })}</li>
         <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(path().basics)}</span></li>
       </ul>
       <p class="cite">(${CONFIG.basicsCite}; health insurance: ${city().healthCite})</p>
@@ -2168,6 +2256,7 @@ const screens = {
       ${S.y.noSnap ? `<div class="note bad">${t("yres.noSnapMode", { snap: fmt(b.snap) })}</div>` : ""}
       <p class="headline">${head}</p>
       ${tiles}
+      ${pathLadder()}
       ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
         if (gain > 0.5 && pay >= 0) return `<div class="note">${t("save.from", { gain: fmt(gain), refund: fmt(rf), pay: fmt(pay) })}</div>`;
         return ""; })()}
