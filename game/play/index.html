@@ -288,6 +288,13 @@ details.more{border-top:1px solid var(--line);border-bottom:1px solid var(--line
 details.more[open]{padding-bottom:14px}
 ul.bl{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
 ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15.5px;line-height:1.45}
+.claim{font-family:var(--serif);font-size:44px;line-height:1.02;font-weight:700;margin:2px 0 12px;color:var(--red)}
+.claimsub{font-family:var(--serif);font-size:20px;line-height:1.3;font-weight:700;margin:0}
+.blr{font-size:14.5px;margin:2px 0 10px}
+.blr div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.blr div b{font-family:var(--mono);white-space:nowrap}
+.blr .tot{border-top:1px solid var(--line);margin-top:3px;padding-top:6px;font-weight:700}
+.blr .need{color:var(--muted)}
 ul.bl li b.h{display:block;font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
 .stat + .kicker, .bl + .kicker{margin-top:34px}
 .receipt{position:relative;background:var(--paper);font:13.5px/1.55 var(--mono);padding:20px 18px 24px;margin:4px 0 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.3);animation:print 1s var(--ease) both}
@@ -1009,12 +1016,22 @@ const TEXT = {
   "label.food": "Left for food",
 
   "final.kicker": "The bigger picture",
-  "bl.kicker": "The bottom line: your year",
+  // bl.claim and bl.claimSub are Ryan's own words, copied from the home page (content.js home_claim and home_thesis)
+  "bl.claim": "No income, no food.",
+  "bl.claimSub": "On a typical low-income salary, it is not possible to buy enough healthy groceries, even when making the best budget choices, and government funding is one of the best ways to solve this problem.",
+  "bl.top": "The bottom line",
+  "bl.kicker": "The proof: your year",
   "bl.big": "of your paycheck went to bills before any food.",
   "bl.bigOver": "of your paycheck was needed for bills, before any food.",
   "bl.payH": "Your paycheck",
-  "bl.pay": "Full time at {wage}/hr: **{net}** a month. After rent, child care, transport and basics, **{left}** was left for **{food}** of food.",
-  "bl.payShort": "Full time at {wage}/hr: **{net}** a month. Rent, child care, transport and basics ran **{left}** over that.",
+  "bl.rowPay": "Take-home pay ({hours} hrs/wk at {wage}/hr)",
+  "bl.rowBills": "Rent, child care, transport, basics",
+  "bl.rowLeft": "Left for food",
+  "bl.rowFood": "Food for 2 (USDA's cheapest healthy diet)",
+  "bl.pay": "Your paycheck left **{short}** a month too little for food. SNAP had to fill that gap.",
+  "bl.payNoSnap": "Your paycheck left **{short}** a month too little for food, and this time there was no SNAP to fill the gap.",
+  "bl.payOk": "Your paycheck covered food, with **{spare}** a month to spare.",
+  "bl.payShort": "Your paycheck didn't even cover the bills: **{left}** short every month, with nothing left for food.",
   "bl.refundAll": "The **{refund}** tax refund covered the gap.",
   "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
   "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
@@ -1355,13 +1372,23 @@ function bottomLine() {
   const n = (x) => Math.round(x).toLocaleString("en-US");
   const yr = (y) => t("bl.yr", { meals: n(y.mealsSkipped), debt: fmt(y.card + y.behind) }, true);
   const item = (head, body) => `<li><b class="h">${head}</b>${body}</li>`;
-  return `<p class="kicker">${t("bl.kicker")}</p>
+  return `<p class="kicker">${t("bl.top")}</p>
+    <p class="claim">${t("bl.claim")}</p>
+    <p class="claimsub">${t("bl.claimSub")}</p>
+    <p class="kicker" style="margin-top:30px">${t("bl.kicker")}</p>
     <div class="stat">
       <div class="big" data-count="${pctBills}" data-dec="0">0%</div>
       <p>${t(pctBills >= 100 ? "bl.bigOver" : "bl.big")}</p>
     </div>
     <ul class="bl">
-      ${item(t("bl.payH"), t(left >= 0 ? "bl.pay" : "bl.payShort", { hours: CONFIG.hoursPerWeek, wage: fmtWage(w0), net: fmt(b.net), left: fmt(Math.abs(left)), food: fmt(b.need) }) + (left < 0 ? " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) }) : ""))}
+      ${item(t("bl.payH"), `<div class="blr">
+          <div><span>${t("bl.rowPay", { hours: CONFIG.hoursPerWeek, wage: fmtWage(w0) }, true)}</span><b>${fmt(b.net)}</b></div>
+          <div><span>${t("bl.rowBills", null, true)}</span><b>−${fmt(bills)}</b></div>
+          <div class="tot"><span>${t("bl.rowLeft", null, true)}</span><b class="${left < b.need ? "red" : ""}">${fmt(Math.max(0, left))}</b></div>
+          <div class="need"><span>${t("bl.rowFood", null, true)}</span><b>${fmt(b.need)}</b></div>
+        </div>`
+        + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
+          : left < b.need ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - left) }) : t("bl.payOk", { spare: fmt(left - b.need) })))}
       ${item(t("bl.choicesH"), t(conscious === 3 ? "bl.cheapest" : "bl.choices", { n: conscious }) + " " + t("bl.yours", { meals: n(meals), debt: fmt(debt) }) + " "
         + (fewer <= 33 && badPct > 0 ? t("bl.lucky", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer, bad: badPct }) : t("bl.odds", { bad: badPct })))}
       ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
