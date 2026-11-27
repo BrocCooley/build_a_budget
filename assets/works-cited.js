@@ -112,5 +112,9 @@ window.WORKS_CITED = [
 
   { "text":"U.S. Bureau of Labor Statistics. \"Table 5. Employment Status of the Population by Sex, Marital Status, and Presence and Age of Own Children under 18, 2024-2025 Annual Averages.\" *Employment Characteristics of Families*, 2026, www.bls.gov/news.release/famee.t05.htm.","url":"https://www.bls.gov/news.release/famee.t05.htm","usedIn":"Game (hours: 8 in 10 employed single mothers work full time)" },
 
-  { "text":"U.S. Bureau of Labor Statistics. \"Table 23. People at Work by Occupation, Sex, and Usual Full- or Part-Time Status.\" *Labor Force Statistics from the Current Population Survey*, 2026, www.bls.gov/cps/cpsaat23.htm.","url":"https://www.bls.gov/cps/cpsaat23.htm","usedIn":"Game (hours: women in full-time sales jobs average 40.5 hours)" }
+  { "text":"U.S. Bureau of Labor Statistics. \"Table 23. People at Work by Occupation, Sex, and Usual Full- or Part-Time Status.\" *Labor Force Statistics from the Current Population Survey*, 2026, www.bls.gov/cps/cpsaat23.htm.","url":"https://www.bls.gov/cps/cpsaat23.htm","usedIn":"Game (hours: women in full-time sales jobs average 40.5 hours)" },
+
+  { "text":"Yang, Hannah. \"Minnesota Is Losing More Child Care Providers amid Rising Costs and Sticky Red Tape.\" *MPR News*, 4 Sept. 2025, www.mprnews.org/story/2025/09/04/minnesota-losing-more-child-care-providers.","url":"https://www.mprnews.org/story/2025/09/04/minnesota-losing-more-child-care-providers","usedIn":"Game (home daycare catch: about 10,000 in-home programs in 2014, 5,781 at the end of 2024)" },
+
+  { "text":"U.S. Census Bureau. \"Means of Transportation to Work by Selected Characteristics (S0802): Minneapolis City, Minnesota.\" *American Community Survey 1-Year Estimates*, 2024, data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000.","url":"https://data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000","usedIn":"Game (bus catch: 44.6-minute average transit commute vs. 21.2 minutes driving alone)" }
 ];

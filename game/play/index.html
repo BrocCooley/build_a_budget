@@ -290,6 +290,7 @@ ul.bl{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
 ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15.5px;line-height:1.45}
 .claim{font-family:var(--serif);font-size:44px;line-height:1.02;font-weight:700;margin:2px 0 12px;color:var(--red)}
 .claimsub{font-family:var(--serif);font-size:20px;line-height:1.3;font-weight:700;margin:0}
+.catch{display:block;margin-top:6px;color:var(--red);font-weight:600}
 .blr{font-size:14.5px;margin:2px 0 10px}
 .blr div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
 .blr div b{font-family:var(--mono);white-space:nowrap}
@@ -860,7 +861,8 @@ const TEXT = {
   "housing.title": "Where do you live?",
   "housing.sub": "Typical rent in {city}.",
   "housing.oneBR": "1-bedroom",
-  "housing.oneBR.sub": "You and your kid share a room.",
+  "housing.oneBR.sub": "Cheapest rent in the city.",
+  "housing.oneBR.catch": "Catch: you and your kid share one bedroom, for years.",
   "housing.twoBR": "2-bedroom",
   "housing.twoBR.sub": "Your kid gets their own room.",
 
@@ -871,6 +873,7 @@ const TEXT = {
   "care.center.sub": "Set hours, trained staff.",
   "care.home": "Home-based daycare",
   "care.home.sub": "A small group in someone's home.",
+  "care.home.catch": "Catch: hard to find. About 4 in 10 Minnesota in-home daycares closed from 2014 to 2024.",
   "care.ffn": "**Why not a relative?** Paid friends or family charge about **{hr}** an hour, around **{mo}** a month full time. Free care only works if someone is free 40+ hours a week.",
   "care.shifts": "**{n} of {total}** shifts a month pay for this.",
 
@@ -879,7 +882,8 @@ const TEXT = {
   "transport.car": "Keep your old car",
   "transport.car.sub": "Paid off. Gas, insurance, repairs.",
   "transport.bus": "Take the bus",
-  "transport.bus.sub": "$1 rides with your EBT card. Slower, with your kid along.",
+  "transport.bus.sub": "$1 rides with your EBT card.",
+  "transport.bus.catch": "Catch: the average Minneapolis transit commute is 45 minutes each way. Driving: 21. Plus daycare drop-off, with your kid along.",
   "transport.grocery": "Grocery store",
   "transport.corner": "Corner store",
   "transport.home": "HOME",
@@ -1035,12 +1039,16 @@ const TEXT = {
   "bl.refundAll": "The **{refund}** tax refund covered the gap.",
   "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
   "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
-  "bl.choicesH": "Your choices",
-  "bl.cheapest": "Cheapest option every time.",
-  "bl.choices": "{n} of 3 cheapest options.",
+  "bl.choicesH": "Your choices and your luck",
+  "bl.cheapest": "**Best case:** you got every cheap option. Real families often can't: in-home daycares are closing, and the bus doubles the commute.",
+  "bl.cheapestLucky": "**Best case, and lucky:** every cheap option was open to you. Real families often can't get them: in-home daycares are closing, and the bus doubles the commute.",
+  "bl.choices": "You picked {n} of 3 cheapest options.",
   "bl.yours": "Result: **{meals}** meals skipped, **{debt}** debt.",
-  "bl.lucky": "You had {n} {em}; only {pct}% of years are that lucky. **{bad}%** of 1,000 random years end in debt or skipped meals.",
-  "bl.odds": "**{bad}%** of 1,000 random years end in debt or skipped meals.",
+  "bl.lucky": "**You got lucky.**",
+  "bl.luckyOdds": "**{bad}%** of 1,000 random years for this household end in debt or skipped meals.",
+  "bl.calm": "You had {n} {em}; only {pct}% of years are that calm.",
+  "bl.unlucky": "**An unlucky year:** {ok}% of random years for this household end with no debt and no skipped meals.",
+  "bl.odds": "**{bad}%** of 1,000 random years for this household end in debt or skipped meals.",
   "bl.snapH": "SNAP",
   "bl.snap": "Same year without its **{snap}** a month: {without} With it: {with}",
   "bl.incomeH": "More income",
@@ -1371,6 +1379,14 @@ function bottomLine() {
   const withSnap = run({}), without = run({ noSnap: true }), raised = run({ wage: w1 }), all = run({ wage: w1, ctc2021: true, careCost: copayAt(w1) });
   const n = (x) => Math.round(x).toLocaleString("en-US");
   const yr = (y) => t("bl.yr", { meals: n(y.mealsSkipped), debt: fmt(y.card + y.behind) }, true);
+  // Luck: compare this year with 1,000 random years for the same household
+  const good = meals === 0 && debt <= 1, calm = fewer <= 33;
+  const em = { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer };
+  let luck;
+  if (good && (badPct >= 10 || calm)) luck = t("bl.lucky") + (badPct >= 10 ? " " + t("bl.luckyOdds", { bad: badPct }) : "") + (calm ? " " + t("bl.calm", em) : "");
+  else if (!good && badPct <= 50) luck = t("bl.unlucky", { ok: 100 - badPct });
+  else luck = t("bl.odds", { bad: badPct }) + (calm ? " " + t("bl.calm", em) : "");
+  const luckLine = t(conscious === 3 ? (good ? "bl.cheapestLucky" : "bl.cheapest") : "bl.choices", { n: conscious }) + " " + t("bl.yours", { meals: n(meals), debt: fmt(debt) }) + " " + luck;
   const item = (head, body) => `<li><b class="h">${head}</b>${body}</li>`;
   return `<p class="kicker">${t("bl.top")}</p>
     <p class="claim">${t("bl.claim")}</p>
@@ -1389,8 +1405,7 @@ function bottomLine() {
         </div>`
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
           : left < b.need ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - left) }) : t("bl.payOk", { spare: fmt(left - b.need) })))}
-      ${item(t("bl.choicesH"), t(conscious === 3 ? "bl.cheapest" : "bl.choices", { n: conscious }) + " " + t("bl.yours", { meals: n(meals), debt: fmt(debt) }) + " "
-        + (fewer <= 33 && badPct > 0 ? t("bl.lucky", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer, bad: badPct }) : t("bl.odds", { bad: badPct })))}
+      ${item(t("bl.choicesH"), luckLine)}
       ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
       ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > withSnap.mealsSkipped ? " " + t("bl.raiseMore") : ""))}
     </ul>
@@ -1659,7 +1674,7 @@ const screens = {
       <h2>${t("housing.title")}</h2>
       <p class="muted">${t("housing.sub", { city: city().name })}${cite(city().rentCite)}</p>
       <div class="opts">
-      ${opt({ act: "housing", val: "oneBR", art: plan1, title: t("housing.oneBR"), price: fmt(r.oneBR), sub: t("housing.oneBR.sub"), side: donut(r.oneBR / meterMax()), tag: t("tag.cheaper") })}
+      ${opt({ act: "housing", val: "oneBR", art: plan1, title: t("housing.oneBR"), price: fmt(r.oneBR), sub: t("housing.oneBR.sub") + `<span class="catch">${t("housing.oneBR.catch")}</span>`, side: donut(r.oneBR / meterMax()), tag: t("tag.cheaper") })}
       ${opt({ act: "housing", val: "twoBR", art: plan2, title: t("housing.twoBR"), price: fmt(r.twoBR), sub: t("housing.twoBR.sub"), side: donut(r.twoBR / meterMax()) })}
       </div>`;
   },
@@ -1677,7 +1692,7 @@ const screens = {
       <p class="muted">${t("care.sub")}</p>
       <div class="opts">
       ${opt({ act: "care", val: "center", ico: "kid", title: t("care.center"), price: fmt(cc.center), sub: t("care.center.sub") + cite(ct.childCareCiteCenter), extra: shiftInfo(cc.center) })}
-      ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome), extra: shiftInfo(cc.home), tag: t("tag.cheaper") })}
+      ${opt({ act: "care", val: "home", ico: "home", title: t("care.home"), price: fmt(cc.home), sub: t("care.home.sub") + cite(ct.childCareCiteHome) + `<span class="catch">${t("care.home.catch")}</span>${cite("MPR News, 2025")}`, extra: shiftInfo(cc.home), tag: t("tag.cheaper") })}
       </div>
       <div class="note plain small">${t("care.ffn", { hr: "$" + ffnHourly().toFixed(2), mo: fmt(ffnHourly() * CONFIG.ffnCare.hoursPerMonth) })}${cite("NSECE via CLASP, 2020; BLS CPI, 2026")}</div>`;
   },
@@ -1687,7 +1702,7 @@ const screens = {
       <h2>${t("transport.title")}</h2>
       <div class="opts">
       ${opt({ act: "transport", val: "car", art: routeCar(), title: t("transport.car"), price: fmt(CONFIG.transport.carMonthly), sub: t("transport.car.sub") + cite("AAA, 2025") })}
-      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite(city().busCite || "estimate") + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper") })}
+      ${opt({ act: "transport", val: "bus", art: routeBus(), title: t("transport.bus"), price: fmt(city().busPass), sub: t("transport.bus.sub") + cite(city().busCite || "estimate") + `<span class="catch">${t("transport.bus.catch")}</span>${cite("Census ACS, 2024")}` + (city().busNote ? `<br><span class="red">${city().busNote}</span>${cite(city().busNoteCite)}` : ""), tag: t("tag.cheaper") })}
       </div>`;
   },
 
@@ -1985,6 +2000,8 @@ const screens = {
         <li>Federal Reserve Bank of Philadelphia. Large Bank Consumer Credit Card data (FR Y-14M): median credit limit, all accounts (RCCCBLIMPCT50) and new accounts with credit scores under 660 (RCCCOLIMMEDSCORELT660), via FRED. <a href="https://fred.stlouisfed.org/series/RCCCBLIMPCT50" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Board of Governors of the Federal Reserve System. G.19 Consumer Credit: interest rate on credit card plans, accounts assessed interest (TERMCBCCINTNS), via FRED. <a href="https://fred.stlouisfed.org/series/TERMCBCCINTNS" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
         <li>Board of Governors of the Federal Reserve System. <i>Economic Well-Being of U.S. Households in 2025</i>, "Credit," Table 40. <a href="https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-credit.htm" target="_blank" rel="noopener">federalreserve.gov</a></li>
+        <li>Yang, Hannah. "Minnesota Is Losing More Child Care Providers amid Rising Costs and Sticky Red Tape." <i>MPR News</i>, Sept. 4, 2025 (data: Minnesota Department of Children, Youth, and Families). <a href="https://www.mprnews.org/story/2025/09/04/minnesota-losing-more-child-care-providers" target="_blank" rel="noopener">mprnews.org</a></li>
+        <li>U.S. Census Bureau. American Community Survey 2024 1-year estimates, Table S0802: Means of Transportation to Work by Selected Characteristics, Minneapolis city. <a href="https://data.census.gov/table/ACSST1Y2024.S0802?g=160XX00US2743000" target="_blank" rel="noopener">data.census.gov</a></li>
         <li>Metro Transit. "Transit Assistance Program (TAP)." <a href="https://www.metrotransit.org/fares-passes/tap/tap-riders/" target="_blank" rel="noopener">metrotransit.org</a></li>
         <li>U.S. Bureau of Labor Statistics. <i>Employment Characteristics of Families, 2025</i>, Table 5. <a href="https://www.bls.gov/news.release/famee.t05.htm" target="_blank" rel="noopener">bls.gov</a>; Current Population Survey 2025, Tables 11 and 23. <a href="https://www.bls.gov/cps/cpsaat23.htm" target="_blank" rel="noopener">bls.gov</a></li>
         <li>U.S. Bureau of Labor Statistics. Average weekly hours, production and nonsupervisory employees, retail trade, Minneapolis-St. Paul-Bloomington MSA (SMU27334604200000007A), via FRED. <a href="https://fred.stlouisfed.org/series/SMU27334604200000007A" target="_blank" rel="noopener">fred.stlouisfed.org</a></li>
