@@ -124,5 +124,23 @@ window.WORKS_CITED = [
 
   { "text":"U.S. Census Bureau. \"Retail Sales: Clothing Stores (MRTSSM4481USN).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/MRTSSM4481USN. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/MRTSSM4481USN","usedIn":"Game (clothes spending by month, 2022–2025 average)" },
 
-  { "text":"\"CFPB Credit Card Late Fees Rule Vacated by Texas District Court.\" *Holland & Knight*, 22 Apr. 2025, www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court.","url":"https://www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court","usedIn":"Game (card late fees: $32 first, $43 repeat)" }
+  { "text":"\"CFPB Credit Card Late Fees Rule Vacated by Texas District Court.\" *Holland & Knight*, 22 Apr. 2025, www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court.","url":"https://www.hklaw.com/en/insights/publications/2025/04/cfpb-credit-card-late-fees-rule-vacated-by-texas-district-court","usedIn":"Game (card late fees: $32 first, $43 repeat)" },
+
+  { "text":"\"Internet Essentials.\" *Xfinity*, Comcast, www.xfinity.com/learn/internet-service/internet-essentials. Accessed 27 Nov. 2026.","url":"https://www.xfinity.com/learn/internet-service/internet-essentials","usedIn":"Game (home internet: $14.95/mo)" },
+
+  { "text":"Minnesota Department of Public Safety, Driver and Vehicle Services. \"Vehicle Fees.\" dps.mn.gov/divisions/dvs/vehicle/vehicle-fees. Accessed 27 Nov. 2026.","url":"https://dps.mn.gov/divisions/dvs/vehicle/vehicle-fees","usedIn":"Game (car tabs: $8 filing fee, $2.25 technology surcharge)" },
+
+  { "text":"Minnesota Department of Public Safety, Driver and Vehicle Services. \"Registration Tax.\" dps.mn.gov/divisions/dvs/Pages/registration-tax.aspx. Accessed 27 Nov. 2026.","url":"https://dps.mn.gov/divisions/dvs/Pages/registration-tax.aspx","usedIn":"Game (car tabs: $35 minimum for cars 10+ years old)" },
+
+  { "text":"Minnesota Department of Revenue. *Tax Year 2025 Inflation-Adjusted Amounts in Minnesota Statutes*. Dec. 2024, revenue.state.mn.us/sites/default/files/2024-12/inflation-adjusted-amounts-2025.pdf.","url":"https://revenue.state.mn.us/sites/default/files/2024-12/inflation-adjusted-amounts-2025.pdf","usedIn":"Game (Minnesota renter's credit table and $5,200 dependent exemption)" },
+
+  { "text":"Minnesota Statutes, section 290.0693, \"Renter's Credit.\" *Office of the Revisor of Statutes*, www.revisor.mn.gov/statutes/cite/290.0693.","url":"https://www.revisor.mn.gov/statutes/cite/290.0693","usedIn":"Game (renter's credit formula: 17% of rent)" },
+
+  { "text":"\"Holiday Shoppers Plan to Spend Briskly.\" *Gallup*, Oct. 2025, news.gallup.com/poll/697061/holiday-shoppers-plan-spend-briskly.aspx.","url":"https://news.gallup.com/poll/697061/holiday-shoppers-plan-spend-briskly.aspx","usedIn":"Game (holiday gifts: $651 planned by households under $50,000)" },
+
+  { "text":"\"Ho, Ho, Hope Has Arrived: 2025 Toy Shop Serving 16,000 Kids in Twin Cities.\" *The Salvation Army USA*, 2025, www.salvationarmyusa.org/usa-central-territory/northern/stories/ho-ho-hope-has-arrived-2025-toy-shop-serving-16000-kids-in-twin-cities/.","url":"https://www.salvationarmyusa.org/usa-central-territory/northern/stories/ho-ho-hope-has-arrived-2025-toy-shop-serving-16000-kids-in-twin-cities/","usedIn":"Game (free toy drive option)" },
+
+  { "text":"Board of Governors of the Federal Reserve System. \"Uniform Retail Credit Classification and Account Management Policy.\" *Federal Reserve Regulatory Service*, www.federalreserve.gov/frrs/guidance/uniform-retail-credit-classification-and-account-management-policy.htm.","url":"https://www.federalreserve.gov/frrs/guidance/uniform-retail-credit-classification-and-account-management-policy.htm","usedIn":"Game (cards are charged off at 180 days past due)" },
+
+  { "text":"\"How Long Does Negative Information Remain on My Credit Report?\" *Consumer Financial Protection Bureau*, www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/.","url":"https://www.consumerfinance.gov/ask-cfpb/how-long-does-negative-information-remain-on-my-credit-report-en-323/","usedIn":"Game (collections stay on a credit report for 7 years)" }
 ];

@@ -9,13 +9,13 @@ const $ = (n) => (n < 0 ? "-$" : "$") + Math.abs(Math.round(n)).toLocaleString("
 let fails = 0;
 const check = (cond, msg) => { if (!cond) { fails++; console.log("FAIL:", msg); } };
 const bi = CONFIG.basicsItems;
-check(CONFIG.basicsMonthly === Math.round((bi.phone + bi.clothes + bi.personal + bi.supplies) / 12), "basicsMonthly does not match its items");
+check(CONFIG.basicsMonthly === Math.round((bi.phone + bi.clothes + bi.personal + bi.supplies + bi.internet) / 12), "basicsMonthly does not match its items");
 
 // 1) Tax refunds
 console.log("TAX REFUNDS (tax year 2025 rules, paid in March)");
 for (const city of ["minneapolis"]) for (const care of ["center", "home"]) {
-  const cc = CONFIG.cities[city], r = taxRefund(city, cc.wage, cc.childCare[care]);
-  console.log(`  ${city.padEnd(11)} ${care.padEnd(6)} EITC ${$(r.eitc)} | care credit ${$(r.careCredit)} | CTC used ${$(r.ctcUsed)} + refundable ${$(r.actc)} | income tax ${$(r.incomeTax)} | MN credits ${$(r.mnCredits)} − MN tax ${$(r.mnTax)} | TOTAL ${$(r.total)}`);
+  const cc = CONFIG.cities[city], r = taxRefund(city, cc.wage, cc.childCare[care], cc.rent.oneBR);
+  console.log(`  ${city.padEnd(11)} ${care.padEnd(6)} EITC ${$(r.eitc)} | care credit ${$(r.careCredit)} | CTC used ${$(r.ctcUsed)} + refundable ${$(r.actc)} | income tax ${$(r.incomeTax)} | MN credits ${$(r.mnCredits)} + renter ${$(r.renterCredit)} − MN tax ${$(r.mnTax)} | TOTAL ${$(r.total)}`);
   check(r.total > 0 && r.total < 10000, "refund out of range " + city);
 }
 
@@ -67,7 +67,24 @@ check(ctx.seasonalExtra({ housing: "oneBR" }, 0).heat > 40 && ctx.seasonalExtra(
   check(y2.months[0].startCard === y1.card && y2.months[0].startBehind === y1.behind, "year 2 does not start with year 1 debt");
   const po = ctx.minPayoff(2000);
   check(po.months > 12 && po.months < 1200 && po.interest > 0, "minimum-payment payoff of $2,000 looks wrong");
-  console.log(`\nCARD: worst no-SNAP year: late fees ${$(y1.lateFees)}, card ${$(y1.card)}, unpaid bills ${$(y1.behind)}. Year 2 ends ${$(y2.card + y2.behind)} in debt. $2,000 at the minimum: ${po.months} months, ${$(po.interest)} interest.`);
+  console.log(`\nCARD: worst no-SNAP year: late fees ${$(y1.lateFees)}, card ${$(y1.card)}, unpaid bills ${$(y1.behind)}, closed: ${y1.chargedOff ? "month " + (y1.chargeOffMonth + 1) : "no"}. Year 2 ends ${$(y2.card + y2.behind)} in debt. $2,000 at the minimum: ${po.months} months, ${$(po.interest)} interest.`);
+  // A closed card: after 6 missed minimums, no more interest, fees or charges
+  if (y1.chargedOff) {
+    const after = y1.months.slice(y1.chargeOffMonth + 1);
+    check(after.every((r) => r.cardInterest === 0 && r.lateFee === 0 && (r.cardFood || 0) === 0), "a closed card still charges interest, fees or groceries");
+  }
+  check(y1.months.filter((r) => r.lateFee).length < CONFIG.card.chargeOffMissed || y1.chargedOff, "6 missed payments did not close the card");
+}
+
+// 8) Car tabs once a year (car owners only); December gifts default to the free toy drive in comparisons
+{
+  const carY = simulateYear("minneapolis", { housing: "oneBR", care: "home", transport: "car" }, 0, 1006, null, { policy: ctx.defaultPolicy });
+  const busY = simulateYear("minneapolis", { housing: "oneBR", care: "home", transport: "bus" }, 0, 1006, null, { policy: ctx.defaultPolicy });
+  check(carY.months.filter((r) => r.tabs > 0).length === 1 && Math.abs(carY.months.find((r) => r.tabs > 0).tabs - CONFIG.transport.carTabs) < 0.01, "car tabs should be charged exactly once");
+  check(busY.months.every((r) => !r.tabs), "bus riders should not pay car tabs");
+  check(carY.months[11].gift && carY.months[11].gift.how === "skip" && carY.months[11].gift.cost === 0, "comparison years should use the free toy drive");
+  const paid = simulateYear("minneapolis", { housing: "oneBR", care: "home", transport: "bus" }, 0, 1006, { food: "skip", "11-g": "savings" }, { policy: ctx.defaultPolicy });
+  check(paid.months[11].gift.cost === CONFIG.gifts.typical || paid.months[11].gift.how === "card", "choosing to pay for gifts should cost the Gallup amount");
 }
 
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
