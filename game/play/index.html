@@ -284,6 +284,12 @@ details.rec summary{cursor:pointer;font-weight:700;padding:14px 0;list-style:non
 details.rec summary::-webkit-details-marker{display:none}
 details.rec summary::after{content:"+";margin-left:auto;font:700 20px/1 var(--mono)}
 details.rec[open] summary::after{content:"−"}
+details.more{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:6px 0 4px}
+details.more[open]{padding-bottom:14px}
+ul.bl{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15.5px;line-height:1.45}
+ul.bl li b.h{display:block;font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.stat + .kicker, .bl + .kicker{margin-top:34px}
 .receipt{position:relative;background:var(--paper);font:13.5px/1.55 var(--mono);padding:20px 18px 24px;margin:4px 0 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.3);animation:print 1s var(--ease) both}
 @keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-12px)}to{clip-path:inset(0 0 -20px 0);transform:none}}
 .receipt::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;background:radial-gradient(circle at 7px 10px,transparent 6.5px,var(--paper) 7px) 0 0/14px 10px repeat-x}
@@ -987,7 +993,8 @@ const TEXT = {
   "results.raise": "At {wage}/hr: {diff} more per hour than the real wage of {oldWage}.",
   "results.context": "For context: {note}",
   "results.receipt": "See the full receipt",
-  "results.next": "What this means",
+  "results.next": "The bottom line",
+  "yres.details": "Details: every day, emergencies, 1,000 more years, other kinds of help",
   "results.raiseBtn": "Replay earning {wage}/hr",
   "results.replay": "Replay from the start",
 
@@ -1002,6 +1009,27 @@ const TEXT = {
   "label.food": "Left for food",
 
   "final.kicker": "The bigger picture",
+  "bl.kicker": "The bottom line: your year",
+  "bl.big": "of your take-home pay went to rent, child care, getting to work and basics, before any food.",
+  "bl.bigOver": "of your take-home pay was needed for rent, child care, getting to work and basics. That's more than you earned, before any food.",
+  "bl.payH": "Your paycheck",
+  "bl.pay": "{hours} hours a week at {wage}/hr brought home **{net}** a month. After the bills, **{left}** was left for food that costs **{food}** a month.",
+  "bl.payShort": "{hours} hours a week at {wage}/hr brought home **{net}** a month. The bills alone came to **{left}** more than that, with nothing left for food that costs **{food}** a month.",
+  "bl.refundAll": "Your **{refund}** tax refund in March covered the difference.",
+  "bl.refundPart": "Your **{refund}** tax refund in March covered only part of the difference.",
+  "bl.raiseMore": "(The raise went first to rent and bills you were behind on, and SNAP shrinks as pay rises, so more meals were skipped than at your pay. Debt went down instead.)",
+  "bl.choicesH": "Your choices",
+  "bl.cheapest": "You picked the cheapest option every time.",
+  "bl.choices": "You made {n} of 3 cheapest choices.",
+  "bl.yours": "Your year: **{meals}** meals skipped, **{debt}** in debt.",
+  "bl.lucky": "You had {n} {em}; only {pct}% of years have that few. In **{bad}%** of 1,000 random years, this same household ends up in debt or skipping meals.",
+  "bl.odds": "In **{bad}%** of 1,000 random years, this same household ends up in debt or skipping meals.",
+  "bl.snapH": "SNAP",
+  "bl.snap": "SNAP added **{snap}** a month for groceries. This same year without it: {without} With it: {with}",
+  "bl.incomeH": "More income",
+  "bl.income": "This same year with 18% higher pay (job training): {raised} With higher pay, a monthly child tax credit and child care help together: {all}",
+  "bl.yr": "**{meals}** meals skipped, **{debt}** in debt.",
+  "bl.note": "Every comparison replays your exact year: same emergencies, same choices. Only the money changes.",
   "final.stat": "of U.S. households were food insecure in 2024, the highest since 2014. It was the last year USDA published that report.",
   "final.grid": "About **{n} in every 100** households.",
   "final.closing": "This wasn't a worst case. It was a typical cashier's paycheck, typical rent, and emergencies at real-world odds.",
@@ -1306,6 +1334,41 @@ function manyYears(cityKey, c, startSavings, opts) {
 /* =====================================================================
    UI
    ===================================================================== */
+
+// The bottom line: what this player's own year shows, in numbers from the simulation (no opinions)
+function bottomLine() {
+  if (!S.y || !S.city) return "";
+  const sim = yearSim(), b = sim.base, c = city(), ms = sim.months;
+  const w0 = S.wageOverride ?? c.wage, H = CONFIG.help, w1 = w0 * (1 + H.trainingRaise);
+  const bills = b.housing + b.care + b.transport + b.basics;
+  const pctBills = Math.round(bills / b.net * 100);
+  const left = b.net - bills;
+  const meals = sim.mealsSkipped, debt = sim.card + sim.behind;
+  const conscious = (S.c.housing === "oneBR") + (S.c.care === "home") + (S.c.transport === "bus");
+  const nEv = ms.reduce((a, r) => a + r.events.length, 0);
+  const mc = manyYears(S.city, S.c, yearStart(), { wage: S.wageOverride });
+  const badPct = Math.round(mc.results.filter((x) => x.debt > 1 || x.meals > 0).length / mc.runs * 100);
+  const fewer = Math.round(mc.results.filter((x) => x.events <= nEv).length / mc.runs * 100);
+  const copayAt = (w) => Math.round(takeHomeFor(w).gross * H.childCareCopayPct);
+  const run = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, null, Object.assign({ wage: w0, policy: defaultPolicy, foodOnCard: S.y.choices.food === "card", noSnap: false }, o));
+  const withSnap = run({}), without = run({ noSnap: true }), raised = run({ wage: w1 }), all = run({ wage: w1, ctc2021: true, careCost: copayAt(w1) });
+  const n = (x) => Math.round(x).toLocaleString("en-US");
+  const yr = (y) => t("bl.yr", { meals: n(y.mealsSkipped), debt: fmt(y.card + y.behind) }, true);
+  const item = (head, body) => `<li><b class="h">${head}</b>${body}</li>`;
+  return `<p class="kicker">${t("bl.kicker")}</p>
+    <div class="stat">
+      <div class="big" data-count="${pctBills}" data-dec="0">0%</div>
+      <p>${t(pctBills >= 100 ? "bl.bigOver" : "bl.big")}</p>
+    </div>
+    <ul class="bl">
+      ${item(t("bl.payH"), t(left >= 0 ? "bl.pay" : "bl.payShort", { hours: CONFIG.hoursPerWeek, wage: fmtWage(w0), net: fmt(b.net), left: fmt(Math.abs(left)), food: fmt(b.need) }) + (left < 0 ? " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) }) : ""))}
+      ${item(t("bl.choicesH"), t(conscious === 3 ? "bl.cheapest" : "bl.choices", { n: conscious }) + " " + t("bl.yours", { meals: n(meals), debt: fmt(debt) }) + " "
+        + (fewer <= 33 && badPct > 0 ? t("bl.lucky", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer, bad: badPct }) : t("bl.odds", { bad: badPct })))}
+      ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
+      ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > withSnap.mealsSkipped ? " " + t("bl.raiseMore") : ""))}
+    </ul>
+    <p class="cap small muted">${t("bl.note")}</p>`;
+}
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => (n < -0.5 ? "−$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
 const fmtWage = (n) => "$" + Number(n).toFixed(2);
@@ -1850,16 +1913,21 @@ const screens = {
       ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) - b.need);
         if (g > 0.5) return `<div class="note bad" style="font-size:16px">${t(S.y.noSnap ? "yres.whyNoSnap" : "yres.why", { gap: fmt(g) })}</div>`;
         return `<p class="section">${t("yres.closeTitle")}</p>${closeList}`; })()}
-      ${bestCase}
-      <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
-      <p class="section">${t("yres.eventsTitle")}</p>${evList}
-      ${S.y.noSnap ? "" : noSnap}
-      <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
-      <p class="section">${t("yres.cmpTitle")}</p>${cmpTable}${helpCards}
-      ${ctx}
-      <p class="small muted">${t("yres.seed", { seed: S.y.seed })}</p>
       <div class="actions">
         ${next("final", t("results.next"), "go")}
+      </div>
+      <details class="rec more">
+        <summary>${t("yres.details")}</summary>
+        ${bestCase}
+        <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
+        <p class="section">${t("yres.eventsTitle")}</p>${evList}
+        ${S.y.noSnap ? "" : noSnap}
+        <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
+        <p class="section">${t("yres.cmpTitle")}</p>${cmpTable}${helpCards}
+        ${ctx}
+        <p class="small muted">${t("yres.seed", { seed: S.y.seed })}</p>
+      </details>
+      <div class="actions">
         <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
         <button class="btn ${S.y.noSnap ? "secondary" : "go"}" data-act="ynosnap">${t(S.y.noSnap ? "yres.withSnapBtn" : "yres.noSnapBtn")}</button>
         <button class="btn secondary" data-act="yreplay">${t("yres.sameYear")}</button>
@@ -1870,13 +1938,14 @@ const screens = {
 
   final() {
     const st = CONFIG.stats;
+    const bl = bottomLine();
     setTimeout(countUp, 200);
     setTimeout(() => {
       document.querySelectorAll(".picto.fill svg").forEach((el, i) => { if (i < Math.round(st.foodInsecure2024)) setTimeout(() => el.classList.add("red"), i * 70); });
     }, 300);
-    return `<p class="kicker">${t("final.kicker")}</p>
+    return `${bl}<p class="kicker">${t("final.kicker")}</p>
       <div class="stat">
-        <div class="big" data-count="${st.foodInsecure2024}" data-dec="1">0%</div>
+        <div class="big" data-count="${st.foodInsecure2024}" data-dec="1" style="font-size:56px">0%</div>
         <p>${t("final.stat")}</p>
         <div class="figure">${picto(HOUSE, "0 0 12 14", 0, "").replace('class="picto"', 'class="picto fill"')}
         <p class="cap">${t("final.grid", { n: Math.round(st.foodInsecure2024) })}</p>${cite("USDA ERS, 2025")}</div>
