@@ -124,6 +124,9 @@ for (const housing of ["oneBR", "twoBR"]) for (const care of ["home", "center"])
   const redYears = m.results.filter((x) => x.red > 0).length / m.runs;
   if (housing === "oneBR" && care === "home" && transport === "bus") check(redYears < 0.01, "the cheapest choices should almost never have a red month");
   else check(redYears === 1, `${housing}/${care}/${transport} should be short or borrowing in every year (claim on the bottom line)`);
+  // "Without SNAP and WIC, every household skips meals, every year."
+  const noAid = manyYears("minneapolis", { housing, care, transport }, 0, { noSnap: true });
+  check(noAid.pctHungry === 100, `${housing}/${care}/${transport} without SNAP and WIC should skip meals every year (claim on the bottom line)`);
 }
 
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");

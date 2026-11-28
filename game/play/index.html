@@ -308,6 +308,10 @@ ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;
 .ralt.better{background:var(--accent-soft)}
 .ralt.worse{background:var(--red-soft)}
 .rarrow{align-self:center;font:700 22px/1 var(--sans);color:var(--faint);flex:0 0 auto}
+ul.bl li.hl{background:var(--accent-soft);border-color:var(--accent)}
+.reveal{background:var(--accent-soft);border:2px solid var(--accent);border-radius:16px;padding:14px 16px;margin:4px 0 16px;font-size:16px;line-height:1.45}
+.reveal p{margin:6px 0 0}
+.rv-k{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 !important}
 .blr{font-size:14.5px;margin:2px 0 10px}
 .blr div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
 .blr div b{font-family:var(--mono);white-space:nowrap}
@@ -752,6 +756,10 @@ const TEXT = {
   "year.carryCard": "The card keeps charging interest, and the minimum payment comes out of every paycheck.",
   "year.carryCollections": "The card debt is with a collector now.",
   "yres.yearN": "Year {n}",
+  "reveal.title": "<p class=\"rv-k\">What food aid would have changed</p>",
+  "reveal.body": "You played without SNAP or WIC: {you} With them (**{aid}** a month for groceries), this same year: {withAid}",
+  "reveal.yr": "**{meals}** meals skipped, **{debt}** in debt.",
+  "reveal.replay": "**Replayed with SNAP and WIC** ({aid} a month for groceries). Without them, this same year: {without}",
   "lad.title": "Your path: what each choice did",
   "lad.yourYear": "Your year",
   "lad.you": "You:",
@@ -760,6 +768,9 @@ const TEXT = {
   "lad.both": "{cash} in cash but {debt} in debt",
   "lad.ahead": "{amt} in cash, no debt",
   "lad.meals": "{n} meals skipped",
+  "lad.aid": "Food aid",
+  "lad.noAid": "no SNAP or WIC",
+  "lad.aidYes": "SNAP and WIC",
   "lad.housing": "Housing",
   "lad.care": "Child care",
   "lad.work": "Getting to work",
@@ -814,6 +825,8 @@ const TEXT = {
   "card.chargedOff": "In {month}, after 6 missed payments, the card went to collections. It stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "mc.foodNoAid": "All from your paycheck: {cash}",
+  "mc.foodCardNoAid": "{cash} from your paycheck, {card} on the card",
   "mc.extra": "more this month: {list}",
   "mc.x.heat": "heat",
   "mc.x.clothes": "clothes",
@@ -855,7 +868,7 @@ const TEXT = {
   "year.seeResults": "See your year",
   "year.pause": "Pause",
   "year.autoplay": "Auto-play the quiet months",
-  "year.cutLeadNoSnap": "Without SNAP, you're {gap} short for food. What do you cut?",
+  "year.cutLeadNoSnap": "You're {gap} short for food. What do you cut?",
   "year.cutLead": "Even with SNAP, you're {gap} short for food. What do you cut?",
   "year.behind": "The paycheck didn't cover the bills. You're **{amount}** behind on rent and bills. The landlord can add a late fee, and after a 30-day notice (Minneapolis rule), file for eviction.",
 
@@ -955,7 +968,7 @@ const TEXT = {
   "yres.cash": "cash left in December",
   "yres.whyTitle": "Why food had to give",
   "yres.why": "Bills come first, or you lose your home or job. Even with SNAP, a month with no emergencies is **{gap}** short.",
-  "yres.whyNoSnap": "Bills come first, or you lose your home or job. Without SNAP, a month with no emergencies is **{gap}** short.",
+  "yres.whyNoSnap": "Bills come first, or you lose your home or job. With no food aid, a month with no emergencies is **{gap}** short.",
   "yres.whyThin": "Every month, rent, child care, getting to work and basics came first. In a month with no surprises, this budget covers food with only **{spare}** to spare. One emergency and food is what gives, because it's the one bill nobody comes to collect.",
   "yres.yearTitle": "Your year, month by month",
   "yres.chartCash": "Cash",
@@ -967,7 +980,7 @@ const TEXT = {
   "yres.noEvents": "No emergencies this year.",
   "yres.onCard": "on the card",
   "yres.fromSavings": "from savings",
-  "yres.noSnap": "Without SNAP ({snap}/mo), this same year: **{meals}** meals skipped, **{debt}** in debt.",
+  "yres.noSnap": "Without SNAP and WIC, this same year: **{meals}** meals skipped, **{debt}** in debt.",
   "yres.mcTitle": "{n} more years like yours",
   "yres.mcDebt": "Years that ended in debt",
   "yres.mcHungry": "Years with skipped meals",
@@ -975,9 +988,9 @@ const TEXT = {
   "yres.mcNote": "{n} random years, same household.",
   "yres.seed": "Replay code: {seed} (add ?seed={seed} to the link).",
   "yres.cmpTitle": "Same year, different help",
-  "yres.cmpSub": "Your exact year, same emergencies. Only the help changes.",
-  "yres.cmpNone": "SNAP only (today)",
-  "yres.cmpNoSnap": "Without SNAP",
+  "yres.cmpSub": "Your exact year, same emergencies. Only the help changes. Every row except the first includes SNAP and WIC.",
+  "yres.cmpNone": "SNAP and WIC (today)",
+  "yres.cmpNoSnap": "No SNAP or WIC",
   "yres.cmpMore": "More skipped meals in the {rows} row? The extra money paid late rent and bills first. Debt went down instead.",
   "yres.cmpMoreRaise": "More skipped meals in the {rows} row? The extra money paid late bills first, and SNAP shrinks as income rises. Debt went down instead.",
   "yres.cmpTrainingShort": "+18% pay (training)",
@@ -1001,9 +1014,11 @@ const TEXT = {
   "help.careReal": "In 2019, only {pct}% of eligible kids got a subsidy. The 7% cap was repealed in July 2026.",
   "yres.newYear": "Play a new random year",
   "yres.sameYear": "Replay this exact year",
-  "yres.noSnapBtn": "Replay this year without SNAP",
-  "yres.withSnapBtn": "Replay this year with SNAP",
+  "yres.noSnapBtn": "Replay this year without SNAP and WIC",
+  "yres.withSnapBtn": "Replay this year with SNAP and WIC",
   "yres.noSnapMode": "**No SNAP this time.** Same job, bills and emergencies, minus {snap} a month for groceries.",
+  "year.noAid": "**No SNAP or WIC this year.** Food comes out of your paycheck, like everything else. You start with $0 saved. At the end, you'll see what food aid would have changed.",
+  "year.withSnapMode": "Replaying with SNAP and WIC: +{snap} a month for food.",
   "year.noSnapMode": "No SNAP this time: −{snap} a month for groceries.",
   "meter.noSnap": "NO SNAP",
   "meter.snap": "+ {snap}/mo SNAP, food only",
@@ -1078,7 +1093,7 @@ const TEXT = {
   "snap.kicker": "Day 10 · You applied for food assistance",
   "snap.title": "You qualified for SNAP.",
   "snap.wic": "**Your kid also gets WIC** until age 5: about **{amt}** a month in foods like milk, eggs and fruit.",
-  "snap.what": "**SNAP** (once called food stamps) is federal money for groceries, for families with low incomes.",
+  "snap.what": "**SNAP** (once called food stamps) is federal money for groceries on an EBT card, like a debit card for food. **WIC** adds specific foods for young kids.",
   "snap.lead": "**{amount}** a month on an EBT card (Electronic Benefits Transfer). It works like a debit card, but only for food.",
   "snap.note": "SNAP can only buy food. Rent, daycare and bills still come out of your paycheck.",
   "snap.deniedTitle": "No SNAP this time.",
@@ -1200,7 +1215,7 @@ const TEXT = {
   // bl.claim and bl.claimSub are Ryan's own words (claimSub lightly shortened at his request from content.js home_thesis)
   "bl.claim": "No income, no food.",
   "bl.claimSub": "On a typical low-income salary, you can't buy enough healthy groceries, even with the best budget choices. Government funding is one of the best ways to fix this.",
-  "bl.onlyWay": "**Only one set of choices stays out of the red:** a 1-bedroom, home daycare and the bus. Every other combination comes up short or borrows money in every one of 1,000 random years.",
+  "bl.onlyWay": "**Without SNAP and WIC, every household runs short on food, every year:** they skip meals or borrow to eat. With them, only one set of choices stays out of the red: a 1-bedroom, home daycare and the bus.",
   "bl.top": "The bottom line",
   "bl.kicker": "The proof: your year",
   "bl.big": "of your paycheck went to bills before any food ({bills} of {net}).",
@@ -1212,7 +1227,7 @@ const TEXT = {
   "bl.rowFood": "Food for 2 (USDA's cheapest healthy diet)",
   "bl.rowWic": "WIC foods for your kid",
   "bl.pay": "That's **{short}** a month too little for food. SNAP fills the gap.",
-  "bl.payNoSnap": "That's **{short}** a month too little for food, and no SNAP to fill it.",
+  "bl.payNoSnap": "That's **{short}** a month too little for food, with no SNAP or WIC to fill it.",
   "bl.payOk": "Food is covered, with **{spare}** a month to spare.",
   "bl.payShort": "Bills alone run **{left}** over your paycheck every month.",
   "bl.refundSave": "Any savings came mostly from the **{refund}** March tax refund.",
@@ -1229,8 +1244,8 @@ const TEXT = {
   "bl.calm": "You had {n} {em}; only {pct}% of years are that calm.",
   "bl.unlucky": "**An unlucky year:** {ok}% of random years for this household end with no debt and no skipped meals.",
   "bl.odds": "**{bad}%** of years like this end in debt or skipped meals.",
-  "bl.snapH": "SNAP",
-  "bl.snap": "Without its **{snap}** a month: {without} With it: {with}",
+  "bl.snapH": "What SNAP and WIC do",
+  "bl.snap": "Without them: {without} With them (**{snap}** a month for groceries): {with}",
   "bl.incomeH": "More income",
   "bl.income": "With 18% higher pay: {raised} Plus child tax credit and child care help: {all}",
   "bl.yr": "**{meals}** meals skipped, **{debt}** in debt.",
@@ -1494,7 +1509,7 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     } else if (cp.pay > 0.5) missed = 0;
     // 3) Emergencies
     const snapAvail = snap + snapCarry;
-    const need = base.need, wicUsed = Math.min(base.wic || 0, need);
+    const need = base.need, wicUsed = opts.noSnap ? 0 : Math.min(base.wic || 0, need);   // noSnap = no food aid (SNAP and WIC)
     const foodCashNeeded = Math.max(0, need - wicUsed - snapAvail);
     for (let i = 0; i < events[m].length; i++) {
       const ev = events[m][i];
@@ -1618,18 +1633,20 @@ function bottomLine() {
   if (!S.y || !S.city) return "";
   const sim = yearSim(), b = sim.base, c = city(), ms = sim.months;
   const w0 = S.wageOverride ?? c.wage, H = CONFIG.help, w1 = w0 * (1 + H.trainingRaise);
-  const bills = b.housing + b.care + b.transport + b.basics;
+  const bills = b.housing + b.care + b.transport + b.basics, wicA = S.y.noSnap ? 0 : b.wic;
   const pctBills = Math.round(bills / b.net * 100);
   const left = b.net - bills;
   const meals = sim.mealsSkipped, debt = sim.card + sim.behind;
   const conscious = (S.c.housing === "oneBR") + (S.c.care === "home") + (S.c.transport === "bus");
   const nEv = ms.reduce((a, r) => a + r.events.length, 0);
-  const mc = manyYears(S.city, S.c, yearStart(), Object.assign({ wage: S.wageOverride }, startOpts()));
+  const mc = manyYears(S.city, S.c, yearStart(), Object.assign({ wage: S.wageOverride, noSnap: !!S.y.noSnap }, startOpts()));
   const badPct = Math.round(mc.results.filter((x) => x.debt > 1 || x.meals > 0).length / mc.runs * 100);
   const fewer = Math.round(mc.results.filter((x) => x.events <= nEv).length / mc.runs * 100);
   const copayAt = (w) => Math.round(takeHomeFor(w).gross * H.childCareCopayPct);
   const run = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, null, Object.assign({ wage: w0, policy: defaultPolicy, foodOnCard: S.y.choices.food === "card", noSnap: false }, startOpts(), o));
-  const withSnap = run({}), without = run({ noSnap: true }), raised = run({ wage: w1 }), all = run({ wage: w1, ctc2021: true, careCost: copayAt(w1) });
+  const runMine = (o) => simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, policy: defaultPolicy, noSnap: false }, startOpts(), o));   // your exact choices
+  const withSnap = runMine({}), without = runMine({ noSnap: true }), raised = run({ wage: w1, noSnap: !!S.y.noSnap }), all = run({ wage: w1, ctc2021: true, careCost: copayAt(w1), noSnap: !!S.y.noSnap });
+  const base0 = withSnap.base;
   const n = (x) => Math.round(x).toLocaleString("en-US");
   const yr = (y) => t("bl.yr", { meals: n(y.mealsSkipped), debt: fmt(y.card + y.behind) }, true);
   // Luck: compare this year with 1,000 random years for the same household
@@ -1651,17 +1668,17 @@ function bottomLine() {
       <p>${t(pctBills >= 100 ? "bl.bigOver" : "bl.big", { bills: fmt(bills), net: fmt(b.net), over: fmt(bills - b.net) })}</p>
     </div>
     <ul class="bl">
+      <li class="hl"><b class="h">${t("bl.snapH")}</b>${t("bl.snap", { snap: fmt(base0.snap + base0.wic), without: yr(without), with: yr(withSnap) })}</li>
       ${item(t("bl.payH"), `<div class="blr">
           <div><span>${t("bl.rowPay", { hours: CONFIG.hoursPerWeek, wage: fmtWage(b.wage) }, true)}</span><b>${fmt(b.net)}</b></div>
           <div><span>${t("bl.rowBills", null, true)}</span><b>−${fmt(bills)}</b></div>
-          <div class="tot"><span>${t("bl.rowLeft", null, true)}</span><b class="${left < b.need - b.wic ? "red" : ""}">${fmt(Math.max(0, left))}</b></div>
+          <div class="tot"><span>${t("bl.rowLeft", null, true)}</span><b class="${left < b.need - wicA ? "red" : ""}">${fmt(Math.max(0, left))}</b></div>
           <div class="need"><span>${t("bl.rowFood", null, true)}</span><b>${fmt(b.need)}</b></div>
-          <div class="need"><span>${t("bl.rowWic", null, true)}</span><b>−${fmt(b.wic)}</b></div>
+          ${S.y.noSnap ? "" : `<div class="need"><span>${t("bl.rowWic", null, true)}</span><b>−${fmt(b.wic)}</b></div>`}
         </div>`
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
-          : left < b.need - b.wic ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - b.wic - left) }) : t("bl.payOk", { spare: fmt(left - b.need + b.wic) }))
+          : left < b.need - wicA ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - wicA - left) }) : t("bl.payOk", { spare: fmt(left - b.need + wicA) }))
         + (left >= 0 ? " " + t("bl.refundSave", { refund: fmt(sim.refund.total) }) : ""))}
-      ${item(t("bl.snapH"), t("bl.snap", { snap: fmt(b.snap), without: yr(without), with: yr(withSnap) }))}
       ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > withSnap.mealsSkipped ? " " + t("bl.raiseMore") : ""))}
     </ul>
     <p class="cap small muted">${t("bl.note")}</p>
@@ -1712,7 +1729,7 @@ const IC = {
 const icon = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 
 const S = { screen: "intro", city: null, wageOverride: null, c: {}, y: null };
-const FLOW = ["housing", "care", "transport", "basics", "snap", "year"];
+const FLOW = ["housing", "care", "transport", "basics", "year"];
 const DAY = { housing: 1, care: 1, transport: 2, basics: 6, snap: 10 };
 
 function city() { return CONFIG.cities[S.city]; }
@@ -1921,6 +1938,7 @@ function pathLadder() {
   const add = (step, chose, other, alt) => rungs.push({ step, chose, other, alt });
   const L = { oneBR: t("housing.oneBR", null, true), twoBR: t("housing.twoBR", null, true), home: t("care.home", null, true), center: t("care.center", null, true), bus: t("lad.bus", null, true), car: t("lad.car", null, true) };
   const flip = { oneBR: "twoBR", twoBR: "oneBR", home: "center", center: "home", bus: "car", car: "bus" };
+  add(t("lad.aid", null, true), t(S.y.noSnap ? "lad.noAid" : "lad.aidYes", null, true), t(S.y.noSnap ? "lad.aidYes" : "lad.noAid", null, true), simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({}, base, { noSnap: !S.y.noSnap })));
   add(t("lad.housing", null, true), L[S.c.housing], L[flip[S.c.housing]], run({ housing: flip[S.c.housing] }));
   add(t("lad.care", null, true), L[S.c.care], L[flip[S.c.care]], run({ care: flip[S.c.care] }));
   add(t("lad.work", null, true), L[S.c.transport], L[flip[S.c.transport]], run({ transport: flip[S.c.transport] }));
@@ -2025,7 +2043,7 @@ const screens = {
         <li class="tot"><span class="ico">${icon("check")}</span>${t("basics.total")}<span class="amt">${fmt(path().basics)}</span></li>
       </ul>
       <p class="cite">(${CONFIG.basicsCite}; health insurance: ${city().healthCite})</p>
-      <div class="actions">${next("snap", "Continue")}</div>`;
+      <div class="actions"><button class="btn go" data-act="savings" data-val="0">${t("savings.start")} <span class="arr">→</span></button></div>`;
   },
 
   snap() {
@@ -2060,7 +2078,7 @@ const screens = {
     let body = "", actions = "";
     if (y.shown < 0 && !p) {
       const st = S.y.start;
-      body = (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t(st.card + st.behind < 0.5 ? "year.carryClean" : "year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}${st.card >= 0.5 ? " " + t(st.chargedOff ? "year.carryCollections" : "year.carryCard") : ""}</div><div class="note plain small">${t("year.prices", { rent: pctTxt(CONFIG.prices.rent), care: pctTxt(CONFIG.prices.care), food: pctTxt(CONFIG.prices.food), other: pctTxt(CONFIG.prices.other), wage: pctTxt(CONFIG.prices.wage), n: S.y.yearNum - 1 })}${cite("BLS, 2026")}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
+      body = (S.y.noSnap && !st ? `<div class="note bad">${t("year.noAid")}</div>` : "") + (st ? `<div class="note ${st.card + st.behind > 1 ? "bad" : ""}">${t(st.card + st.behind < 0.5 ? "year.carryClean" : "year.carry", { n: S.y.yearNum, cash: fmt(st.cash), card: fmt(st.card), behind: fmt(st.behind) })}${st.card >= 0.5 ? " " + t(st.chargedOff ? "year.carryCollections" : "year.carryCard") : ""}</div><div class="note plain small">${t("year.prices", { rent: pctTxt(CONFIG.prices.rent), care: pctTxt(CONFIG.prices.care), food: pctTxt(CONFIG.prices.food), other: pctTxt(CONFIG.prices.other), wage: pctTxt(CONFIG.prices.wage), n: S.y.yearNum - 1 })}${cite("BLS, 2026")}</div>` : "") + `<div class="note plain">${t("year.intro")}</div>`;
       actions = `<button class="btn go" data-act="ystart">${t("year.start")} <span class="arr">→</span></button>`;
     } else if (p.type === "event") body = eventPanel(p.p);
     else {
@@ -2105,7 +2123,7 @@ const screens = {
     }
     return `<p class="kicker">${t(S.y.yearNum > 1 ? "year.kickerN" : "year.kicker", { city: CONFIG.cities[S.city].name, n: S.y.yearNum })}</p>
       <h2>${MONTHS[curM]}</h2>
-      ${S.y.noSnap ? `<div class="note bad small">${t("year.noSnapMode", { snap: fmt(sim.base.snap) })}</div>` : ""}
+      ${S.y.noSnap ? "" : `<div class="note small">${t("year.withSnapMode", { snap: fmt(sim.base.snap + sim.base.wic) })}</div>`}
       <div class="ytrack">${track}</div>
       <p class="ylegend"><i class="ok"></i>${t("year.legendOk", null, true)} <i class="dip"></i>${t("year.legendDip", null, true)} <i class="bad"></i>${t("year.legendBad", null, true)}</p>
       ${body}
@@ -2169,11 +2187,11 @@ const screens = {
       : `<p class="muted">${t("yres.noEvents")}</p>`;
 
     // Without SNAP, same year and choices
-    const no = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: true }, startOpts()));
+    const no = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: true, policy: defaultPolicy }, startOpts()));
     const noSnap = `<div class="note plain">${t("yres.noSnap", { meals: no.mealsSkipped.toLocaleString("en-US"), debt: fmt(no.card + no.behind), snap: fmt(b.snap) })}</div>`;
 
     // 1,000 random years
-    const mc = manyYears(S.city, S.c, yearStart(), Object.assign({ wage: S.wageOverride }, startOpts()));
+    const mc = manyYears(S.city, S.c, yearStart(), Object.assign({ wage: S.wageOverride, noSnap: !!S.y.noSnap }, startOpts()));
     const bar = (pct, label, cls) => `<div class="pbar"><div class="row"><span>${label}</span><b class="${cls}">${pct}%</b></div><div class="track"><i class="${cls}" data-w="${pct}"></i></div></div>`;
     const odds = `<div class="figure">
       ${bar(mc.pctDebt, t("yres.mcDebt"), mc.pctDebt > 0 ? "red" : "acc")}
@@ -2198,12 +2216,12 @@ const screens = {
         <div class="note" style="font-size:16px">${conscious === 3 ? t("best.cheapest") + " " : ""}${t(lucky ? "best.luck" : "best.noLuck", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: fewer })}</div>
         ${alts.length ? `<div class="figure"><table class="cmp"><thead><tr><th>${t("best.head")}</th><th class="n">${t("yres.cmpRed")}</th><th class="n">${t("yres.cmpMeals")}</th><th class="n">${t("best.debtPct")}</th></tr></thead><tbody>
           ${row(t("best.yours"), mc, "you")}
-          ${alts.map(([label, ch, w]) => row(label, manyYears(S.city, Object.assign({}, S.c, ch), yearStart(), Object.assign({ wage: w ?? S.wageOverride }, startOpts())))).join("")}
+          ${alts.map(([label, ch, w]) => row(label, manyYears(S.city, Object.assign({}, S.c, ch), yearStart(), Object.assign({ wage: w ?? S.wageOverride, noSnap: !!S.y.noSnap }, startOpts())))).join("")}
         </tbody></table><p class="cap small muted">${t("best.note", { n: mc.runs.toLocaleString("en-US") })}</p></div>` : ""}`;
     }
 
     // How close was it? (only shown when food never ran short in a normal month)
-    const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + b.snap + b.wic - b.need;
+    const spareMo = b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap + b.wic) - b.need;
     const noRefund = sim.netWorth - sim.refund.total;
     const typicalBill = CONFIG.help.typicalEmergency;
     const closeList = `<ul class="close">
@@ -2256,15 +2274,18 @@ const screens = {
     const ctx = c.stateMinWageNote && !S.wageOverride ? `<p class="small muted">${t("results.context", { note: c.stateMinWageNote })}${cite("U.S. DOL")}</p>` : "";
     const raise = first.wageToClose ? `<button class="btn secondary two" data-act="raise" data-val="${first.wageToClose}"><span>${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) }, true)}</span><small class="btn-sub">${t("yres.raiseWhy", null, true)}</small></button>` : "";
     return `<p class="kicker">${S.y.yearNum > 1 ? t("yres.yearN", { n: S.y.yearNum }) + " · " : ""}${t("results.choices3", { n: conscious })}</p>
-      ${S.y.noSnap ? `<div class="note bad">${t("yres.noSnapMode", { snap: fmt(b.snap) })}</div>` : ""}
       <p class="headline">${head}</p>
       ${tiles}
+      ${(() => { const other = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: !S.y.noSnap, policy: defaultPolicy }, startOpts()));
+        const yr = (y) => t("reveal.yr", { meals: y.mealsSkipped.toLocaleString("en-US"), debt: fmt(y.card + y.behind) }, true);
+        return S.y.noSnap ? `<div class="reveal">${t("reveal.title")}<p>${t("reveal.body", { aid: fmt(b.snap + b.wic), withAid: yr(other), you: yr(sim) })}</p><p class="small">${t("snap.what")}</p></div>`
+          : `<div class="note">${t("reveal.replay", { aid: fmt(b.snap + b.wic), without: yr(other) })}</div>`; })()}
       ${pathLadder()}
       ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
         if (gain > 0.5 && pay >= 0) return `<div class="note">${t("save.from", { gain: fmt(gain), refund: fmt(rf), pay: fmt(pay) })}</div>`;
         return ""; })()}
       ${S.wageOverride ? `<div class="note">${t("results.raise", { wage: fmtWage(S.wageOverride), diff: fmtWage(S.wageOverride - c.wage), oldWage: fmtWage(c.wage) })}</div>` : ""}
-      ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap) + b.wic - b.need);
+      ${(() => { const g = -(b.net - (b.housing + b.care + b.transport + b.basics) + (S.y.noSnap ? 0 : b.snap + b.wic) - b.need);
         if (g > 0.5) return `<div class="note bad" style="font-size:16px">${t(S.y.noSnap ? "yres.whyNoSnap" : "yres.why", { gap: fmt(g) })}</div>`;
         return ""; })()}
       ${debt + behind > 0.5 ? cardBox : ""}
@@ -2287,7 +2308,7 @@ const screens = {
       </details>
       <div class="actions">
         <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
-        <button class="btn ${S.y.noSnap ? "secondary" : "go"}" data-act="ynosnap">${t(S.y.noSnap ? "yres.withSnapBtn" : "yres.noSnapBtn")}</button>
+        <button class="btn ${S.y.noSnap ? "go" : "secondary"}" data-act="ynosnap">${t(S.y.noSnap ? "yres.withSnapBtn" : "yres.noSnapBtn")}</button>
         <button class="btn secondary" data-act="yreplay">${t("yres.sameYear")}</button>
         ${raise}
         <button class="btn link" data-act="replay">${t("results.replay")}</button>
@@ -2413,7 +2434,7 @@ function startOpts() { const st = S.y && S.y.start; return st ? { startCard: st.
 function yearSim() { return simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: !!S.y.noSnap }, startOpts())); }
 function seedFromUrl() { const m = location.search.match(/[?&]seed=(\d{1,9})/); return m ? +m[1] : null; }
 function newYearState(seed) {
-  return { seed: seed != null ? seed : 100000 + Math.floor(Math.random() * 900000), choices: {}, shown: -1, panel: null,
+  return { seed: seed != null ? seed : 100000 + Math.floor(Math.random() * 900000), choices: {}, shown: -1, panel: null, noSnap: true,
     auto: true, cutDone: false, cutPicked: false, seenBehind: false, seenRefund: false };
 }
 let yTimer = null;
@@ -2464,7 +2485,7 @@ function monthCard(r) {
   if (r.tabs) extra.push(t("mc.x.tabs", null, true));
   const cardPaid = (r.cardPay || 0) + (r.cardExtra || 0), fees = (r.rentLateFee || 0) + (r.lateFee || 0);
   return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(r.cardFood > 0.5 ? "mc.foodCard" : "mc.food", { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(S.y && S.y.noSnap ? (r.cardFood > 0.5 ? "mc.foodCardNoAid" : "mc.foodNoAid") : (r.cardFood > 0.5 ? "mc.foodCard" : "mc.food"), { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t("mc.pay", null, true), "+" + fmt(b.net), "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
@@ -2584,8 +2605,8 @@ document.addEventListener("click", async (e) => {
   if (act === "ypause") { S.y.auto = false; yStop(); return yRender(); }
   if (act === "yplay") { S.y.auto = true; return yAdvance(); }
   if (act === "ynext") {     // next year: cash, card debt and unpaid bills carry over
-    const sim = yearSim(), n = (S.y.yearNum || 1) + 1;
-    S.y = newYearState(null); S.y.yearNum = n; S.y.start = { cash: sim.cash, card: sim.card, behind: sim.behind, lastLate: sim.lastLate, chargedOff: sim.chargedOff, missed: sim.missed };
+    const sim = yearSim(), n = (S.y.yearNum || 1) + 1, ns = S.y.noSnap;
+    S.y = newYearState(null); S.y.yearNum = n; S.y.noSnap = ns; S.y.start = { cash: sim.cash, card: sim.card, behind: sim.behind, lastLate: sim.lastLate, chargedOff: sim.chargedOff, missed: sim.missed };
     meterShown = yearStart(); return go("year");
   }
   if (act === "ynosnap") {   // same year, same emergency choices, SNAP switched on or off
@@ -2595,7 +2616,7 @@ document.addEventListener("click", async (e) => {
     meterShown = yearStart(); return go("year");
   }
   if (act === "ynew" || act === "yreplay") {
-    const off = act === "yreplay" && S.y.noSnap, keep = S.y;
+    const off = act === "yreplay" ? S.y.noSnap : true, keep = S.y;
     S.y = newYearState(act === "yreplay" ? keep.seed : null); S.y.noSnap = off;
     if (act === "yreplay") { S.y.start = keep.start; S.y.yearNum = keep.yearNum; }
     meterShown = yearStart(); return go("year");
