@@ -160,5 +160,11 @@ window.WORKS_CITED = [
 
   { "text":"U.S. Census Bureau. \"Retail Sales: Automotive Parts, Accessory, and Tire Stores (MRTSSM4413USN)\" and \"Retail Sales: Health and Personal Care Stores (MRTSSM446USN).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/MRTSSM4413USN. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/MRTSSM4413USN","usedIn":"Game (car upkeep and personal care by month)" },
 
-  { "text":"U.S. Energy Information Administration. \"US Regular All Formulations Gas Price (GASREGM)\"; Federal Highway Administration. \"Vehicle Miles Traveled (TRFVOLUSM227NFWA).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/GASREGM. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/GASREGM","usedIn":"Game (gas costs by month)" }
+  { "text":"U.S. Energy Information Administration. \"US Regular All Formulations Gas Price (GASREGM)\"; Federal Highway Administration. \"Vehicle Miles Traveled (TRFVOLUSM227NFWA).\" *FRED*, Federal Reserve Bank of St. Louis, fred.stlouisfed.org/series/GASREGM. Accessed 27 Nov. 2026.","url":"https://fred.stlouisfed.org/series/GASREGM","usedIn":"Game (gas costs by month)" },
+
+  { "text":"\"State-Level Child Tax Credit.\" *National Conference of State Legislatures*, 2026, www.ncsl.org/human-services/child-tax-credit-overview.","url":"https://www.ncsl.org/human-services/child-tax-credit-overview","usedIn":"Game (Minnesota's $1,750 child tax credit among state credits)" },
+
+  { "text":"\"States That Offer a Child Tax Credit.\" *Kiplinger*, www.kiplinger.com/taxes/states-that-offer-a-child-tax-credit. Accessed 27 Nov. 2026.","url":"https://www.kiplinger.com/taxes/states-that-offer-a-child-tax-credit","usedIn":"Game (Minnesota has one of the largest state child tax credits)" },
+
+  { "text":"U.S. Department of Labor, Wage and Hour Division. \"Minimum Wage.\" www.dol.gov/agencies/whd/minimum-wage. Accessed 27 Nov. 2026.","url":"https://www.dol.gov/agencies/whd/minimum-wage","usedIn":"Game (federal minimum wage: $7.25)" }
 ];
