@@ -321,6 +321,7 @@ ul.bl li.hl{background:var(--accent-soft);border-color:var(--accent)}
 .vcol.wi b{color:var(--accent)}
 .vcol b.vd{font-size:17px;margin-top:6px}
 .vcol small{font-size:12px;color:var(--muted)}
+.lucky{background:var(--paper);border:2px dashed var(--accent);border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:15.5px;line-height:1.45}
 .rv-k{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 !important}
 .bestcase{margin:14px 0 4px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;font-size:15px;line-height:1.45}
 .bestcase .cite{display:block;margin-top:4px}
@@ -771,6 +772,8 @@ const TEXT = {
   "yres.yearN": "Year {n}",
   "reveal.title": "<p class=\"rv-k\">What food aid would have changed</p>",
   "reveal.body": "You played without SNAP or WIC: {you} With them (**{aid}** a month for groceries), this same year: {withAid}",
+  "luck.best": "**Best case, and lucky.** You picked the cheapest option every time, and every one was open to you. Real families often can't get them: in-home daycares are closing, and the bus takes twice as long. In **{pct}%** of 1,000 random years, this same household comes up short or has to borrow.",
+  "luck.calm": "You also had only {n} {em}; just {pct}% of years are that calm.",
   "reveal.without": "Without SNAP and WIC",
   "reveal.with": "With SNAP and WIC",
   "reveal.you": "(your year)",
@@ -2346,6 +2349,10 @@ const screens = {
     const raise = first.wageToClose ? `<button class="btn secondary two" data-act="raise" data-val="${first.wageToClose}"><span>${t("yres.raiseBtn", { wage: fmtWage(first.wageToClose) }, true)}</span><small class="btn-sub">${t("yres.raiseWhy", null, true)}</small></button>` : "";
     return `<p class="kicker">${S.y.yearNum > 1 ? t("yres.yearN", { n: S.y.yearNum }) + " · " : ""}${t("results.choices3", { n: conscious })}</p>
       <p class="headline">${head}</p>
+      ${conscious === 3 && meals === 0 && debt + behind <= 1 ? (() => {   // the best case: say it was luck, with the odds
+        const redPct = Math.round(mc.results.filter((x) => x.red > 0).length / mc.runs * 100), nEv = evs.length;
+        const calmPct = Math.round(mc.results.filter((x) => x.events <= nEv).length / mc.runs * 100);
+        return `<div class="lucky">${t("luck.best", { pct: redPct })}${calmPct <= 50 ? " " + t("luck.calm", { n: nEv === 0 ? "no" : nEv, em: nEv === 1 ? "emergency" : "emergencies", pct: calmPct }) : ""}</div>`; })() : ""}
       ${tiles}
       ${(() => { const other = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: !S.y.noSnap, policy: defaultPolicy }, startOpts()));
         const yr = (y) => t("reveal.yr", { meals: y.mealsSkipped.toLocaleString("en-US"), debt: fmt(y.card + y.behind) }, true);
