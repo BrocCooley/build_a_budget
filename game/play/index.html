@@ -311,6 +311,16 @@ ul.bl li{background:var(--card);border:1px solid var(--line);border-radius:14px;
 ul.bl li.hl{background:var(--accent-soft);border-color:var(--accent)}
 .reveal{background:var(--accent-soft);border:2px solid var(--accent);border-radius:16px;padding:14px 16px;margin:4px 0 16px;font-size:16px;line-height:1.45}
 .reveal p{margin:6px 0 0}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 6px}
+.vcol{border-radius:12px;padding:10px 12px;background:var(--card);display:flex;flex-direction:column}
+.vcol.wo{background:var(--red-soft)}
+.vl{font-size:12.5px;line-height:1.3;color:var(--muted);min-height:2.6em}
+.vl em{font-style:normal;font-weight:700}
+.vcol b{font:800 26px/1.1 var(--mono);margin-top:4px}
+.vcol.wo b{color:var(--red)}
+.vcol.wi b{color:var(--accent)}
+.vcol b.vd{font-size:17px;margin-top:6px}
+.vcol small{font-size:12px;color:var(--muted)}
 .rv-k{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 !important}
 .bestcase{margin:14px 0 4px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;font-size:15px;line-height:1.45}
 .bestcase .cite{display:block;margin-top:4px}
@@ -761,6 +771,12 @@ const TEXT = {
   "yres.yearN": "Year {n}",
   "reveal.title": "<p class=\"rv-k\">What food aid would have changed</p>",
   "reveal.body": "You played without SNAP or WIC: {you} With them (**{aid}** a month for groceries), this same year: {withAid}",
+  "reveal.without": "Without SNAP and WIC",
+  "reveal.with": "With SNAP and WIC",
+  "reveal.you": "(your year)",
+  "reveal.meals": "meals skipped",
+  "reveal.debt": "debt at year's end",
+  "reveal.aid": "Same year, same choices. The only difference: **{aid}** a month for groceries.",
   "reveal.yr": "**{meals}** meals skipped, **{debt}** in debt.",
   "reveal.replay": "**Replayed with SNAP and WIC** ({aid} a month for groceries). Without them, this same year: {without}",
   "lad.title": "Your path: what each choice did",
@@ -1231,7 +1247,7 @@ const TEXT = {
   "results.context": "For context: {note}",
   "results.receipt": "See the full receipt",
   "results.next": "The bottom line",
-  "yres.details": "More: how close it was, every day, other help",
+  "yres.details": "More: every day, emergencies, other kinds of help",
   "results.raiseBtn": "Replay earning {wage}/hr",
   "results.replay": "Replay from the start",
 
@@ -1727,10 +1743,9 @@ function bottomLine() {
         </div>`
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
           : left < b.need - wicA ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - wicA - left) }) : t("bl.payOk", { spare: fmt(left - b.need + wicA) }))
-        + (left >= 0 ? " " + t("bl.refundSave", { refund: fmt(sim.refund.total) }) : ""))}
+)}
       ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > sim.mealsSkipped ? " " + t(S.y.noSnap ? "bl.raiseMoreNoSnap" : "bl.raiseMore") : ""))}
     </ul>
-    <p class="cap small muted">${t("bl.note")}</p>
     <details class="rec more"><summary>${t("bl.more")}</summary><ul class="bl">
       ${item(t("bl.choicesH"), luckLine)}
       ${debt > 0.5 ? item(t("bl.cardH"), t(sim.card < 0.5 ? "bl.cardBills" : "bl.card", { amt: fmt(debt), card: fmt(sim.card), years: (() => { if (sim.card < 0.5) return ""; if (sim.chargedOff) return t("bl.cardCollections", null, true); const po = minPayoff(sim.card); return t("bl.cardPayoff", { years: po.months >= 24 ? (po.months / 12).toFixed(1) + " years" : po.months + " months", interest: fmt(po.interest) }, true); })() })) : ""}
@@ -1992,7 +2007,7 @@ function pathLadder() {
   add(t("lad.care", null, true), L[S.c.care], L[flip[S.c.care]], run({ care: flip[S.c.care] }));
   add(t("lad.work", null, true), L[S.c.transport], L[flip[S.c.transport]], run({ transport: flip[S.c.transport] }));
   const ch = S.y.choices, evKeys = Object.keys(ch).filter((k) => /^\d+-\d+$/.test(k));
-  if (evKeys.length) {
+  if (false && evKeys.length) {   // emergencies: rarely changes the outcome, left to the More panel
     const onCard = evKeys.filter((k) => ch[k] === "card").length, alt = {};
     evKeys.forEach((k) => (alt[k] = ch[k] === "card" ? "savings" : "card"));
     add(t("lad.emerg", null, true), t(onCard ? "lad.onCard" : "lad.cash", null, true), t(onCard ? "lad.cash" : "lad.onCard", null, true), run(null, alt));
@@ -2001,8 +2016,8 @@ function pathLadder() {
   if (ch.food) add(t("lad.short", null, true), t(FL[ch.food], null, true), t(FL[FALT[ch.food]], null, true), run(null, { food: FALT[ch.food] }));
   if (ch.cutOnce) add(t("lad.skipMonth", null, true), t(ch.cutOnce.type === "care" ? "lad.skipCare" : "lad.skipRide", null, true), t("lad.dontSkip", null, true), run(null, { cutOnce: null }));
   const cpKey = Object.keys(ch).find((k) => k.endsWith("-cp"));
-  if (cpKey) add(t("lad.cardplan", null, true), t(ch[cpKey] === "pay" ? "lad.payCard" : "lad.keepCash", null, true), t(ch[cpKey] === "pay" ? "lad.keepCash" : "lad.payCard", null, true), run(null, { [cpKey]: ch[cpKey] === "pay" ? "keep" : "pay" }));
-  if (ch["11-g"]) add(t("lad.gifts", null, true), t(ch["11-g"] === "skip" ? "lad.toy" : "lad.gift", null, true), t(ch["11-g"] === "skip" ? "lad.gift" : "lad.toy", null, true), run(null, { "11-g": ch["11-g"] === "skip" ? "savings" : "skip" }));
+  if (false && cpKey) add(t("lad.cardplan", null, true), t(ch[cpKey] === "pay" ? "lad.payCard" : "lad.keepCash", null, true), t(ch[cpKey] === "pay" ? "lad.keepCash" : "lad.payCard", null, true), run(null, { [cpKey]: ch[cpKey] === "pay" ? "keep" : "pay" }));
+  if (false && ch["11-g"]) add(t("lad.gifts", null, true), t(ch["11-g"] === "skip" ? "lad.toy" : "lad.gift", null, true), t(ch["11-g"] === "skip" ? "lad.gift" : "lad.toy", null, true), run(null, { "11-g": ch["11-g"] === "skip" ? "savings" : "skip" }));
   const cheap = run({ housing: "oneBR", care: "home", transport: "bus" });
   const cell = (r) => {
     const d = score(r.alt) - score(mine), cls = d > 25 ? "better" : d < -25 ? "worse" : "same";
@@ -2334,8 +2349,9 @@ const screens = {
       ${tiles}
       ${(() => { const other = simulateYear(S.city, S.c, yearStart(), S.y.seed, S.y.choices, Object.assign({ wage: S.wageOverride, noSnap: !S.y.noSnap, policy: defaultPolicy }, startOpts()));
         const yr = (y) => t("reveal.yr", { meals: y.mealsSkipped.toLocaleString("en-US"), debt: fmt(y.card + y.behind) }, true);
-        return S.y.noSnap ? `<div class="reveal">${t("reveal.title")}<p>${t("reveal.body", { aid: fmt(b.snap + b.wic), withAid: yr(other), you: yr(sim) })}</p><p class="small">${t("snap.what")}</p></div>`
-          : `<div class="note">${t("reveal.replay", { aid: fmt(b.snap + b.wic), without: yr(other) })}</div>`; })()}
+        const without = S.y.noSnap ? sim : other, withA = S.y.noSnap ? other : sim;
+        const col = (label, y, cls, you) => `<div class="vcol ${cls}"><span class="vl">${label}${you ? ` <em>${t("reveal.you", null, true)}</em>` : ""}</span><b>${y.mealsSkipped.toLocaleString("en-US")}</b><small>${t("reveal.meals", null, true)}</small><b class="vd">${fmt(y.card + y.behind)}</b><small>${t("reveal.debt", null, true)}</small></div>`;
+        return `<div class="reveal">${t("reveal.title")}<div class="vs">${col(t("reveal.without", null, true), without, "wo", S.y.noSnap)}${col(t("reveal.with", null, true), withA, "wi", !S.y.noSnap)}</div><p class="small">${t("reveal.aid", { aid: fmt(b.snap + b.wic) })}</p></div>`; })()}
       ${pathLadder()}
       ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
         if (gain > 0.5 && pay >= 0) return `<div class="note">${t("save.from", { gain: fmt(gain), refund: fmt(rf), pay: fmt(pay) })}</div>`;
@@ -2347,26 +2363,22 @@ const screens = {
       ${debt + behind > 0.5 ? cardBox : ""}
       <div class="actions">
         ${next("final", t("results.next"), "go")}
-        <button class="btn secondary" data-act="ynext">${t(debt + behind > 0.5 ? "yres.nextYearDebt" : "yres.nextYear", { n: (S.y.yearNum || 1) + 1, amt: fmt(debt + behind) })}</button>
+        <button class="btn ${S.y.noSnap ? "go" : "secondary"}" data-act="ynosnap">${t(S.y.noSnap ? "yres.withSnapBtn" : "yres.noSnapBtn")}</button>
       </div>
       <details class="rec more">
         <summary>${t("yres.details")}</summary>
         ${spareMo > -0.5 ? `<p class="section">${t("yres.closeTitle")}</p>${closeList}` : ""}
         ${debt + behind > 0.5 ? "" : cardBox}
-        ${bestCase}
         <p class="section">${t("yres.mealsTitle")}</p><div class="figure">${grid}</div>
         <p class="section">${t("yres.eventsTitle")}</p>${evList}
-        ${S.y.noSnap ? "" : noSnap}
-        <p class="section">${t("yres.mcTitle", { n: mc.runs.toLocaleString("en-US") })}</p>${odds}
         <p class="section">${t("yres.cmpTitle")}</p>${cmpTable}${helpCards}
         ${ctx}
         <p class="small muted">${t("yres.seed", { seed: S.y.seed })}</p>
       </details>
       <div class="actions">
-        <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
-        <button class="btn ${S.y.noSnap ? "go" : "secondary"}" data-act="ynosnap">${t(S.y.noSnap ? "yres.withSnapBtn" : "yres.noSnapBtn")}</button>
-        <button class="btn secondary" data-act="yreplay">${t("yres.sameYear")}</button>
+        <button class="btn secondary" data-act="ynext">${t(debt + behind > 0.5 ? "yres.nextYearDebt" : "yres.nextYear", { n: (S.y.yearNum || 1) + 1, amt: fmt(debt + behind) })}</button>
         ${raise}
+        <button class="btn secondary" data-act="ynew">${t("yres.newYear")}</button>
         <button class="btn link" data-act="replay">${t("results.replay")}</button>
       </div>`;
   },
