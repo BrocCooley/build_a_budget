@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f3efe6">
 <title>Build a Budget</title>
-<meta name="description" content="A two-minute budgeting game about food insecurity: one cashier's paycheck, thirty days, and what's left for food.">
+<meta name="description" content="A budgeting game about food insecurity: one cashier's paycheck in Minneapolis, one year, and what's left for food.">
 <style>
 :root{
   --bg:#f3efe6; --card:#fffdf8; --paper:#fffef9; --ink:#17201c; --muted:#5f665f; --faint:#8b918a; --line:#e3ddd0;
@@ -833,6 +833,7 @@ const TEXT = {
   "card.chargedOff": "In {month}, after 6 missed payments, the card went to collections. It stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "mc.foodNone": "No money left for food: {n} meals skipped",
   "mc.foodNoAid": "All from your paycheck: {cash}",
   "mc.foodCardNoAid": "{cash} from your paycheck, {card} on the card",
   "mc.extra": "more this month: {list}",
@@ -1042,9 +1043,9 @@ const TEXT = {
   "yres.raiseWhy": "Lowest pay that covers a month with no emergencies",
 
 
-  "intro.kicker": "Build a Budget · a 4-minute game",
+  "intro.kicker": "Build a Budget · a one-year game",
   "intro.title1": "One paycheck.",
-  "intro.title2": "Thirty days.",
+  "intro.title2": "One year.",
   "intro.title3": "Make it work.",
   "intro.tag1": "Single parent",
   "intro.tag2": "Kid, age 4",
@@ -1266,6 +1267,7 @@ const TEXT = {
   "bl.refundSave": "Any savings came mostly from the **{refund}** March tax refund.",
   "bl.refundAll": "The **{refund}** tax refund covered the gap.",
   "bl.refundPart": "The **{refund}** tax refund covered only part of it.",
+  "bl.raiseMoreNoSnap": "(The raise paid late bills first, so debt fell instead.)",
   "bl.raiseMore": "(The raise paid late bills first and SNAP shrank, so debt fell instead.)",
   "bl.choicesH": "Your choices and your luck",
   "bl.cheapest": "**Best case:** you got every cheap option. Real families often can't: in-home daycares are closing, and the bus takes twice as long.",
@@ -1726,7 +1728,7 @@ function bottomLine() {
         + (left < 0 ? t("bl.payShort", { left: fmt(-left) }) + " " + t(debt > 1 || meals > 0 ? "bl.refundPart" : "bl.refundAll", { refund: fmt(sim.refund.total) })
           : left < b.need - wicA ? t(S.y.noSnap ? "bl.payNoSnap" : "bl.pay", { short: fmt(b.need - wicA - left) }) : t("bl.payOk", { spare: fmt(left - b.need + wicA) }))
         + (left >= 0 ? " " + t("bl.refundSave", { refund: fmt(sim.refund.total) }) : ""))}
-      ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > withSnap.mealsSkipped ? " " + t("bl.raiseMore") : ""))}
+      ${item(t("bl.incomeH"), t("bl.income", { raised: yr(raised), all: yr(all) }) + (raised.mealsSkipped > sim.mealsSkipped ? " " + t(S.y.noSnap ? "bl.raiseMoreNoSnap" : "bl.raiseMore") : ""))}
     </ul>
     <p class="cap small muted">${t("bl.note")}</p>
     <details class="rec more"><summary>${t("bl.more")}</summary><ul class="bl">
@@ -2543,7 +2545,7 @@ function monthCard(r) {
   if (r.tabs) extra.push(t("mc.x.tabs", null, true));
   const cardPaid = (r.cardPay || 0) + (r.cardExtra || 0), fees = (r.rentLateFee || 0) + (r.lateFee || 0);
   return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
-  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t("mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(S.y && S.y.noSnap ? (r.cardFood > 0.5 ? "mc.foodCardNoAid" : "mc.foodNoAid") : (r.cardFood > 0.5 ? "mc.foodCard" : "mc.food"), { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
+  <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t(r.daysFed < 1 ? "mc.foodNone" : "mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(S.y && S.y.noSnap ? (r.cardFood > 0.5 ? "mc.foodCardNoAid" : "mc.foodNoAid") : (r.cardFood > 0.5 ? "mc.foodCard" : "mc.food"), { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t(r.skipped ? "mc.payLost" : "mc.pay", { what: t(r.skipped === "care" ? "mc.noCare" : "mc.noRide", null, true) }, true), "+" + fmt(r.pay != null ? r.pay : b.net), r.skipped ? "" : "plus")}
     ${r.refund ? ln(t("mc.refund", null, true), "+" + fmt(r.refund), "plus") : ""}
