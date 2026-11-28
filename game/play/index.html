@@ -322,6 +322,33 @@ ul.bl li.hl{background:var(--accent-soft);border-color:var(--accent)}
 .vcol b.vd{font-size:17px;margin-top:6px}
 .vcol small{font-size:12px;color:var(--muted)}
 .lucky{background:var(--paper);border:2px dashed var(--accent);border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:15.5px;line-height:1.45}
+.wilab{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:4px 0 16px}
+.wi-sub{font-size:13px;color:var(--muted);margin:4px 0 10px;line-height:1.35}
+.wi-row{display:flex;align-items:center;gap:8px;margin:0 0 7px}
+.wi-k{flex:0 0 82px;font-size:12.5px;color:var(--muted);line-height:1.2}
+.wi-seg{flex:1;display:flex;gap:4px;background:var(--paper);border-radius:10px;padding:3px}
+.wi-b{flex:1;border:1.5px solid transparent;background:transparent;border-radius:8px;padding:7px 4px;font:600 12.5px/1.15 var(--sans);color:var(--ink);cursor:pointer}
+.wi-b.mine{border-color:var(--line);border-style:dashed}
+.wi-b.on{background:var(--ink);color:#fff;border-style:solid;border-color:var(--ink)}
+.wi-out{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0 8px}
+.wi-out div{background:var(--paper);border-radius:10px;padding:8px}
+.wi-out b{display:block;font:800 19px/1.1 var(--mono)}
+.wi-out span{font-size:11.5px;color:var(--muted);line-height:1.3;display:block;margin-top:2px}
+.wi-out em{font-style:normal;font-weight:700;display:block}
+.wi-out em.good{color:var(--accent)}
+.wi-out em.bad{color:var(--red)}
+.wi-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.wi-strip i{height:12px;border-radius:3px;background:var(--line)}
+.wi-strip i.ok{background:var(--accent)}
+.wi-strip i.dip{background:#c9862c}
+.wi-strip i.bad{background:var(--red)}
+.wi-verdict{margin:8px 0 6px;font-size:14px;font-weight:700}
+.wi-verdict.bad{color:var(--red)}
+.wi-verdict.good{color:var(--accent)}
+.wi-btns{display:flex;gap:6px}
+.wi-x{flex:1;border:1.5px solid var(--ink);background:transparent;border-radius:10px;padding:8px;font:600 13px/1.2 var(--sans);color:var(--ink);cursor:pointer}
+.wi-x[disabled]{opacity:.35}
+.story{font-family:var(--serif);font-size:19px;line-height:1.25;font-weight:700;margin:2px 0 10px}
 .rv-k{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 !important}
 .bestcase{margin:14px 0 4px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;font-size:15px;line-height:1.45}
 .bestcase .cite{display:block;margin-top:4px}
@@ -782,6 +809,30 @@ const TEXT = {
   "reveal.aid": "Same year, same choices. The only difference: **{aid}** a month for groceries.",
   "reveal.yr": "**{meals}** meals skipped, **{debt}** in debt.",
   "reveal.replay": "**Replayed with SNAP and WIC** ({aid} a month for groceries). Without them, this same year: {without}",
+  "wi.title": "What if? Tap to change your year",
+  "wi.sub": "Same year, same emergencies. Change one thing or all of them. Outlined = what you chose.",
+  "wi.aid": "Food aid",
+  "wi.none": "None",
+  "wi.snap": "SNAP + WIC",
+  "wi.housing": "Home",
+  "wi.care": "Child care",
+  "wi.home": "Home daycare",
+  "wi.center": "Center",
+  "wi.work": "To work",
+  "wi.bus": "Bus",
+  "wi.car": "Car",
+  "wi.short": "Short on food",
+  "wi.skip": "Skip meals",
+  "wi.cardF": "Card",
+  "wi.rent": "Late rent",
+  "wi.meals": "meals skipped",
+  "wi.debt": "debt",
+  "wi.cash": "cash in Dec.",
+  "wi.yours": "This is your year. Tap a choice to change it.",
+  "wi.red": "{n} of 12 months short or borrowing.",
+  "wi.clear": "Out of the red all year.",
+  "wi.cheapest": "Try the cheapest path",
+  "wi.reset": "Reset to my year",
   "lad.title": "Your path: what each choice did",
   "lad.yourYear": "Your year",
   "lad.you": "You:",
@@ -852,6 +903,22 @@ const TEXT = {
   "card.chargedOff": "In {month}, after 6 missed payments, the card went to collections. It stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "st.closed": "The bank closes your card. The debt goes to a collector.",
+  "st.noCare": "No child care, so no shifts. The paycheck doesn't come.",
+  "st.noRide": "No ride, so no shifts. The paycheck doesn't come.",
+  "st.refund": "Tax refund day: the biggest check of the year.",
+  "st.empty": "The fridge is empty from day one. You eat less so your kid can eat.",
+  "st.empty2": "No grocery money left after the bills. Dinner is whatever is in the cupboard.",
+  "st.empty3": "Another month with nothing left for food. You skip meals and hope your kid doesn't notice.",
+  "st.runsOut2": "By day {day} the groceries are gone. The rest of the month is rice and whatever is left.",
+  "st.runsOut": "Day {day}: the groceries run out. You eat less so your kid can eat.",
+  "st.rentFood": "You hold back part of the rent to buy groceries.",
+  "st.cardFood": "Groceries go on the credit card again.",
+  "st.event": "Out of nowhere: a {what}.",
+  "st.late": "The rent is late. The landlord notices.",
+  "st.cold": "A cold month. The heating bill jumps.",
+  "st.holiday": "The holidays. Your kid is counting the days.",
+  "st.quiet": "A quiet month. Bills paid, food on the table.",
   "mc.foodNone": "No money left for food: {n} meals skipped",
   "mc.foodNoAid": "All from your paycheck: {cash}",
   "mc.foodCardNoAid": "{cash} from your paycheck, {card} on the card",
@@ -2037,6 +2104,53 @@ function pathLadder() {
     <p class="cap small muted">${t("lad.note")}</p>`;
 }
 
+
+// What if? Your exact year (same emergencies, same seed), with the choices you tap changed. Re-renders in place.
+let WI = null;
+function wiDefaults() { return { aid: !S.y.noSnap, housing: S.c.housing, care: S.c.care, transport: S.c.transport, food: S.y.choices.food || "skip" }; }
+function wiRun(w) {
+  const ch = Object.assign({}, S.y.choices, { food: w.food });
+  if (w.food !== (S.y.choices.food || "skip")) delete ch.foodFrom;
+  return simulateYear(S.city, Object.assign({}, S.c, { housing: w.housing, care: w.care, transport: w.transport }), yearStart(), S.y.seed, ch,
+    Object.assign({ wage: S.wageOverride, noSnap: !w.aid, policy: defaultPolicy }, startOpts()));
+}
+function whatIfLab() {
+  if (!WI || WI.seed !== S.y.seed) WI = Object.assign(wiDefaults(), { seed: S.y.seed });
+  const mine = wiRun(wiDefaults()), now = wiRun(WI), same = JSON.stringify(Object.assign({}, WI, { seed: 0 })) === JSON.stringify(Object.assign(wiDefaults(), { seed: 0 }));
+  const row = (key, label, opts) => `<div class="wi-row"><span class="wi-k">${label}</span><div class="wi-seg">${opts.map(([v, txt]) =>
+    `<button class="wi-b ${WI[key] === v ? "on" : ""} ${wiDefaults()[key] === v ? "mine" : ""}" data-wi="${key}" data-v="${v}">${txt}</button>`).join("")}</div></div>`;
+  const debt = (y) => y.card + y.behind, num = (n) => Math.round(n).toLocaleString("en-US");
+  const dm = now.mealsSkipped - mine.mealsSkipped, dd = debt(now) - debt(mine);
+  const diff = (d, unit, money) => Math.abs(d) < 1 ? "" : `<em class="${d < 0 ? "good" : "bad"}">${d < 0 ? "−" : "+"}${money ? fmt(Math.abs(d)) : num(Math.abs(d))}${unit}</em>`;
+  const strip = now.months.map((r) => `<i class="${monthState(r)}"></i>`).join("");
+  const red = now.months.filter(isRedMonth).length;
+  return `<div class="wilab" id="wilab">
+    <p class="rv-k">${t("wi.title", null, true)}</p>
+    <p class="wi-sub">${t("wi.sub", null, true)}</p>
+    ${row("aid", t("wi.aid", null, true), [[false, t("wi.none", null, true)], [true, t("wi.snap", null, true)]])}
+    ${row("housing", t("wi.housing", null, true), [["oneBR", t("housing.oneBR", null, true)], ["twoBR", t("housing.twoBR", null, true)]])}
+    ${row("care", t("wi.care", null, true), [["home", t("wi.home", null, true)], ["center", t("wi.center", null, true)]])}
+    ${row("transport", t("wi.work", null, true), [["bus", t("wi.bus", null, true)], ["car", t("wi.car", null, true)]])}
+    ${row("food", t("wi.short", null, true), [["skip", t("wi.skip", null, true)], ["card", t("wi.cardF", null, true)], ["rent", t("wi.rent", null, true)]])}
+    <div class="wi-out">
+      <div><b class="${now.mealsSkipped ? "red" : "accent"}">${num(now.mealsSkipped)}</b><span>${t("wi.meals", null, true)} ${diff(dm, "", false)}</span></div>
+      <div><b class="${debt(now) > 1 ? "red" : "accent"}">${fmt(debt(now))}</b><span>${t("wi.debt", null, true)} ${diff(dd, "", true)}</span></div>
+      <div><b>${fmt(now.cash)}</b><span>${t("wi.cash", null, true)}</span></div>
+    </div>
+    <div class="wi-strip">${strip}</div>
+    <p class="wi-verdict ${red ? "bad" : "good"}">${same ? t("wi.yours", null, true) : red ? t("wi.red", { n: red }, true) : t("wi.clear", null, true)}</p>
+    <div class="wi-btns"><button class="wi-x" data-wi="preset" data-v="cheap">${t("wi.cheapest", null, true)}</button><button class="wi-x" data-wi="preset" data-v="mine" ${same ? "disabled" : ""}>${t("wi.reset", null, true)}</button></div>
+  </div>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-wi]"); if (!b || !WI) return;
+  const k = b.dataset.wi, v = b.dataset.v;
+  if (k === "preset") { if (v === "mine") WI = Object.assign(wiDefaults(), { seed: S.y.seed }); else Object.assign(WI, { housing: "oneBR", care: "home", transport: "bus" }); }
+  else WI[k] = v === "true" ? true : v === "false" ? false : v;
+  const el = document.getElementById("wilab"); if (el) el.outerHTML = whatIfLab();
+  buzz(10);
+});
+
 /* ---------- Screens ---------- */
 const screens = {
   intro() {
@@ -2228,12 +2342,17 @@ const screens = {
     }
 
     // Tiles
-    const tile = (big, label, cls) => `<div class="tile"><b class="${cls || ""}">${big}</b><span>${label}</span></div>`;
+    const tile = (big, label, cls, n, money) => `<div class="tile"><b class="${cls || ""}"${n != null ? ` data-num="${Math.round(n)}" data-money="${money ? 1 : 0}"` : ""}>${big}</b><span>${label}</span></div>`;
+    setTimeout(() => document.querySelectorAll("[data-num]").forEach((el) => {
+      const to = +el.dataset.num, money = el.dataset.money === "1", dur = reduceMotion ? 0 : 1100, t0 = performance.now();
+      const tick = (now) => { const k = dur ? Math.min(1, (now - t0) / dur) : 1, v = to * (1 - Math.pow(1 - k, 3)); el.textContent = money ? fmt(v) : Math.round(v).toLocaleString("en-US"); if (k < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }), 150);
     const tiles = `<div class="tiles">
       ${tile(`${redMonths.length}<small>/12</small>`, t("yres.redMonths"), redMonths.length ? "red" : "accent")}
-      ${tile(meals.toLocaleString("en-US"), t("yres.meals"), meals ? "red" : "accent")}
-      ${tile(fmt(debt + behind), t("yres.debtTile", { card: fmt(debt), bills: fmt(behind) }), debt + behind > 1 ? "red" : "accent")}
-      ${tile(fmt(sim.cash), t("yres.cash"), "")}
+      ${tile(meals.toLocaleString("en-US"), t("yres.meals"), meals ? "red" : "accent", meals)}
+      ${tile(fmt(debt + behind), t("yres.debtTile", { card: fmt(debt), bills: fmt(behind) }), debt + behind > 1 ? "red" : "accent", debt + behind, true)}
+      ${tile(fmt(sim.cash), t("yres.cash"), "", sim.cash, true)}
     </div>`;
 
     // Year chart: cash above the line, debt below
@@ -2359,7 +2478,7 @@ const screens = {
         const without = S.y.noSnap ? sim : other, withA = S.y.noSnap ? other : sim;
         const col = (label, y, cls, you) => `<div class="vcol ${cls}"><span class="vl">${label}${you ? ` <em>${t("reveal.you", null, true)}</em>` : ""}</span><b>${y.mealsSkipped.toLocaleString("en-US")}</b><small>${t("reveal.meals", null, true)}</small><b class="vd">${fmt(y.card + y.behind)}</b><small>${t("reveal.debt", null, true)}</small></div>`;
         return `<div class="reveal">${t("reveal.title")}<div class="vs">${col(t("reveal.without", null, true), without, "wo", S.y.noSnap)}${col(t("reveal.with", null, true), withA, "wi", !S.y.noSnap)}</div><p class="small">${t("reveal.aid", { aid: fmt(b.snap + b.wic) })}</p></div>`; })()}
-      ${pathLadder()}
+      ${whatIfLab()}
       ${(() => { const startNet = yearStart() - sim.startCard - sim.startBehind, gain = sim.netWorth - startNet, rf = sim.refund.total, pay = gain - rf;
         if (gain > 0.5 && pay >= 0) return `<div class="note">${t("save.from", { gain: fmt(gain), refund: fmt(rf), pay: fmt(pay) })}</div>`;
         return ""; })()}
@@ -2563,7 +2682,20 @@ function monthCard(r) {
   if (sx.upkeep > 5) extra.push(t("mc.x.upkeep", null, true));
   if (r.tabs) extra.push(t("mc.x.tabs", null, true));
   const cardPaid = (r.cardPay || 0) + (r.cardExtra || 0), fees = (r.rentLateFee || 0) + (r.lateFee || 0);
-  return `<div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
+  // A one-line story for the month: the most important thing that happened
+  const ev0 = r.events[0], story = r.chargedOff ? t("st.closed", null, true)
+    : r.skipped ? t(r.skipped === "care" ? "st.noCare" : "st.noRide", null, true)
+    : r.refund ? t("st.refund", null, true)
+    : short && r.daysFed < 1 ? t(["st.empty", "st.empty2", "st.empty3"][r.m % 3], null, true)
+    : short ? t(["st.runsOut", "st.runsOut2"][r.m % 2], { day: r.daysFed }, true)
+    : r.rentFood > 0.5 ? t("st.rentFood", null, true)
+    : r.cardFood > 0.5 ? t("st.cardFood", null, true)
+    : ev0 ? t("st.event", { what: t("ev." + ev0.id + ".short", null, true).toLowerCase() }, true)
+    : r.behindAdded > 0.5 ? t("st.late", null, true)
+    : sx.heat > 40 ? t("st.cold", null, true)
+    : r.gift ? t("st.holiday", null, true)
+    : t("st.quiet", null, true);
+  return `<p class="story">${story}</p><div class="mresult ${st === "bad" ? "neg" : st === "dip" ? "dip" : "pos"}"><span>${t("mc.result", null, true)}</span><b>${change < -0.5 ? "−" : "+"}${fmt(Math.abs(change))}</b></div>
   <div class="mfood ${short ? "short" : ""}">${icon("plate")}<div><b>${short ? t(r.daysFed < 1 ? "mc.foodNone" : "mc.foodShort", { days: r.daysFed, n: r.mealsSkipped }, true) : t("mc.foodOk", null, true)}</b><span>${t(S.y && S.y.noSnap ? (r.cardFood > 0.5 ? "mc.foodCardNoAid" : "mc.foodNoAid") : (r.cardFood > 0.5 ? "mc.foodCard" : "mc.food"), { cash: fmt(r.cashFood), card: fmt(r.cardFood) }, true)}</span>${short ? `<span class="why">${t("mc.foodWhy", null, true)}</span>` : ""}</div></div>
   <div class="mcard">
     ${ln(t(r.skipped ? "mc.payLost" : "mc.pay", { what: t(r.skipped === "care" ? "mc.noCare" : "mc.noRide", null, true) }, true), "+" + fmt(r.pay != null ? r.pay : b.net), r.skipped ? "" : "plus")}
