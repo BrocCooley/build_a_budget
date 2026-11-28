@@ -152,5 +152,14 @@ for (const housing of ["oneBR", "twoBR"]) for (const care of ["home", "center"])
   check(b.months.slice(5).some((r) => r.cardFood > 0) && b.months.slice(0, 5).every((r) => !r.cardFood), "groceries go on the card only from June on");
 }
 
+// 14) Food shelf: helps, but doesn't close the gap that SNAP and WIC close
+for (const c of [{ housing: "oneBR", care: "home", transport: "bus" }, { housing: "twoBR", care: "center", transport: "car" }]) {
+  const opt = { policy: ctx.defaultPolicy, noSnap: true };
+  const skip = simulateYear("minneapolis", c, 0, 4242, { food: "skip", "11-g": "skip" }, opt);
+  const shelf = simulateYear("minneapolis", c, 0, 4242, { food: "shelf", "11-g": "skip" }, opt);
+  check(shelf.mealsSkipped < skip.mealsSkipped && shelf.mealsSkipped > 0, "a food shelf should cut skipped meals but not end them");
+  check(shelf.months.every((r) => r.shelfFood <= r.need ? true : r.shelfFood <= shelf.base.need * CONFIG.food.shelfDaysPerMonth / 30 + 0.01), "food shelf limited to about 10 days a month");
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);

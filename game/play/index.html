@@ -349,6 +349,15 @@ ul.bl li.hl{background:var(--accent-soft);border-color:var(--accent)}
 .wi-x{flex:1;border:1.5px solid var(--ink);background:transparent;border-radius:10px;padding:8px;font:600 13px/1.2 var(--sans);color:var(--ink);cursor:pointer}
 .wi-x[disabled]{opacity:.35}
 .story{font-family:var(--serif);font-size:19px;line-height:1.25;font-weight:700;margin:2px 0 10px}
+.season{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 -4px 10px;padding:10px 12px;border-radius:14px}
+.season h2{margin:0}
+.season.s0{background:linear-gradient(120deg,#dbe7f3,#eef3f8)}
+.season.s1{background:linear-gradient(120deg,#dcefd9,#f0f6ea)}
+.season.s2{background:linear-gradient(120deg,#fbe9c4,#fdf4e1)}
+.season.s3{background:linear-gradient(120deg,#f6d9c2,#fbeee2)}
+.schip{display:inline-flex;align-items:center;gap:5px;font:700 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.75);color:#33403a}
+.schip svg{width:14px;height:14px}
+.story{border-left:4px solid var(--accent);padding-left:10px}
 .rv-k{font:700 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 !important}
 .bestcase{margin:14px 0 4px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;font-size:15px;line-height:1.45}
 .bestcase .cite{display:block;margin-top:4px}
@@ -417,6 +426,13 @@ ul.close{margin:12px 0 0;padding-left:20px;display:grid;gap:8px;font-size:15px;l
 .ylegend{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:-6px 0 12px;font-size:12px;color:var(--muted)}
 .ylegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:-6px}
 .ylegend i.ok{background:var(--accent)} .ylegend i.dip{background:var(--amber)} .ylegend i.bad{background:var(--red)}
+.ylegend i{width:14px;height:14px;font:700 10px/14px var(--sans);color:#fff;text-align:center;font-style:normal}
+.ylegend i.ok::after,.ym.ok::after,.wi-strip i.ok::after{content:"✓"}
+.ylegend i.dip::after,.ym.dip::after,.wi-strip i.dip::after{content:"–"}
+.ylegend i.bad::after,.ym.bad::after,.wi-strip i.bad::after{content:"✕"}
+.ym.ok::after,.ym.dip::after,.ym.bad::after{position:absolute;right:3px;bottom:2px;font:700 9px/1 var(--sans);color:#fff;opacity:.95}
+.ym.bad,.wi-strip i.bad{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.18) 0 3px,transparent 3px 7px)}
+.wi-strip i{height:16px !important;font:700 10px/16px var(--sans);color:#fff;text-align:center;font-style:normal}
 .ym.now{border-color:var(--ink);border-width:2.5px;color:var(--ink)}
 .ym .ev{position:absolute;top:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:var(--ink);color:#fff;font:800 10px/15px var(--mono);text-align:center;font-style:normal}
 .ym .rf{position:absolute;bottom:-6px;right:-4px;width:15px;height:15px;border-radius:50%;background:#e9d9a6;color:var(--ink);font:800 10px/15px var(--mono);text-align:center;font-style:normal}
@@ -643,6 +659,8 @@ const CONFIG = {
   },
 
   food: {
+    shelfDaysPerMonth: 10,       // ESTIMATE from reporting: a Minnesota food shelf aims for "a good five-day supply" per visit, and families often come
+                                 // twice a month (The Food Group, Apr. 2026); 83% of regular users visit more than once a month (MPR, Mar. 2026). Rules vary by shelf.
     wicMonthly: 64.71,           // WIC average monthly food benefit per participant, FY2025 (USDA FNS WIC Program data). A 4-year-old qualifies until age 5;
                                  // SNAP and Medical Assistance make the family automatically income-eligible. WIC buys only set foods (milk, cereal, eggs, fruit, vegetables…).
     usdaMonthly: 487,            // USDA Thrifty Food Plan, Oct 2026: female 20–50 $254.20 + child 4–5 $188.50 = $442.70, +10% for a 2-person household = $486.97
@@ -822,8 +840,9 @@ const TEXT = {
   "wi.bus": "Bus",
   "wi.car": "Car",
   "wi.short": "Short on food",
-  "wi.skip": "Skip meals",
+  "wi.skip": "Skip",
   "wi.cardF": "Card",
+  "wi.shelf": "Food shelf",
   "wi.rent": "Late rent",
   "wi.meals": "meals skipped",
   "wi.debt": "debt",
@@ -855,6 +874,7 @@ const TEXT = {
   "lad.short": "When food ran short",
   "lad.foodCard": "put groceries on the card",
   "lad.foodSkip": "skip meals",
+  "lad.foodShelf": "go to a food shelf",
   "lad.foodRent": "pay rent late",
   "lad.skipMonth": "A month off",
   "lad.skipCare": "skipped child care",
@@ -903,6 +923,10 @@ const TEXT = {
   "card.chargedOff": "In {month}, after 6 missed payments, the card went to collections. It stays on your credit report for 7 years.",
   "card.lastYear": "last year",
   "bl.cardCollections": "The card is in collections: it can follow you onto your credit report for 7 years.",
+  "season.0": "Winter",
+  "season.1": "Spring",
+  "season.2": "Summer",
+  "season.3": "Fall",
   "st.closed": "The bank closes your card. The debt goes to a collector.",
   "st.noCare": "No child care, so no shifts. The paycheck doesn't come.",
   "st.noRide": "No ride, so no shifts. The paycheck doesn't come.",
@@ -912,6 +936,8 @@ const TEXT = {
   "st.empty3": "Another month with nothing left for food. You skip meals and hope your kid doesn't notice.",
   "st.runsOut2": "By day {day} the groceries are gone. The rest of the month is rice and whatever is left.",
   "st.runsOut": "Day {day}: the groceries run out. You eat less so your kid can eat.",
+  "st.shelf": "Two trips to the food shelf this month. It's enough, barely.",
+  "st.shelfShort": "Two trips to the food shelf, and it still runs out. You eat less so your kid can eat.",
   "st.rentFood": "You hold back part of the rent to buy groceries.",
   "st.cardFood": "Groceries go on the credit card again.",
   "st.event": "Out of nowhere: a {what}.",
@@ -920,6 +946,7 @@ const TEXT = {
   "st.holiday": "The holidays. Your kid is counting the days.",
   "st.quiet": "A quiet month. Bills paid, food on the table.",
   "mc.foodNone": "No money left for food: {n} meals skipped",
+  "mc.shelf": "Food shelf groceries (free)",
   "mc.foodNoAid": "All from your paycheck: {cash}",
   "mc.foodCardNoAid": "{cash} from your paycheck, {card} on the card",
   "mc.extra": "more this month: {list}",
@@ -1148,7 +1175,7 @@ const TEXT = {
   "tag.cheaper": "Cheaper",
   "tag.noDebt": "No debt",
 
-  "housing.kicker": "Day 1 · Rent is due",
+  "housing.kicker": "Step 1 of 4 · Where you live",
   "housing.title": "Where do you live?",
   "housing.sub": "Typical rent in {city}, with utilities. Heat costs more in winter.",
   "housing.oneBR": "1-bedroom",
@@ -1157,7 +1184,7 @@ const TEXT = {
   "housing.twoBR": "2-bedroom",
   "housing.twoBR.sub": "Your kid gets their own room.",
 
-  "care.kicker": "Day 1 · Your shift starts at 7",
+  "care.kicker": "Step 2 of 4 · Your shift starts at 7",
   "care.title": "Who watches your kid?",
   "care.sub": "Full-time care for a 4-year-old.",
   "care.center": "Licensed center",
@@ -1168,7 +1195,7 @@ const TEXT = {
   "care.ffn": "**Why not a relative?** Paid friends or family cost about **{mo}** a month. Free care only works if someone is free 40+ hours a week.",
   "care.shifts": "**{n} of your {total}** shifts a month pay for this.",
 
-  "transport.kicker": "Day 2 · Getting to work",
+  "transport.kicker": "Step 3 of 4 · Getting to work",
   "transport.title": "Car or bus?",
   "transport.car": "Keep your old car",
   "transport.car.sub": "Paid off. Gas, insurance, repairs.",
@@ -1180,7 +1207,7 @@ const TEXT = {
   "transport.home": "HOME",
   "transport.work": "WORK",
 
-  "basics.kicker": "Day 6 · Autopay",
+  "basics.kicker": "Step 4 of 4 · The basics",
   "basics.title": "These happen no matter what.",
   "basics.sub": "What the lowest-income households actually spend, on average. Clothes cost more in winter and at the holidays.",
   "basics.phone": "Cell phone service",
@@ -1246,10 +1273,14 @@ const TEXT = {
   "plan.skip": "skip meals",
   "plan.card": "put groceries on the card",
   "plan.rent": "pay rent late",
+  "plan.shelf": "go to a food shelf",
   "year.switch": "Change how you cover short months (now: {now})",
   "cut.switchTitle": "Change your plan",
   "cut.switchLead": "Right now, when food runs short you {now}. Starting in {month}, what will you do?",
   "cut.switched": "**Starting in {month}, you'll {how}** when food runs short. Earlier months stay as they were.",
+  "cut.shelf": "Go to a food shelf",
+  "cut.shelf.sub": "Free groceries, about 10 days' worth a month (two visits). Rules vary by shelf. The rest of the month, meals get skipped.",
+  "cut.yesShelf": "**You'll use a food shelf.** Two visits a month cover about 10 days of groceries. The other days, meals get skipped.",
   "cut.rent.short": "Late fees, then eviction.",
   "cut.care.short": "No daycare, no shift, no paycheck.",
   "cut.transport.short": "No ride, no shift, no paycheck.",
@@ -1593,11 +1624,11 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
   const tabMonth = seed % 12, G = CONFIG.gifts;
   let foodMode = choices && choices.food;                                         // "skip" | "card" | "rent": how a short month gets covered
   const foodFrom = (choices && choices.foodFrom) || {};                           // { month: mode }: changes the player made later in the year
-  let foodOnCard = foodMode === "card" || !!opts.foodOnCard, rentForFood = foodMode === "rent";
+  let foodOnCard = foodMode === "card" || !!opts.foodOnCard, rentForFood = foodMode === "rent", useShelf = foodMode === "shelf";
   const skipOnce = choices && choices.cutOnce;                                    // { type: "care" | "transport", m }: no daycare or no ride for one month = no shifts   // player chose to buy groceries on the card when short
   const months = [];
   for (let m = 0; m < CONFIG.year.months; m++) {
-    if (foodFrom[m]) { foodMode = foodFrom[m]; foodOnCard = foodMode === "card" || !!opts.foodOnCard; rentForFood = foodMode === "rent"; }
+    if (foodFrom[m]) { foodMode = foodFrom[m]; foodOnCard = foodMode === "card" || !!opts.foodOnCard; rentForFood = foodMode === "rent"; useShelf = foodMode === "shelf"; }
     const rec = { m, startCash: cash, startCard: card, startBehind: behind, events: [], refund: 0 };
     // 1) Paycheck (and tax refund in March)
     const skipped = skipOnce && skipOnce.m === m ? skipOnce.type : null;
@@ -1677,6 +1708,10 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
       rec.cardFood = Math.min(gap, room()); card += rec.cardFood; cardCharged += rec.cardFood; gap -= rec.cardFood;
       if (gap > 0.005 && !chargedOff) rec.cardMaxed = true;
     }
+    rec.shelfFood = 0;
+    if (useShelf && gap > 0.005) {               // two food shelf visits: about 10 days of groceries, free
+      rec.shelfFood = Math.min(gap, need * CONFIG.food.shelfDaysPerMonth / CONFIG.daysInMonth); gap -= rec.shelfFood;
+    }
     rec.rentFood = 0;
     if (rentForFood && gap > 0.005) {            // hold back part of the rent to buy groceries: it becomes unpaid rent, plus the late fee
       // Stops once you owe a full month: then the landlord can give the 30-day notice and file for eviction
@@ -1687,7 +1722,7 @@ function simulateYear(cityKey, c, startSavings, seed, choices, opts) {
     }
     rec.foodGap = gap;
     rec.mealsSkipped = Math.min(base.totalMeals, Math.round(rec.foodGap / base.perMeal));
-    rec.daysFed = Math.min(days, Math.floor((wicUsed + snapUsed + cashFood + rec.cardFood + rec.rentFood) / need * days));
+    rec.daysFed = Math.min(days, Math.floor((wicUsed + snapUsed + cashFood + rec.cardFood + rec.rentFood + rec.shelfFood) / need * days));
     // 5) Catch up on bills you were behind on, if money is left
     if (cash > 0 && behind > 0) { const p = Math.min(cash, behind); cash -= p; behind -= p; rec.behindPaid = p; }
     // 6) Pay down the card with cash beyond one month of groceries (a 22% card costs more than cash earns)
@@ -1841,6 +1876,10 @@ function t(key, vars, raw) {
 
 /* Line icons */
 const IC = {
+  snow: '<path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5"/><path d="M9 3.5 12 6l3-2.5M9 20.5 12 18l3 2.5"/>',
+  sprout: '<path d="M12 21v-8"/><path d="M12 13c0-4-3-6-7-6 0 4 3 6 7 6zM12 11c0-3 2.5-5.5 7-5.5 0 3.5-2.5 5.5-7 5.5z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  leaf: '<path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15H5z"/><path d="M5 19 14 10"/>',
   home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
   homeBig: '<path d="M2 11l10-7 10 7"/><path d="M4 10v10h16V10"/><path d="M8 13h3v3H8zM13 13h3v3h-3z"/>',
   kid: '<circle cx="12" cy="6" r="3"/><path d="M7 21v-5a5 5 0 0 1 10 0v5"/>',
@@ -1919,7 +1958,7 @@ function updateMeter() {
     else fp.hidden = true;
   } else {
     cp.hidden = true; $("foodPill").hidden = true;
-    $("day").textContent = `DAY ${DAY[S.screen] || 1} / ${CONFIG.daysInMonth}`;
+    $("day").textContent = `SETUP · ${Math.max(1, FLOW.indexOf(S.screen) + 1)} / 4`;
   }
   if (S.c.snap) { const s = S.y && S.y.noSnap ? 0 : path().snap; ebt.hidden = false; ebt.textContent = s > 0 ? t("meter.snap", { snap: fmt(s) }, true) : t("meter.noSnap", null, true); }
   else ebt.hidden = true;
@@ -2082,7 +2121,7 @@ function pathLadder() {
     evKeys.forEach((k) => (alt[k] = ch[k] === "card" ? "savings" : "card"));
     add(t("lad.emerg", null, true), t(onCard ? "lad.onCard" : "lad.cash", null, true), t(onCard ? "lad.cash" : "lad.onCard", null, true), run(null, alt));
   }
-  const FL = { card: "lad.foodCard", skip: "lad.foodSkip", rent: "lad.foodRent" }, FALT = { card: "skip", skip: "card", rent: "skip" };
+  const FL = { card: "lad.foodCard", skip: "lad.foodSkip", rent: "lad.foodRent", shelf: "lad.foodShelf" }, FALT = { card: "skip", skip: "card", rent: "skip", shelf: "skip" };
   if (ch.food) add(t("lad.short", null, true), t(FL[ch.food], null, true), t(FL[FALT[ch.food]], null, true), run(null, { food: FALT[ch.food] }));
   if (ch.cutOnce) add(t("lad.skipMonth", null, true), t(ch.cutOnce.type === "care" ? "lad.skipCare" : "lad.skipRide", null, true), t("lad.dontSkip", null, true), run(null, { cutOnce: null }));
   const cpKey = Object.keys(ch).find((k) => k.endsWith("-cp"));
@@ -2131,7 +2170,7 @@ function whatIfLab() {
     ${row("housing", t("wi.housing", null, true), [["oneBR", t("housing.oneBR", null, true)], ["twoBR", t("housing.twoBR", null, true)]])}
     ${row("care", t("wi.care", null, true), [["home", t("wi.home", null, true)], ["center", t("wi.center", null, true)]])}
     ${row("transport", t("wi.work", null, true), [["bus", t("wi.bus", null, true)], ["car", t("wi.car", null, true)]])}
-    ${row("food", t("wi.short", null, true), [["skip", t("wi.skip", null, true)], ["card", t("wi.cardF", null, true)], ["rent", t("wi.rent", null, true)]])}
+    ${row("food", t("wi.short", null, true), [["skip", t("wi.skip", null, true)], ["shelf", t("wi.shelf", null, true)], ["card", t("wi.cardF", null, true)], ["rent", t("wi.rent", null, true)]])}
     <div class="wi-out">
       <div><b class="${now.mealsSkipped ? "red" : "accent"}">${num(now.mealsSkipped)}</b><span>${t("wi.meals", null, true)} ${diff(dm, "", false)}</span></div>
       <div><b class="${debt(now) > 1 ? "red" : "accent"}">${fmt(debt(now))}</b><span>${t("wi.debt", null, true)} ${diff(dd, "", true)}</span></div>
@@ -2275,7 +2314,7 @@ const screens = {
           ${p.type === "refund" ? monthCard(r) : `<div class="note plain small">${t("refund.first")}</div>`}`;
       } else if (p.type === "cut") {
         if (y.cutPicked && y.switchedTo) body = `<div class="note" style="font-size:17px">${t("cut.switched", { month: MONTHS[Math.min(11, y.shown + 1)], how: t("plan." + y.switchedTo, null, true) })}</div>${monthCard(r)}`;
-        else if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t(S.y.choices.food === "card" ? "cut.yesCard" : S.y.choices.food === "rent" ? "cut.yesRent" : (S.y.noSnap ? "cut.yesNoSnap" : "cut.yes"), { limit: fmt(CONFIG.card.creditLimit) })}</div>${monthCard(r)}`;
+        else if (y.cutPicked) body = `<div class="note bad" style="font-size:17px">${t(S.y.choices.food === "card" ? "cut.yesCard" : S.y.choices.food === "rent" ? "cut.yesRent" : S.y.choices.food === "shelf" ? "cut.yesShelf" : (S.y.noSnap ? "cut.yesNoSnap" : "cut.yes"), { limit: fmt(CONFIG.card.creditLimit) })}</div>${monthCard(r)}`;
         else {
           const car = S.c.transport === "car", b = sim.base;
           const sw = !!y.switching;
@@ -2288,6 +2327,7 @@ const screens = {
             ${sw ? "" : opt({ act: "cut", val: "transport", ico: car ? "car" : "bus", title: t("cut.transport"), price: fmt(b.transport), sub: t("cut.transport.short") })}
             ${sw ? "" : opt({ act: "cut", val: "phone", ico: "phone", title: t("cut.phone"), price: "", sub: t("cut.phone.short") })}
             ${opt({ act: "cut", val: "card", ico: "card", title: t("cut.card"), price: "", sub: t("cut.card.sub", { apr: (CONFIG.card.apr * 100).toFixed(1) + "%" }) })}
+            ${opt({ act: "cut", val: "shelf", ico: "bag", title: t("cut.shelf"), price: "$0", sub: t("cut.shelf.sub") + cite("The Food Group, 2026") })}
             ${opt({ act: "cut", val: "food", ico: "plate", title: t("cut.food"), price: "", sub: t("cut.food.sub") })}
             </div>`;
         }
@@ -2310,7 +2350,7 @@ const screens = {
       }
     }
     return `<p class="kicker">${t(S.y.yearNum > 1 ? "year.kickerN" : "year.kicker", { city: CONFIG.cities[S.city].name, n: S.y.yearNum })}</p>
-      <h2>${MONTHS[curM]}</h2>
+      <div class="season s${[0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0][curM]}"><h2>${MONTHS[curM]}</h2><span class="schip">${icon(["snow", "sprout", "sun", "leaf"][[0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0][curM]])}${t("season." + [0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0][curM], null, true)}</span></div>
       ${S.y.noSnap ? "" : `<div class="note small">${t("year.withSnapMode", { snap: fmt(sim.base.snap + sim.base.wic) })}</div>`}
       <div class="ytrack">${track}</div>
       <p class="ylegend"><i class="ok"></i>${t("year.legendOk", null, true)} <i class="dip"></i>${t("year.legendDip", null, true)} <i class="bad"></i>${t("year.legendBad", null, true)}</p>
@@ -2556,6 +2596,8 @@ const screens = {
         <li>National Conference of State Legislatures. "State-Level Child Tax Credit" (state table, 2026). <a href="https://www.ncsl.org/human-services/child-tax-credit-overview" target="_blank" rel="noopener">ncsl.org</a></li>
         <li>Kiplinger. "States That Offer a Child Tax Credit." <a href="https://www.kiplinger.com/taxes/states-that-offer-a-child-tax-credit" target="_blank" rel="noopener">kiplinger.com</a></li>
         <li>U.S. Department of Labor, Wage and Hour Division. "Minimum Wage" (federal $7.25). <a href="https://www.dol.gov/agencies/whd/minimum-wage" target="_blank" rel="noopener">dol.gov</a></li>
+        <li>The Food Group. "Food Shelf Visits Hit All-Time High in 2025." Apr. 2026. <a href="https://www.thefoodgroupmn.org/food-shelf-visits-hit-all-time-high-in-2025/" target="_blank" rel="noopener">thefoodgroupmn.org</a></li>
+        <li>MPR News. "Minnesotans Make 9 Million Visits to Food Shelves in 2025." Mar. 18, 2026. <a href="https://www.mprnews.org/story/2026/03/18/minnesotans-made-9-million-visits-to-food-shelves-in-2025" target="_blank" rel="noopener">mprnews.org</a></li>
         <li>Comcast. "Internet Essentials." <a href="https://www.xfinity.com/learn/internet-service/internet-essentials" target="_blank" rel="noopener">xfinity.com</a></li>
         <li>Minnesota Driver and Vehicle Services. "Vehicle Fees" and "Registration Tax." <a href="https://dps.mn.gov/divisions/dvs/vehicle/vehicle-fees" target="_blank" rel="noopener">dps.mn.gov</a></li>
         <li>Minnesota Department of Revenue. <i>Tax Year 2025 Inflation-Adjusted Amounts in Minnesota Statutes</i> (renter's credit, Minn. Stat. 290.0693). <a href="https://revenue.state.mn.us/sites/default/files/2024-12/inflation-adjusted-amounts-2025.pdf" target="_blank" rel="noopener">revenue.state.mn.us</a></li>
@@ -2608,6 +2650,7 @@ const screens = {
         <p><b>Missed card payments:</b> bills are paid first. If there isn't enough left for the card's minimum, the payment is missed and a late fee goes on the card: $32 the first time, $43 for another within six months (the federal limits in force since a court struck down the $8 cap in April 2025). After 6 missed payments (180 days), banks close the card and charge it off; the debt goes to a collector and stays on a credit report for 7 years. In the game a closed card charges no more interest or fees and can't be used. Debt, interest and unpaid bills carry into the next year.</p>
         <p><b>Paycheck deductions:</b> Social Security and Medicare (7.65%) plus the employee half of Minnesota Paid Leave (0.88% of wages in 2026, split evenly by default; MN DEED) = 8.09%. In exchange, workers can take paid family and medical leave.</p>
         <p><b>WIC:</b> a 4-year-old qualifies for WIC until age 5, and SNAP or Medical Assistance makes the family income-eligible. The game counts the national average WIC food benefit, $64.71 a month (FY2025, USDA FNS), toward the food budget. WIC buys only set foods and needs an appointment to sign up.</p>
+        <p><b>Food shelf:</b> a choice when food runs short. Free groceries covering about 10 days a month. This is an estimate: there is no statewide figure for food per visit, so the game uses a Minnesota food shelf manager's description of "a good five-day supply" per visit and families coming twice a month (The Food Group, 2026), which fits The Food Group's finding that 83% of regular food shelf users visit more than once a month (MPR News, 2026). Rules vary by shelf. Minnesotans made a record 9 million food shelf visits in 2025.</p>
         <p><b>Cutting other bills:</b> on the "what do you cut?" screen, rent, child care and your ride take two taps. Paying rent late to buy food adds the unpaid amount and the 8% late fee to your unpaid bills. Skipping child care or your ride for a month means no shifts that month: you lose that month's pay and keep the bill's cost. You can't hold back more once you owe a full month of rent and bills, since a Minneapolis landlord can then give the 30-day notice and file for eviction; after that, meals get skipped. The game doesn't model being fired or evicted, so the real cost could be higher.</p>
         <p><b>Late rent:</b> if the lease allows it, a landlord can charge a late fee of up to 8% of the overdue rent (Minn. Stat. 504B.177); the game charges it once per late payment. In Minneapolis, a landlord must give 30 days' written notice before filing for eviction for unpaid rent (Minneapolis Code 244.2060).</p>
         <p><b>Year 2 and later:</b> prices and pay change by the most recent year-over-year change (Sept. 2025 to Sept. 2026, since BLS skipped Oct. 2025 during the government shutdown): rent +4.1% (Minneapolis CPI rent), child care +3.1% (U.S. CPI day care and preschool), groceries +2.1% (Minneapolis CPI food at home; SNAP and WIC follow food prices), everything else +3.6% (Minneapolis CPI), pay +3.8% (Minneapolis–St. Paul retail hourly earnings). Tax brackets and benefit income limits are kept at 2025–26 levels.</p>
@@ -2686,8 +2729,10 @@ function monthCard(r) {
   const ev0 = r.events[0], story = r.chargedOff ? t("st.closed", null, true)
     : r.skipped ? t(r.skipped === "care" ? "st.noCare" : "st.noRide", null, true)
     : r.refund ? t("st.refund", null, true)
-    : short && r.daysFed < 1 ? t(["st.empty", "st.empty2", "st.empty3"][r.m % 3], null, true)
-    : short ? t(["st.runsOut", "st.runsOut2"][r.m % 2], { day: r.daysFed }, true)
+    : short && r.daysFed < 1 && !(r.shelfFood > 0.5) ? t(["st.empty", "st.empty2", "st.empty3"][r.m % 3], null, true)
+    : short && !(r.shelfFood > 0.5) ? t(["st.runsOut", "st.runsOut2"][r.m % 2], { day: r.daysFed }, true)
+    : r.shelfFood > 0.5 && short ? t("st.shelfShort", null, true)
+    : r.shelfFood > 0.5 ? t("st.shelf", null, true)
     : r.rentFood > 0.5 ? t("st.rentFood", null, true)
     : r.cardFood > 0.5 ? t("st.cardFood", null, true)
     : ev0 ? t("st.event", { what: t("ev." + ev0.id + ".short", null, true).toLowerCase() }, true)
@@ -2708,6 +2753,7 @@ function monthCard(r) {
     ${r.behindPaid ? ln(t("mc.catchup", null, true), "−" + fmt(r.behindPaid)) : ""}
     ${fees > 0 ? ln(`<span class="red">${t("mc.fees", null, true)}</span>`, `<span class="red">+${fmt(fees)}</span>`) : ""}
     ${r.cardFood > 0.5 ? ln(`<span class="red">${t("mc.cardFood", null, true)}</span>`, `<span class="red">${fmt(r.cardFood)}</span>`) : ""}
+    ${r.shelfFood > 0.5 ? ln(t("mc.shelf", null, true), `<span class="accent">${fmt(r.shelfFood)}</span>`) : ""}
     ${r.rentCapped ? ln(`<span class="red">${t("mc.rentCapped", null, true)}</span>`, "") : ""}
     ${r.rentFood > 0.5 ? ln(`<span class="red">${t("mc.rentFood", null, true)}</span>`, `<span class="red">${fmt(r.rentFood)}</span>`) : ""}
     ${r.behindAdded > 0.5 ? ln(`<span class="red">${t("mc.behind", null, true)}</span>`, `<span class="red">${fmt(r.behindAdded)}</span>`) : ""}
@@ -2822,9 +2868,9 @@ document.addEventListener("click", async (e) => {
       S.y.choices.cutOnce = { type: val, m: S.y.shown };   // one month without daycare or a ride: no shifts that month
       return yRender();
     }
-    if (val !== "food" && val !== "card") return cutNo(b, val);
+    if (val !== "food" && val !== "card" && val !== "shelf") return cutNo(b, val);
     locked = true; b.classList.add("picked"); buzz(15); await wait(400); locked = false;
-    setFoodPlan(val === "card" ? "card" : "skip"); return yRender();
+    setFoodPlan(val === "card" ? "card" : val === "shelf" ? "shelf" : "skip"); return yRender();
   }
   if (act === "savings") {
     locked = true; buzz(15); await wait(200); locked = false;

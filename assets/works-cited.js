@@ -166,5 +166,9 @@ window.WORKS_CITED = [
 
   { "text":"\"States That Offer a Child Tax Credit.\" *Kiplinger*, www.kiplinger.com/taxes/states-that-offer-a-child-tax-credit. Accessed 27 Nov. 2026.","url":"https://www.kiplinger.com/taxes/states-that-offer-a-child-tax-credit","usedIn":"Game (Minnesota has one of the largest state child tax credits)" },
 
-  { "text":"U.S. Department of Labor, Wage and Hour Division. \"Minimum Wage.\" www.dol.gov/agencies/whd/minimum-wage. Accessed 27 Nov. 2026.","url":"https://www.dol.gov/agencies/whd/minimum-wage","usedIn":"Game (federal minimum wage: $7.25)" }
+  { "text":"U.S. Department of Labor, Wage and Hour Division. \"Minimum Wage.\" www.dol.gov/agencies/whd/minimum-wage. Accessed 27 Nov. 2026.","url":"https://www.dol.gov/agencies/whd/minimum-wage","usedIn":"Game (federal minimum wage: $7.25)" },
+
+  { "text":"\"Food Shelf Visits Hit All-Time High in 2025.\" *The Food Group*, 8 Apr. 2026, www.thefoodgroupmn.org/food-shelf-visits-hit-all-time-high-in-2025/.","url":"https://www.thefoodgroupmn.org/food-shelf-visits-hit-all-time-high-in-2025/","usedIn":"Game (food shelf: 9 million visits; about a five-day supply per visit, often twice a month)" },
+
+  { "text":"\"Minnesotans Make 9 Million Visits to Food Shelves in 2025.\" *MPR News*, 18 Mar. 2026, www.mprnews.org/story/2026/03/18/minnesotans-made-9-million-visits-to-food-shelves-in-2025.","url":"https://www.mprnews.org/story/2026/03/18/minnesotans-made-9-million-visits-to-food-shelves-in-2025","usedIn":"Game (83% of regular food shelf users visit more than once a month)" }
 ];
