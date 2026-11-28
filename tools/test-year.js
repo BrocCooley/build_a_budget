@@ -129,5 +129,28 @@ for (const housing of ["oneBR", "twoBR"]) for (const care of ["home", "center"])
   check(noAid.pctHungry === 100, `${housing}/${care}/${transport} without SNAP and WIC should skip meals every year (claim on the bottom line)`);
 }
 
+// 12) Cutting other bills: paying rent late to eat, or skipping a month of child care / a ride
+{
+  const c = { housing: "oneBR", care: "home", transport: "car" }, base = { "11-g": "skip", "2-cp": "pay", "9-cp": "pay" };
+  const opt = { policy: ctx.defaultPolicy, noSnap: true };
+  const skipY = simulateYear("minneapolis", c, 0, 4242, Object.assign({ food: "skip" }, base), opt);
+  const rentY = simulateYear("minneapolis", c, 0, 4242, Object.assign({ food: "rent" }, base), opt);
+  check(rentY.mealsSkipped < skipY.mealsSkipped, "paying rent late should mean fewer skipped meals");
+  check(rentY.months.some((r) => r.rentFood > 0 && r.rentLateFee >= r.rentFood * 0.08 - 0.01), "rent held back for food should get the 8% late fee");
+  check(rentY.months.every((r) => r.rentFood <= rentY.base.housing + 0.01), "can't hold back more than the rent");
+  const careY = simulateYear("minneapolis", c, 0, 4242, Object.assign({ food: "skip", cutOnce: { type: "care", m: 0 } }, base), opt);
+  check(careY.months[0].pay === 0 && careY.netWorth < skipY.netWorth, "skipping child care should cost a month's pay and leave you worse off");
+  console.log(`CUT OTHER BILLS: skip meals ${skipY.mealsSkipped} meals / ${$(skipY.card + skipY.behind)} debt; pay rent late ${rentY.mealsSkipped} meals / ${$(rentY.card + rentY.behind)} debt; skip a month of child care: net ${$(careY.netWorth)} vs ${$(skipY.netWorth)}.`);
+}
+
+// 13) Changing the food plan mid-year only changes later months
+{
+  const c = { housing: "twoBR", care: "center", transport: "car" }, opt = { policy: ctx.defaultPolicy, noSnap: true };
+  const a = simulateYear("minneapolis", c, 0, 4242, { food: "skip", "11-g": "skip" }, opt);
+  const b = simulateYear("minneapolis", c, 0, 4242, { food: "skip", foodFrom: { 5: "card" }, "11-g": "skip" }, opt);
+  check(a.months.slice(0, 5).every((r, i) => r.mealsSkipped === b.months[i].mealsSkipped && Math.abs(r.endCash - b.months[i].endCash) < 0.01), "a plan change in June should not change January-May");
+  check(b.months.slice(5).some((r) => r.cardFood > 0) && b.months.slice(0, 5).every((r) => !r.cardFood), "groceries go on the card only from June on");
+}
+
 console.log(fails ? `\n${fails} FAILURES` : "\nAll checks passed.");
 process.exit(fails ? 1 : 0);
